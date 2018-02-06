@@ -67,6 +67,56 @@ public class Abalone extends Game {
         
     }
 
+    public boolean move(int x1, int y1, int x2, int y2, Dir dir) {
+        boolean moveSuccess = false;
+        
+        // check move is in bounds and direction is not null
+        if (!checkValidMoveInput(x1, y1, x2, y2, dir)) {
+            return false;
+        }
+        
+        // get pieces between coordinates. they must all be friendly and there
+        // must be no more than 3 pieces, otherwise null is returned and function
+        // exits with false
+        ArrayList<AbalonePiece> pieces = getPieces(x1, y1, x2, y2);
+        if (pieces == null) {
+            return false;
+        }
+        
+        // get squares to move to 
+        ArrayList<AbaloneSquare> toSquares = new ArrayList<AbaloneSquare>();
+        for (AbalonePiece piece : pieces) {
+            if (piece != null) {
+                int x = ((AbaloneSquare)piece.getPosition()).x + dir.dx;
+                int y = ((AbaloneSquare)piece.getPosition()).y + dir.dy;
+                toSquares.add(getSquare(x,y));
+            }
+        }
+        
+        // squares you're moving to cannot be occupied by friendlies
+        if (!this.checkSquaresOccupiedByFriendly(pieces, toSquares)) {
+            for (int i = 0; i < Math.min(pieces.size(), toSquares.size()); i++) {
+                movePiece(pieces.get(i), toSquares.get(i));
+                moveSuccess = true;
+            }
+        }
+        
+
+        int numberOfPieces = pieces.size();
+    
+        return moveSuccess;
+    }
+    
+    private boolean checkValidMoveInput(int x1, int y1, int x2, int y2, Dir dir) {
+        if (dir == null) {
+            return false;
+        }
+        if (!inBounds(x1,y1) || !inBounds(x2,y2)) {
+            return false;
+        }
+        return true;
+    }
+    
     private boolean processInput(String input) {
         String[] parsed = input.split(" ");
         int x1 = Integer.parseInt(parsed[0]);
@@ -82,27 +132,28 @@ public class Abalone extends Game {
         return move(x1, y1, x2, y2, dir);
     }
     
-    AbaloneSquare getSquare(int x, int y) {
+    private AbaloneSquare getSquare(int x, int y) {
         if (!inBounds(x, y)) {
             return null;
         }
         return squares[y][x];
     }
 
-    void movePiece(GamePiece piece, GamePosition pos) {
+    private void movePiece(GamePiece piece, GamePosition pos) {
         if (piece != null) {
             if (pos == null) {
                 piece.remove();
+                System.out.println("piece out");
             }
             piece.move(pos);
         }
     }
-    
-    boolean inBounds(int x, int y) {
+
+    private boolean inBounds(int x, int y) {
         return (x > 0 || x < 8) || (y > 0 || y < 8);
     }
     
-    AbalonePiece getPiece(int x, int y) {
+    private AbalonePiece getPiece(int x, int y) {
         if (!inBounds(x, y)) {
             return null;
         }
@@ -121,9 +172,12 @@ public class Abalone extends Game {
         int ddx = getIncrement(dx);
         int ddy = getIncrement(dy);
         if (dx > 2 || dy > 2 || dx < -2 || dy < -2) {
-            return result;
+            return null;
         }
-        for (int i = 0; i <= Math.max(Math.abs(dx), Math.abs(dy)); i++) {            
+        for (int i = 0; i <= Math.max(Math.abs(dx), Math.abs(dy)); i++) {
+            if (getPiece(x1 + ddx * i, y1 + ddy * i) == null) {
+                return null;
+            }
             result.add(getPiece(x1 + ddx * i, y1 + ddy * i));
         }
         
@@ -140,38 +194,12 @@ public class Abalone extends Game {
         }
     }
     
-    public boolean move(int x1, int y1, int x2, int y2, Dir dir) {
-        if (dir == null) {
-            return false;
-        }
-        if (!inBounds(x1,y1) || !inBounds(x2,y2)) {
-            return false;
-        }
-        boolean moveSuccess = false;
-        ArrayList<AbalonePiece> pieces = getPieces(x1, y1, x2, y2);
-        ArrayList<AbaloneSquare> squares = new ArrayList<AbaloneSquare>();
-        for (AbalonePiece piece : pieces) {
-            if (piece != null) {
-                int x = ((AbaloneSquare)piece.getPosition()).x + dir.dx;
-                int y = ((AbaloneSquare)piece.getPosition()).y + dir.dy;
-                squares.add(getSquare(x,y));
-                moveSuccess = true;
-            }
-        }
-        if (this.checkSquaresOccupiedByFriendly(squares)) {
-            for (int i = 0; i < pieces.size(); i++) {
-                pieces.get(i).move(squares.get(i));
-            }
-        }
-
-        
-        return moveSuccess;
-    }
-    
-    private boolean checkSquaresOccupiedByFriendly(ArrayList<AbaloneSquare> squares) {
+    private boolean checkSquaresOccupiedByFriendly(ArrayList<AbalonePiece> pieces, ArrayList<AbaloneSquare> squares) {
         for (AbaloneSquare sq : squares) {
-            if (sq.containsFriendly(getCurPlayer())) {
-                return true;
+            if (sq != null) {
+                if (sq.containsFriendly(getCurPlayer()) && !pieces.contains(sq.getPiece())) {
+                    return true;
+                }
             }
         }
         return false;
