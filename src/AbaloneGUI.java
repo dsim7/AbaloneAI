@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -48,15 +49,17 @@ public class AbaloneGUI extends JPanel implements GameGUI {
     @Override
     public void updateGUI() {
         info.updateInfo();
+        repaint();
+        revalidate();
     }
     
     
 class AbaloneGUIInfoPanel extends JPanel {
         
-        JLabel player1 = new JLabel("Player 1                ");
-        JLabel player2 = new JLabel("Player 2                ");
-        JLabel time1 = new JLabel("0               ");
-        JLabel time2 = new JLabel("0               ");
+        JLabel player1 = new JLabel("Player 1");
+        JLabel player2 = new JLabel("Player 2");
+        JLabel time1 = new JLabel("0");
+        JLabel time2 = new JLabel("0");
         JLabel outs1 = new JLabel("0");
         JLabel outs2 = new JLabel("0");
         JLabel turns = new JLabel("0");
@@ -83,12 +86,12 @@ class AbaloneGUIInfoPanel extends JPanel {
             turns.setForeground(Color.WHITE);
             
             JPanel p1 = new JPanel();
-            p1.setLayout(new FlowLayout());
+            p1.setLayout(new GridLayout());
             p1.setBackground(Color.BLACK);
             p1.setPreferredSize(new Dimension(400,100));
             
             JPanel p2 = new JPanel();
-            p2.setLayout(new FlowLayout());
+            p2.setLayout(new GridLayout());
             p2.setBackground(Color.BLACK);
             p2.setPreferredSize(new Dimension(400,100));
             
@@ -109,11 +112,17 @@ class AbaloneGUIInfoPanel extends JPanel {
             center.add(turns);
         }
         
-        void updateInfo() {
+        private void updateInfo() {
             outs1.setText("" + ((AbalonePlayer) (getGame().getPlayers().get(0))).outs);
             outs2.setText("" + ((AbalonePlayer) (getGame().getPlayers().get(1))).outs);
-            time1.setText("" + ((AbalonePlayer) (getGame().getPlayers().get(0))).timeTaken);
-            time2.setText("" + ((AbalonePlayer) (getGame().getPlayers().get(1))).timeTaken);
+            time1.setText("" + Abalone.FORMAT.format(((AbalonePlayer) (getGame().getPlayers().get(0))).timeTaken));
+            time2.setText("" + Abalone.FORMAT.format(((AbalonePlayer) (getGame().getPlayers().get(1))).timeTaken));
+        }
+        
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            updateInfo();
         }
         
 

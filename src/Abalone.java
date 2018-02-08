@@ -1,9 +1,13 @@
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
+import javax.swing.Timer;
 
 import game.Game;
 import game.GamePiece;
@@ -17,10 +21,36 @@ public class Abalone extends Game {
     static final Color P1_COLOR = Color.RED;
     static final Color P2_COLOR = Color.BLUE;
     static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
-    
-    Scanner console = new Scanner(System.in);
+    static final DecimalFormat FORMAT = new DecimalFormat(".#");
+
     int turns = 0;
+    Scanner console = new Scanner(System.in);
     AbaloneSquare[][] squares = new AbaloneSquare[9][9];
+
+    ActionListener p1timerTick = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            player1.timeTaken += 0.1;
+            player1.getGUI().updateGUI();
+            player2.getGUI().updateGUI();
+        }
+        
+    };
+    Timer p1timer = new Timer(100, p1timerTick);
+    ActionListener p2timerTick = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            player2.timeTaken += 0.1;
+            player1.getGUI().updateGUI();
+            player2.getGUI().updateGUI();
+        }
+        
+    };
+    Timer p2timer = new Timer(100, p2timerTick);
+    
+    AbalonePlayer player1 = new AbalonePlayer(P1_COLOR, this);
+    AbalonePlayer player2 = new AbalonePlayer(P2_COLOR, this);
+    
     
     public static void main(String[] args) {
         new Abalone();
@@ -29,16 +59,18 @@ public class Abalone extends Game {
     @Override
     public void nextPlayerTurn() {
         super.nextPlayerTurn();
+        startStopTimers();
         turns++;
+        player1.getGUI().updateGUI();
+        player2.getGUI().updateGUI();
+        
     }
     
     public Abalone() {
-        AbalonePlayer player1 = new AbalonePlayer(P1_COLOR, this);
-        AbalonePlayer player2 = new AbalonePlayer(P2_COLOR, this);
         this.addPlayer(player1);
         this.addPlayer(player2);
         this.initSquares();
-        this.initPiecesGermanDaisy();
+        this.initPiecesStandard();
         
         JFrame frame1 = new JFrame();
         frame1.setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -57,13 +89,23 @@ public class Abalone extends Game {
         frame2.add(new AbaloneGUI(this, player2));
 
         //this.move(2, 2, 2, 0, Dir.UL);
+
+        p1timer.setRepeats(true);
+        p2timer.setRepeats(true);
+        p1timer.start();
+        //p2timer.start();
+        
         while (console.hasNextLine()) {
-            this.processInput(console.nextLine());
+            if (this.processInput(console.nextLine())) {
+                nextPlayerTurn();
+                System.out.println("Player turn: " + getCurPlayer());
+            }
             frame1.repaint();
             frame1.revalidate();
             frame2.repaint();
             frame2.revalidate();
         }
+        
         
     }
 
@@ -94,17 +136,52 @@ public class Abalone extends Game {
         }
         
         // squares you're moving to cannot be occupied by friendlies
-        if (!this.checkSquaresOccupiedByFriendly(pieces, toSquares)) {
-            for (int i = 0; i < Math.min(pieces.size(), toSquares.size()); i++) {
-                movePiece(pieces.get(i), toSquares.get(i));
-                moveSuccess = true;
-            }
+        if (this.checkSquaresOccupiedByFriendly(pieces, toSquares)) {
+            return false;
         }
         
-
-        int numberOfPieces = pieces.size();
+        // pushing move
+        if (!inlineMove(x1, y1, x2, y2, dir)) {
+            int numberOfPieces = pieces.size();
+        } else {
+            
+        }
     
+        
+        for (int i = 0; i < Math.min(pieces.size(), toSquares.size()); i++) {
+            movePiece(pieces.get(i), toSquares.get(i));
+            moveSuccess = true;
+        }
         return moveSuccess;
+    }
+    
+    private void startStopTimers() {
+        if (p1timer.isRunning()) {
+            p1timer.stop();
+            p2timer.start();
+        } else {
+            p2timer.stop();
+            p1timer.start();
+        }
+    }
+
+    private boolean inlineMove(int x1, int y1, int x2, int y2, Dir dir) {
+        if ((x1 == x2) && (y1 != y2)) {
+             if (dir == Dir.UL || dir == Dir.DR) {
+                 return true;
+             }
+        }
+        if ((x1 != x2) && (y1 == y2)) {
+            if (dir == Dir.L || dir == Dir.R) {
+                return true;
+            }
+        }
+        if ((x1 != x2) && (y1 != y2)) {
+            if (dir == Dir.UR || dir == Dir.DL) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private boolean checkValidMoveInput(int x1, int y1, int x2, int y2, Dir dir) {
@@ -144,6 +221,7 @@ public class Abalone extends Game {
             if (pos == null) {
                 piece.remove();
                 System.out.println("piece out");
+                ((AbalonePlayer)piece.getOwner()).outs++;
             }
             piece.move(pos);
         }
@@ -154,7 +232,7 @@ public class Abalone extends Game {
     }
     
     private AbalonePiece getPiece(int x, int y) {
-        if (!inBounds(x, y)) {
+        if (squares[x][y] == null) {
             return null;
         }
         return (AbalonePiece)((AbaloneSquare)squares[y][x]).getPiece();
@@ -175,7 +253,8 @@ public class Abalone extends Game {
             return null;
         }
         for (int i = 0; i <= Math.max(Math.abs(dx), Math.abs(dy)); i++) {
-            if (getPiece(x1 + ddx * i, y1 + ddy * i) == null) {
+            if (getPiece(x1 + ddx * i, y1 + ddy * i) == null ||
+                    getPiece(x1 + ddx * i, y1 + ddy * i).getOwner() != getCurPlayer()) {
                 return null;
             }
             result.add(getPiece(x1 + ddx * i, y1 + ddy * i));
