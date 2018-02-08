@@ -20,13 +20,10 @@ import game.GamePiece;
 import game.GamePlayer;
 
 public class AbaloneGUI extends JPanel implements GameGUI {
-    
-
     private AbaloneGUIInfoPanel info = new AbaloneGUIInfoPanel();
     private Abalone ab;
     private GamePlayer player;
 
-    
     AbaloneGUI(Abalone ab, GamePlayer player) {
         this.ab = ab;
         this.player = player;
@@ -53,7 +50,7 @@ public class AbaloneGUI extends JPanel implements GameGUI {
         revalidate();
     }
     
-    
+// panel containing statistics of the game
 class AbaloneGUIInfoPanel extends JPanel {
         
         JLabel player1 = new JLabel("Player 1");
@@ -112,11 +109,13 @@ class AbaloneGUIInfoPanel extends JPanel {
             center.add(turns);
         }
         
+        // update statistics with the most recent information
         private void updateInfo() {
             outs1.setText("" + ((AbalonePlayer) (getGame().getPlayers().get(0))).outs);
             outs2.setText("" + ((AbalonePlayer) (getGame().getPlayers().get(1))).outs);
             time1.setText("" + Abalone.FORMAT.format(((AbalonePlayer) (getGame().getPlayers().get(0))).timeTaken));
             time2.setText("" + Abalone.FORMAT.format(((AbalonePlayer) (getGame().getPlayers().get(1))).timeTaken));
+            turns.setText("" + ((Abalone) getGame()).getTurns());
         }
         
         @Override
@@ -129,6 +128,7 @@ class AbaloneGUIInfoPanel extends JPanel {
     }
 
     
+    // panel containing the hexagonal board
     class AbaloneGUIGrid extends JPanel {
     AbaloneGUIGrid() {
         this.setBackground(Color.BLACK);
@@ -140,6 +140,7 @@ class AbaloneGUIInfoPanel extends JPanel {
 }
 
 
+    // a strip represents one row of squares on the board
     class AbaloneGUIGridStrip extends JPanel {
         AbaloneGUIGridStrip(AbaloneSquare[] strip) {
             this.setBackground(Color.BLACK);
@@ -152,6 +153,7 @@ class AbaloneGUIInfoPanel extends JPanel {
             
         }
         
+        // represents a single square
         class AbaloneGUISquare extends JPanel {
             AbaloneSquare square;
             Color color;
@@ -196,8 +198,6 @@ class AbaloneGUIInfoPanel extends JPanel {
             }
 
             private class Listener implements MouseListener {
-
-
                 @Override
                 public void mouseClicked(MouseEvent arg0) {
                     // TODO Auto-generated method stub
@@ -230,12 +230,46 @@ class AbaloneGUIInfoPanel extends JPanel {
                     
                     AbaloneGUI.this.repaint();
                     */
+                    if (ab.selection1[0] == -1) {
+                        ab.selection1[0] = square.x;
+                        ab.selection1[1] = square.y;
+                        System.out.println("Selection 1: " + square.x + " " + square.y);
+                    } else if (ab.selection2[0] == -1) {
+                        ab.selection2[0] = square.x;
+                        ab.selection2[1] = square.y;
+                        System.out.println("Selection 2: " + square.x + " " + square.y);
+                    } else if (ab.directionSelection == null) {
+                        System.out.println("Destination 2: " + square.x + " " + square.y);
+                        ab.directionSelection = getDirection();
+                        ab.move(ab.selection1[0],
+                                ab.selection1[1],
+                                ab.selection2[0],
+                                ab.selection2[1],
+                                ab.directionSelection);
+                        System.out.println("Direction: " + ab.directionSelection);
+                        ab.clearSelection();
+                    }
                 }
 
                 @Override
                 public void mouseReleased(MouseEvent arg0) {
                     // TODO Auto-generated method stub
                     
+                }
+                
+                private Abalone.Dir getDirection() {
+                    
+                    int dx = square.x - ab.selection2[0];
+                    int dy = square.y - ab.selection2[1];
+                    System.out.println("" + dx);
+                    System.out.println("" + dy);
+                    for (Abalone.Dir dir : Abalone.Dir.values()) {
+                        System.out.println(dir + " " + dir.dx + " " + dir.dy);
+                        if (dir.dx == dx && dir.dy == dy) {
+                            return dir;
+                        }
+                    }
+                    return null;
                 }
                 
             }
