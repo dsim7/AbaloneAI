@@ -498,8 +498,6 @@ public class Abalone extends Game {
         p1timer.stop();
         p2timer.stop();
         maxTurnTimer.stop();
-        ((AbalonePlayer)getPlayers().get(0)).timeTaken = 0;
-        ((AbalonePlayer)getPlayers().get(1)).timeTaken = 0;
         lastRunningTimer = p1timer;
         gameRunning = false;
         gameStarted = false;
