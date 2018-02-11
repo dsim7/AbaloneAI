@@ -14,6 +14,9 @@ import game.GamePiece;
 import game.GamePosition;
 
 public class Abalone extends Game {
+    static final int PVP = 0;
+    static final int PVC = 1;
+    static final int CVC = 2;
     static final int FRAME_WIDTH = 1000;
     static final int FRAME_HEIGHT = 1000;
     static final Color P1_COLOR = Color.RED;
@@ -21,6 +24,8 @@ public class Abalone extends Game {
     static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
     static final DecimalFormat FORMAT = new DecimalFormat(".#");
     private int turns = 0;
+    private int maxTurns = 0;
+    private double maxTimePerTurn = 0;
     private Scanner console = new Scanner(System.in);
     AbaloneSquare[][] squares = new AbaloneSquare[9][9];
     private ActionListener p1timerTick = new ActionListener() {
@@ -47,6 +52,11 @@ public class Abalone extends Game {
     int[] selection1 = {-1, -1};
     int[] selection2 = {-1, -1};
     private boolean gameRunning = false;
+    private boolean gameStarted = false;
+    private double timeAtTurnStart = 0;
+    private AbaloneMove moveThisTurn;
+    private boolean settingTurns = false;
+    private boolean settingTimePerTurn = false;
     Dir directionSelection;
     
     public static void main(String[] args) {
@@ -56,11 +66,50 @@ public class Abalone extends Game {
     // switches the current player of the game;
     @Override
     public void nextPlayerTurn() {
+        printTurnInfo();
         super.nextPlayerTurn();
+        updateTimeAtTurnStart();
         switchTimers();
         turns++;
         updateGUIs();
         
+        // ai
+        AbalonePlayer player = (AbalonePlayer) getCurPlayer();
+        if (player.isAI) {
+            AbaloneMove move = player.ai.getNextMove(squares);
+            if (move != null) {
+                executeAIMove(move);
+            }
+        }
+        
+        
+    }
+    
+    private boolean executeAIMove(AbaloneMove move) {
+        return true;
+    }
+    
+    private void printTurnInfo() {
+        if (moveThisTurn != null) {
+            System.out.println("Player " + (getPlayers().indexOf(getCurPlayer()) + 1) + 
+                    ": " + moveThisTurn.x1 + 
+                    "," + moveThisTurn.y1 +
+                    " to " + moveThisTurn.x2 + 
+                    "," + moveThisTurn.y2 + 
+                    " moving " + moveThisTurn.direction + 
+                    " in " + FORMAT.format(getDeltaTime()) + "s");
+        }
+    }
+    
+    // get the time that has elapsed this turn
+    private double getDeltaTime() {
+        return ((AbalonePlayer)getCurPlayer()).timeTaken - timeAtTurnStart;
+        
+    }
+    
+    // sets timeAtTurnStart to the current time taken by the current player
+    private void updateTimeAtTurnStart() {
+        timeAtTurnStart = ((AbalonePlayer)getCurPlayer()).timeTaken;
     }
     
     // constructor which initializes the board and begins listening for user input
@@ -90,19 +139,21 @@ public class Abalone extends Game {
     // or if the input coordinates are out of bounds or do not exist
     // or if the direction given is null
     // or if there is an invalid selection of pieces between coordinates given
-    // or if the the destination squares are out of bounds or do not exist
+    // or if the the destination squares are not available to be occupied
+    // or if an attempted push fails.
+    // switches turns on a successful move
     public boolean move(int x1, int y1, int x2, int y2, Dir dir) {
         boolean moveSuccess = false;
         
         // game running
         if (!gameRunning) {
-            System.out.println("Game not running");
+            System.out.println("Game has not started");
             return false;
         }
         
         // check move is in bounds and direction is not null
         if (!checkValidMoveInput(x1, y1, x2, y2, dir)) {
-            System.out.println("out of bounds");
+            //System.out.println("out of bounds or direction null");
             return false;
         }
         
@@ -111,7 +162,7 @@ public class Abalone extends Game {
         // exits with false
         ArrayList<AbalonePiece> pieces = getPieces(x1, y1, x2, y2);
         if (pieces == null) {
-            System.out.println("invalid pieces");
+            //System.out.println("invalid pieces");
             return false;
         }
         
@@ -120,7 +171,7 @@ public class Abalone extends Game {
         
         // squares you're moving to cannot be occupied by friendlies
         if (this.checkSquaresOccupiedByFriendly(pieces, toSquares)) {
-            System.out.println("friendlies in destination");
+            //System.out.println("friendlies in destination");
             return false;
         }
         
@@ -136,6 +187,7 @@ public class Abalone extends Game {
 
         // Next player turn
         if (moveSuccess) {
+            this.moveThisTurn = new AbaloneMove(x1, y1, x2, y2, dir);
             nextPlayerTurn();
         }
         return moveSuccess;
@@ -144,7 +196,7 @@ public class Abalone extends Game {
     // processes input from System.in
     private boolean processInput(String input) {
         String lowerInput = input.toLowerCase();
-        
+        System.out.println(lowerInput);
         if (lowerInput.equals("reset")) {
             clearBoard();
             stopTimers();
@@ -152,20 +204,14 @@ public class Abalone extends Game {
             return true;
         } else if (lowerInput.equals("standard")) {
             clearBoard();
-            stopTimers();
-            resetTurns();
             initPiecesStandard();
             return true;
         } else if (lowerInput.equals("belgian")) {
             clearBoard();
-            stopTimers();
-            resetTurns();
             initPiecesBelgianDaisy();
             return true;
         } else if (lowerInput.equals("german")) {
             clearBoard();
-            stopTimers();
-            resetTurns();
             initPiecesGermanDaisy();
             return true;
         } else if (lowerInput.equals("pause")) {
@@ -174,35 +220,100 @@ public class Abalone extends Game {
         } else if (lowerInput.equals("resume") || lowerInput.equals("start")) {
             resumeTimers();
             return true;
+        } else if (lowerInput.equals("pvp")) {
+            setAI(PVP);
+        } else if (lowerInput.equals("pvc")) {
+            setAI(PVC);
+        } else if (lowerInput.equals("cvc")) {
+            setAI(CVC);
+        } else if (lowerInput.equals("redfirst")) {
+            setRedGoesFirst(true);
+        } else if (lowerInput.equals("bluefirst")) {
+            setRedGoesFirst(false);
+        } else if (lowerInput.equals("turns")) {
+            System.out.println("Set number of Turns");
+            settingTurns = true;
+        } else if (lowerInput.equals("time")) {
+            System.out.println("Set Time per turn");
+            settingTimePerTurn = true;
         } else {
-            /*
-            int x1, y1, x2, y2;
-            String[] parsed = input.split(" ");
             try {
-                x1 = Integer.parseInt(parsed[0]);
-                y1 = Integer.parseInt(parsed[1]);
-                x2 = Integer.parseInt(parsed[2]);
-                y2 = Integer.parseInt(parsed[3]);
-            } catch (NumberFormatException ex) {
-                return false;
-            }
-            
-            Dir dir = null;
-            for (Dir direction : Dir.values()) {
-                if (direction.name.equals(input.trim())) {
-                    dir = direction;
+                int intinput = Integer.parseInt(lowerInput);
+                if (settingTurns) {
+                    maxTurns = intinput;
+                    System.out.println("Max Turns: " + maxTurns);
+                } else if (settingTimePerTurn) {
+                    maxTimePerTurn = intinput;
+                    System.out.println("Max Time Per Turn: " + maxTimePerTurn);
                 }
+            } catch (Exception e) {
+                System.out.println("Invalid number");
             }
-            System.out.println("!! " + selection1[0] + " " + selection1[0] + " " + selection2[0] + " " + selection2[1] + " "  + dir);
-            
-            boolean result = move(selection1[0], selection1[1], selection2[0], selection2[1], dir);
-            clearSelection();
-            return result;
-            */
+            settingTurns = false;
+            settingTimePerTurn = false;
         }
         return false;
     }
+    
 
+    /*
+    int x1, y1, x2, y2;
+    String[] parsed = input.split(" ");
+    try {
+        x1 = Integer.parseInt(parsed[0]);
+        y1 = Integer.parseInt(parsed[1]);
+        x2 = Integer.parseInt(parsed[2]);
+        y2 = Integer.parseInt(parsed[3]);
+    } catch (NumberFormatException ex) {
+        return false;
+    }
+    
+    Dir dir = null;
+    for (Dir direction : Dir.values()) {
+        if (direction.name.equals(input.trim())) {
+            dir = direction;
+        }
+    }
+    System.out.println("!! " + selection1[0] + " " + selection1[0] + " " + selection2[0] + " " + selection2[1] + " "  + dir);
+    
+    boolean result = move(selection1[0], selection1[1], selection2[0], selection2[1], dir);
+    clearSelection();
+    return result;
+    */
+
+    // if the game has not started, determines whether red will move first or not
+    private void setRedGoesFirst(boolean b) {
+        if (!gameStarted) {
+            if (!b) {
+                this.setCurPlayer(getPlayers().get(1));
+            } else {
+                this.setCurPlayer(getPlayers().get(0));
+            }
+        }
+    }
+    
+    // sets whether it is PVP, PVC, or CVC
+    private void setAI(int x) {
+        AbalonePlayer p1 = (AbalonePlayer) getPlayers().get(0);
+        AbalonePlayer p2 = (AbalonePlayer) getPlayers().get(1);
+        if (!gameStarted) {
+            switch(x) {
+            case 0 :
+                p1.isAI = false;
+                p2.isAI = false;
+                break;
+            case 1 : 
+                p1.isAI = false;
+                p2.isAI = true;
+                break;
+            case 2 :
+                p1.isAI = true;
+                p2.isAI = true;
+                break;
+            }
+        }
+    }
+    
     // move all pieces in the array of pieces to the squares in array of squares
     // PRE: size of both arrays are equal
     private boolean movePieces(ArrayList<AbalonePiece> pieces, ArrayList<AbaloneSquare> toSquares) {
@@ -225,27 +336,6 @@ public class Abalone extends Game {
             }
         }
         return toSquares;
-    }
-    
-    // initializes the gui's for player 1 and player 2
-    private void initGUIs() {
-        JFrame frame1 = new JFrame();
-        frame1.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-        frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame1.setVisible(true);
-        
-        frame1.add(new AbaloneGUI(this, player1));
-        frame1.revalidate();
-        frame1.repaint();
-        
-        JFrame frame2 = new JFrame();
-        frame2.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-        frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame2.setVisible(true);
-        
-        frame2.add(new AbaloneGUI(this, player2));
-        frame1.revalidate();
-        frame1.repaint();
     }
     
     // pause timers
@@ -330,6 +420,7 @@ public class Abalone extends Game {
         ((AbalonePlayer)getPlayers().get(1)).timeTaken = 0;
         lastRunningTimer = p1timer;
         gameRunning = false;
+        gameStarted = false;
         resetTurns();
 
         updateGUIs();
@@ -344,6 +435,7 @@ public class Abalone extends Game {
     private void resumeTimers() {
         lastRunningTimer.start();
         gameRunning = true;
+        gameStarted = true;
     }
     
     // switches which timer is running between player1 and player2
@@ -380,8 +472,8 @@ public class Abalone extends Game {
     
     // checks if the squares x1,y1 and x2,y2 exist and that dir is not null
     private boolean checkValidMoveInput(int x1, int y1, int x2, int y2, Dir dir) {
-        System.out.println("" + x1 + y1 + x2 + y2 + dir);
-        System.out.println(getSquare(x1, y1) + " " + getSquare(x2, y2));
+        //System.out.println("" + x1 + y1 + x2 + y2 + dir);
+        //System.out.println(getSquare(x1, y1) + " " + getSquare(x2, y2));
         return dir != null && getSquare(x1, y1) != null && getSquare(x2, y2) != null;
     }
     
@@ -389,7 +481,7 @@ public class Abalone extends Game {
     // exist, such as coordinate 0,8 or if the coordinates are out of bounds
     private AbaloneSquare getSquare(int x, int y) {
         if (!inBounds(x, y)) {
-            System.out.println("coordinates not in bounds");
+            //System.out.println("coordinates not in bounds");
             return null;
         }
         return squares[y][x];
@@ -596,112 +688,141 @@ public class Abalone extends Game {
     
     // removes all pieces from the board
     private void clearBoard() {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (squares[i][j] != null && squares[i][j].getPiece() != null) {
-                    squares[i][j].getPiece().remove();
+        if (!gameRunning) {
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    if (squares[i][j] != null && squares[i][j].getPiece() != null) {
+                        squares[i][j].getPiece().remove();
+                    }
                 }
             }
+            updateGUIs();
         }
-        updateGUIs();
     }
     
     // places pieces on the board as per standard Abalone layout
     private void initPiecesStandard() {
-        for (int i = 0; i < 5; i++) {
-            new AbalonePiece(this, players.get(0), squares[0][i]);
+        if (!gameStarted) {
+            for (int i = 0; i < 5; i++) {
+                new AbalonePiece(this, players.get(0), squares[0][i]);
+            }
+            for (int i = 0; i < 6; i++) {
+                new AbalonePiece(this, players.get(0), squares[1][i]);
+            }
+            new AbalonePiece(this, players.get(0), squares[2][2]);
+            new AbalonePiece(this, players.get(0), squares[2][3]);
+            new AbalonePiece(this, players.get(0), squares[2][4]);
+            new AbalonePiece(this, players.get(1), squares[6][6]);
+            new AbalonePiece(this, players.get(1), squares[6][5]);
+            new AbalonePiece(this, players.get(1), squares[6][4]);
+            for (int i = 3; i < 9; i++) {
+                new AbalonePiece(this, players.get(1), squares[7][i]);
+            }
+            for (int i = 4; i < 9; i++) {
+                new AbalonePiece(this, players.get(1), squares[8][i]);
+            }
+            updateGUIs();
         }
-        for (int i = 0; i < 6; i++) {
-            new AbalonePiece(this, players.get(0), squares[1][i]);
-        }
-        new AbalonePiece(this, players.get(0), squares[2][2]);
-        new AbalonePiece(this, players.get(0), squares[2][3]);
-        new AbalonePiece(this, players.get(0), squares[2][4]);
-        new AbalonePiece(this, players.get(1), squares[6][6]);
-        new AbalonePiece(this, players.get(1), squares[6][5]);
-        new AbalonePiece(this, players.get(1), squares[6][4]);
-        for (int i = 3; i < 9; i++) {
-            new AbalonePiece(this, players.get(1), squares[7][i]);
-        }
-        for (int i = 4; i < 9; i++) {
-            new AbalonePiece(this, players.get(1), squares[8][i]);
-        }
-        updateGUIs();
     }
 
     // places pieces on the board as per belgian daisy layout
     private void initPiecesBelgianDaisy() {
-        new AbalonePiece(this, players.get(0), squares[0][0]);
-        new AbalonePiece(this, players.get(0), squares[1][0]);
-        new AbalonePiece(this, players.get(0), squares[0][1]);
-        new AbalonePiece(this, players.get(0), squares[1][1]);
-        new AbalonePiece(this, players.get(0), squares[2][1]);
-        new AbalonePiece(this, players.get(0), squares[1][2]);
-        new AbalonePiece(this, players.get(0), squares[2][2]);
-
-        new AbalonePiece(this, players.get(0), squares[8][8]);
-        new AbalonePiece(this, players.get(0), squares[7][8]);
-        new AbalonePiece(this, players.get(0), squares[8][7]);
-        new AbalonePiece(this, players.get(0), squares[7][7]);
-        new AbalonePiece(this, players.get(0), squares[6][7]);
-        new AbalonePiece(this, players.get(0), squares[7][6]);
-        new AbalonePiece(this, players.get(0), squares[6][6]);
-        
-        new AbalonePiece(this, players.get(1), squares[0][3]);
-        new AbalonePiece(this, players.get(1), squares[1][3]);
-        new AbalonePiece(this, players.get(1), squares[0][4]);
-        new AbalonePiece(this, players.get(1), squares[1][4]);
-        new AbalonePiece(this, players.get(1), squares[2][4]);
-        new AbalonePiece(this, players.get(1), squares[1][5]);
-        new AbalonePiece(this, players.get(1), squares[2][5]);
-        
-        new AbalonePiece(this, players.get(1), squares[7][3]);
-        new AbalonePiece(this, players.get(1), squares[6][3]);
-        new AbalonePiece(this, players.get(1), squares[8][4]);
-        new AbalonePiece(this, players.get(1), squares[7][4]);
-        new AbalonePiece(this, players.get(1), squares[6][4]);
-        new AbalonePiece(this, players.get(1), squares[8][5]);
-        new AbalonePiece(this, players.get(1), squares[7][5]);
-        updateGUIs();
+        if (!gameStarted) {
+            new AbalonePiece(this, players.get(0), squares[0][0]);
+            new AbalonePiece(this, players.get(0), squares[1][0]);
+            new AbalonePiece(this, players.get(0), squares[0][1]);
+            new AbalonePiece(this, players.get(0), squares[1][1]);
+            new AbalonePiece(this, players.get(0), squares[2][1]);
+            new AbalonePiece(this, players.get(0), squares[1][2]);
+            new AbalonePiece(this, players.get(0), squares[2][2]);
+    
+            new AbalonePiece(this, players.get(0), squares[8][8]);
+            new AbalonePiece(this, players.get(0), squares[7][8]);
+            new AbalonePiece(this, players.get(0), squares[8][7]);
+            new AbalonePiece(this, players.get(0), squares[7][7]);
+            new AbalonePiece(this, players.get(0), squares[6][7]);
+            new AbalonePiece(this, players.get(0), squares[7][6]);
+            new AbalonePiece(this, players.get(0), squares[6][6]);
+            
+            new AbalonePiece(this, players.get(1), squares[0][3]);
+            new AbalonePiece(this, players.get(1), squares[1][3]);
+            new AbalonePiece(this, players.get(1), squares[0][4]);
+            new AbalonePiece(this, players.get(1), squares[1][4]);
+            new AbalonePiece(this, players.get(1), squares[2][4]);
+            new AbalonePiece(this, players.get(1), squares[1][5]);
+            new AbalonePiece(this, players.get(1), squares[2][5]);
+            
+            new AbalonePiece(this, players.get(1), squares[7][3]);
+            new AbalonePiece(this, players.get(1), squares[6][3]);
+            new AbalonePiece(this, players.get(1), squares[8][4]);
+            new AbalonePiece(this, players.get(1), squares[7][4]);
+            new AbalonePiece(this, players.get(1), squares[6][4]);
+            new AbalonePiece(this, players.get(1), squares[8][5]);
+            new AbalonePiece(this, players.get(1), squares[7][5]);
+            updateGUIs();
+        }
         
     }
     
     // places pieces on the board as per german daisy layout
     private void initPiecesGermanDaisy() {
-        new AbalonePiece(this, players.get(0), squares[1][0]);
-        new AbalonePiece(this, players.get(0), squares[2][0]);
-        new AbalonePiece(this, players.get(0), squares[1][1]);
-        new AbalonePiece(this, players.get(0), squares[2][1]);
-        new AbalonePiece(this, players.get(0), squares[3][1]);
-        new AbalonePiece(this, players.get(0), squares[2][2]);
-        new AbalonePiece(this, players.get(0), squares[3][2]);
-
-        new AbalonePiece(this, players.get(0), squares[7][8]);
-        new AbalonePiece(this, players.get(0), squares[6][8]);
-        new AbalonePiece(this, players.get(0), squares[7][7]);
-        new AbalonePiece(this, players.get(0), squares[6][7]);
-        new AbalonePiece(this, players.get(0), squares[5][7]);
-        new AbalonePiece(this, players.get(0), squares[6][6]);
-        new AbalonePiece(this, players.get(0), squares[5][6]);
-        
-        new AbalonePiece(this, players.get(1), squares[1][4]);
-        new AbalonePiece(this, players.get(1), squares[2][4]);
-        new AbalonePiece(this, players.get(1), squares[1][5]);
-        new AbalonePiece(this, players.get(1), squares[2][5]);
-        new AbalonePiece(this, players.get(1), squares[3][5]);
-        new AbalonePiece(this, players.get(1), squares[2][6]);
-        new AbalonePiece(this, players.get(1), squares[3][6]);
-        
-        new AbalonePiece(this, players.get(1), squares[6][2]);
-        new AbalonePiece(this, players.get(1), squares[5][2]);
-        new AbalonePiece(this, players.get(1), squares[7][3]);
-        new AbalonePiece(this, players.get(1), squares[6][3]);
-        new AbalonePiece(this, players.get(1), squares[5][3]);
-        new AbalonePiece(this, players.get(1), squares[7][4]);
-        new AbalonePiece(this, players.get(1), squares[6][4]);
-        updateGUIs();
+        if (!gameStarted) {
+            new AbalonePiece(this, players.get(0), squares[1][0]);
+            new AbalonePiece(this, players.get(0), squares[2][0]);
+            new AbalonePiece(this, players.get(0), squares[1][1]);
+            new AbalonePiece(this, players.get(0), squares[2][1]);
+            new AbalonePiece(this, players.get(0), squares[3][1]);
+            new AbalonePiece(this, players.get(0), squares[2][2]);
+            new AbalonePiece(this, players.get(0), squares[3][2]);
+    
+            new AbalonePiece(this, players.get(0), squares[7][8]);
+            new AbalonePiece(this, players.get(0), squares[6][8]);
+            new AbalonePiece(this, players.get(0), squares[7][7]);
+            new AbalonePiece(this, players.get(0), squares[6][7]);
+            new AbalonePiece(this, players.get(0), squares[5][7]);
+            new AbalonePiece(this, players.get(0), squares[6][6]);
+            new AbalonePiece(this, players.get(0), squares[5][6]);
+            
+            new AbalonePiece(this, players.get(1), squares[1][4]);
+            new AbalonePiece(this, players.get(1), squares[2][4]);
+            new AbalonePiece(this, players.get(1), squares[1][5]);
+            new AbalonePiece(this, players.get(1), squares[2][5]);
+            new AbalonePiece(this, players.get(1), squares[3][5]);
+            new AbalonePiece(this, players.get(1), squares[2][6]);
+            new AbalonePiece(this, players.get(1), squares[3][6]);
+            
+            new AbalonePiece(this, players.get(1), squares[6][2]);
+            new AbalonePiece(this, players.get(1), squares[5][2]);
+            new AbalonePiece(this, players.get(1), squares[7][3]);
+            new AbalonePiece(this, players.get(1), squares[6][3]);
+            new AbalonePiece(this, players.get(1), squares[5][3]);
+            new AbalonePiece(this, players.get(1), squares[7][4]);
+            new AbalonePiece(this, players.get(1), squares[6][4]);
+            updateGUIs();
+        }
     }
     
+    // initializes the gui's for player 1 and player 2
+    private void initGUIs() {
+        JFrame frame1 = new JFrame();
+        frame1.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame1.setVisible(true);
+        
+        frame1.add(new AbaloneGUI(this, player1));
+        frame1.revalidate();
+        frame1.repaint();
+        
+        JFrame frame2 = new JFrame();
+        frame2.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame2.setVisible(true);
+        
+        frame2.add(new AbaloneGUI(this, player2));
+        frame1.revalidate();
+        frame1.repaint();
+    }
+
     // clears all currently selected squares and directions
     public void clearSelection() {
         selection1[0] = -1;

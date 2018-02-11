@@ -1,10 +1,11 @@
 
 public class AbaloneAI {
-    public static AbaloneMove getNextMove(Abalone a) {
+    
+    public AbaloneMove getNextMove(AbaloneSquare[][] board) {
         return null;
     }
     
-    private static int getValueOfBoard(Abalone a, int player) {
+    private int getValueOfBoard(AbaloneSquare[][] board) {
         return 0;
     }
 
