@@ -23,29 +23,35 @@ public class Abalone extends Game {
     static final Color P2_COLOR = Color.BLUE;
     static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
     static final DecimalFormat FORMAT = new DecimalFormat(".#");
-    private int turns = 0;
+    private int turns = 1;
     private int maxTurns = 0;
     private double maxTimePerTurn = 0;
     private Scanner console = new Scanner(System.in);
     AbaloneSquare[][] squares = new AbaloneSquare[9][9];
-    private ActionListener p1timerTick = new ActionListener() {
+    private Timer p1timer = new Timer(100, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             player1.timeTaken += 0.1;
             updateGUIs();
         }
-        
-    };
-    private Timer p1timer = new Timer(100, p1timerTick);
-    private ActionListener p2timerTick = new ActionListener() {
+    });
+    private Timer p2timer = new Timer(100, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             player2.timeTaken += 0.1;
             updateGUIs();
         }
         
-    };
-    private Timer p2timer = new Timer(100, p2timerTick);
+    });
+    private Timer maxTurnTimer = new Timer(1000, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            nextPlayerTurn();
+            System.out.println("Turn is up");
+            updateGUIs();
+        }
+    });
+    
     private Timer lastRunningTimer = p1timer;
     private AbalonePlayer player1 = new AbalonePlayer(P1_COLOR, this);
     private AbalonePlayer player2 = new AbalonePlayer(P2_COLOR, this);
@@ -53,6 +59,7 @@ public class Abalone extends Game {
     int[] selection2 = {-1, -1};
     private boolean gameRunning = false;
     private boolean gameStarted = false;
+    private boolean gameOver = false;
     private double timeAtTurnStart = 0;
     private AbaloneMove moveThisTurn;
     private boolean settingTurns = false;
@@ -70,7 +77,19 @@ public class Abalone extends Game {
         super.nextPlayerTurn();
         updateTimeAtTurnStart();
         switchTimers();
-        turns++;
+        if (maxTimePerTurn != 0) {
+            maxTurnTimer.restart();
+        }
+        if (getCurPlayer().equals(getPlayers().get(0))) {
+            turns++;
+            if (maxTurns != 0 && turns >= maxTurns) {
+                System.out.println("Game Over");
+                gameOver = true;
+                pauseTimers();
+            }
+        }
+        
+        
         updateGUIs();
         
         // ai
@@ -85,38 +104,11 @@ public class Abalone extends Game {
         
     }
     
-    private boolean executeAIMove(AbaloneMove move) {
-        return true;
-    }
-    
-    private void printTurnInfo() {
-        if (moveThisTurn != null) {
-            System.out.println("Player " + (getPlayers().indexOf(getCurPlayer()) + 1) + 
-                    ": " + moveThisTurn.x1 + 
-                    "," + moveThisTurn.y1 +
-                    " to " + moveThisTurn.x2 + 
-                    "," + moveThisTurn.y2 + 
-                    " moving " + moveThisTurn.direction + 
-                    " in " + FORMAT.format(getDeltaTime()) + "s");
-        }
-    }
-    
-    // get the time that has elapsed this turn
-    private double getDeltaTime() {
-        return ((AbalonePlayer)getCurPlayer()).timeTaken - timeAtTurnStart;
-        
-    }
-    
-    // sets timeAtTurnStart to the current time taken by the current player
-    private void updateTimeAtTurnStart() {
-        timeAtTurnStart = ((AbalonePlayer)getCurPlayer()).timeTaken;
-    }
-    
     // constructor which initializes the board and begins listening for user input
     public Abalone() {
         this.addPlayer(player1);
         this.addPlayer(player2);
-
+    
         this.initSquares();
         this.initGUIs();
         this.initPiecesStandard();
@@ -133,7 +125,7 @@ public class Abalone extends Game {
         
         
     }
-    
+
     // front end method to make a move, returns true if the move was successful
     // returns false if the game is currently paused or stopped
     // or if the input coordinates are out of bounds or do not exist
@@ -146,7 +138,7 @@ public class Abalone extends Game {
         boolean moveSuccess = false;
         
         // game running
-        if (!gameRunning) {
+        if (!gameRunning || gameOver) {
             System.out.println("Game has not started");
             return false;
         }
@@ -184,7 +176,7 @@ public class Abalone extends Game {
     
         // move pieces
         moveSuccess = movePieces(pieces, toSquares);
-
+    
         // Next player turn
         if (moveSuccess) {
             this.moveThisTurn = new AbaloneMove(x1, y1, x2, y2, dir);
@@ -196,46 +188,80 @@ public class Abalone extends Game {
     // processes input from System.in
     private boolean processInput(String input) {
         String lowerInput = input.toLowerCase();
-        System.out.println(lowerInput);
-        if (lowerInput.equals("reset")) {
-            clearBoard();
-            stopTimers();
-            resetTurns();
+        if (lowerInput.equals("reset") || lowerInput.equals("stop")) { //stops the game and restarts all timers. game is over
+            if (gameStarted) {
+                System.out.println("Reseting");
+                stopTimers();
+            }
             return true;
         } else if (lowerInput.equals("standard")) {
-            clearBoard();
-            initPiecesStandard();
+            if (!gameOver && !gameStarted) {
+                System.out.println("Standard layout");
+                clearBoard();
+                initPiecesStandard();
+            }
             return true;
         } else if (lowerInput.equals("belgian")) {
-            clearBoard();
-            initPiecesBelgianDaisy();
+            if (!gameOver && !gameStarted) {
+                System.out.println("Belgian Daisy layout");
+                clearBoard();
+                initPiecesBelgianDaisy();
+            }
             return true;
         } else if (lowerInput.equals("german")) {
-            clearBoard();
-            initPiecesGermanDaisy();
+            if (!gameOver && !gameStarted) {
+                System.out.println("German Daisy layout");
+                clearBoard();
+                initPiecesGermanDaisy();
+            }
             return true;
         } else if (lowerInput.equals("pause")) {
-            pauseTimers();
+            if (!gameOver && gameStarted && gameRunning) {
+                System.out.println("Pausing");
+                pauseTimers();
+            }
             return true;
         } else if (lowerInput.equals("resume") || lowerInput.equals("start")) {
-            resumeTimers();
+            if (!gameOver) {
+                System.out.println("Starting/Resuming");
+                resumeTimers();
+            }
             return true;
         } else if (lowerInput.equals("pvp")) {
-            setAI(PVP);
+            if (!gameStarted) {
+                System.out.println("Setting Player Vs Player");
+                setAI(PVP);
+            }
         } else if (lowerInput.equals("pvc")) {
-            setAI(PVC);
+            System.out.println("Setting Player Vs Computer");
+            if (!gameStarted) {
+                setAI(PVC);
+            }
         } else if (lowerInput.equals("cvc")) {
-            setAI(CVC);
+            System.out.println("Setting Computer vs Computer");
+            if (!gameStarted) {
+                setAI(CVC);
+            }
         } else if (lowerInput.equals("redfirst")) {
-            setRedGoesFirst(true);
+            System.out.println("Setting Red moves first");
+            if (!gameStarted) {
+                setRedGoesFirst(true);
+            }
         } else if (lowerInput.equals("bluefirst")) {
-            setRedGoesFirst(false);
+            System.out.println("Setting Blue moves first");
+            if (!gameStarted) {
+                setRedGoesFirst(false);
+            }
         } else if (lowerInput.equals("turns")) {
-            System.out.println("Set number of Turns");
-            settingTurns = true;
+            if (!gameStarted) {
+                System.out.println("Enter number of Turns");
+                settingTurns = true;
+            }
         } else if (lowerInput.equals("time")) {
-            System.out.println("Set Time per turn");
-            settingTimePerTurn = true;
+            if (!gameStarted) {
+                System.out.println("Enter Time per turn");
+                settingTimePerTurn = true;
+            }
         } else {
             try {
                 int intinput = Integer.parseInt(lowerInput);
@@ -244,16 +270,47 @@ public class Abalone extends Game {
                     System.out.println("Max Turns: " + maxTurns);
                 } else if (settingTimePerTurn) {
                     maxTimePerTurn = intinput;
+                    maxTurnTimer.setInitialDelay(intinput * 1000 + 100);
+                    maxTurnTimer.setDelay(intinput * 1000 + 100);
                     System.out.println("Max Time Per Turn: " + maxTimePerTurn);
                 }
             } catch (Exception e) {
-                System.out.println("Invalid number");
+                System.out.println("Invalid input");
             }
             settingTurns = false;
             settingTimePerTurn = false;
         }
         return false;
     }
+
+    private boolean executeAIMove(AbaloneMove move) {
+        return true;
+    }
+    
+    private void printTurnInfo() {
+        if (moveThisTurn != null) {
+            System.out.println("Player " + (getPlayers().indexOf(getCurPlayer()) + 1) + 
+                    ": " + moveThisTurn.x1 + 
+                    "," + moveThisTurn.y1 +
+                    " to " + moveThisTurn.x2 + 
+                    "," + moveThisTurn.y2 + 
+                    " moving " + moveThisTurn.direction + 
+                    " in " + FORMAT.format(getDeltaTime()) + "s");
+        }
+    }
+    
+    // get the time that has elapsed this turn
+    private double getDeltaTime() {
+        return ((AbalonePlayer)getCurPlayer()).timeTaken - timeAtTurnStart;
+        
+    }
+    
+    // sets timeAtTurnStart to the current time taken by the current player
+    private void updateTimeAtTurnStart() {
+        timeAtTurnStart = ((AbalonePlayer)getCurPlayer()).timeTaken;
+    }
+    
+    
     
 
     /*
@@ -281,39 +338,6 @@ public class Abalone extends Game {
     return result;
     */
 
-    // if the game has not started, determines whether red will move first or not
-    private void setRedGoesFirst(boolean b) {
-        if (!gameStarted) {
-            if (!b) {
-                this.setCurPlayer(getPlayers().get(1));
-            } else {
-                this.setCurPlayer(getPlayers().get(0));
-            }
-        }
-    }
-    
-    // sets whether it is PVP, PVC, or CVC
-    private void setAI(int x) {
-        AbalonePlayer p1 = (AbalonePlayer) getPlayers().get(0);
-        AbalonePlayer p2 = (AbalonePlayer) getPlayers().get(1);
-        if (!gameStarted) {
-            switch(x) {
-            case 0 :
-                p1.isAI = false;
-                p2.isAI = false;
-                break;
-            case 1 : 
-                p1.isAI = false;
-                p2.isAI = true;
-                break;
-            case 2 :
-                p1.isAI = true;
-                p2.isAI = true;
-                break;
-            }
-        }
-    }
-    
     // move all pieces in the array of pieces to the squares in array of squares
     // PRE: size of both arrays are equal
     private boolean movePieces(ArrayList<AbalonePiece> pieces, ArrayList<AbaloneSquare> toSquares) {
@@ -338,10 +362,66 @@ public class Abalone extends Game {
         return toSquares;
     }
     
+    /*
+    int x1, y1, x2, y2;
+    String[] parsed = input.split(" ");
+    try {
+        x1 = Integer.parseInt(parsed[0]);
+        y1 = Integer.parseInt(parsed[1]);
+        x2 = Integer.parseInt(parsed[2]);
+        y2 = Integer.parseInt(parsed[3]);
+    } catch (NumberFormatException ex) {
+        return false;
+    }
+    
+    Dir dir = null;
+    for (Dir direction : Dir.values()) {
+        if (direction.name.equals(input.trim())) {
+            dir = direction;
+        }
+    }
+    System.out.println("!! " + selection1[0] + " " + selection1[0] + " " + selection2[0] + " " + selection2[1] + " "  + dir);
+    
+    boolean result = move(selection1[0], selection1[1], selection2[0], selection2[1], dir);
+    clearSelection();
+    return result;
+    */
+    
+    // if the game has not started, determines whether red will move first or not
+    private void setRedGoesFirst(boolean b) {
+        if (!b) {
+            this.setCurPlayer(getPlayers().get(1));
+        } else {
+            this.setCurPlayer(getPlayers().get(0));
+        }
+    }
+
+    // sets whether it is PVP, PVC, or CVC
+    private void setAI(int x) {
+        AbalonePlayer p1 = (AbalonePlayer) getPlayers().get(0);
+        AbalonePlayer p2 = (AbalonePlayer) getPlayers().get(1);
+        switch(x) {
+        case 0 :
+            p1.isAI = false;
+            p2.isAI = false;
+            break;
+        case 1 : 
+            p1.isAI = false;
+            p2.isAI = true;
+            break;
+        case 2 :
+            p1.isAI = true;
+            p2.isAI = true;
+            break;
+        }
+        
+    }
+
     // pause timers
     private void pauseTimers() {
         this.lastRunningTimer = p1timer.isRunning() ? p1timer : p2timer;
         lastRunningTimer.stop();
+        maxTurnTimer.stop();
         gameRunning = false;
         // stop ai's TODO
     }
@@ -414,13 +494,16 @@ public class Abalone extends Game {
     private void stopTimers() {
         p1timer.restart();
         p2timer.restart();
+        maxTurnTimer.restart();
         p1timer.stop();
         p2timer.stop();
+        maxTurnTimer.stop();
         ((AbalonePlayer)getPlayers().get(0)).timeTaken = 0;
         ((AbalonePlayer)getPlayers().get(1)).timeTaken = 0;
         lastRunningTimer = p1timer;
         gameRunning = false;
         gameStarted = false;
+        gameOver = true;
         resetTurns();
 
         updateGUIs();
@@ -433,9 +516,15 @@ public class Abalone extends Game {
 
     // resumes timers
     private void resumeTimers() {
+        if (!gameStarted) {
+            if (maxTimePerTurn != 0) {
+                maxTurnTimer.start();
+            }
+            gameStarted = true;
+        }
         lastRunningTimer.start();
         gameRunning = true;
-        gameStarted = true;
+        
     }
     
     // switches which timer is running between player1 and player2
@@ -447,6 +536,18 @@ public class Abalone extends Game {
             p2timer.stop();
             p1timer.start();
         }
+    }
+
+    // removes all pieces from the board
+    private void clearBoard() {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (squares[i][j] != null && squares[i][j].getPiece() != null) {
+                    squares[i][j].getPiece().remove();
+                }
+            }
+        }
+        updateGUIs();
     }
 
     // determines if a move of pieces between x1,y1 and x2,y2 moving in dir direction
@@ -493,7 +594,7 @@ public class Abalone extends Game {
         if (piece != null) {
             if (pos == null) {
                 piece.remove();
-                System.out.println("piece out");
+                System.out.println("Piece out");
                 ((AbalonePlayer)piece.getOwner()).outs++;
             }
             piece.move(pos);
@@ -532,14 +633,14 @@ public class Abalone extends Game {
         int ddx = getIncrement(dx);
         int ddy = getIncrement(dy);
         if (dx > 2 || dy > 2 || dx < -2 || dy < -2) {
-            System.out.println("too many");
+            //System.out.println("too many");
             return null;
         }
         for (int i = 0; i <= Math.max(Math.abs(dx), Math.abs(dy)); i++) {
             if (getPiece(x1 + ddx * i, y1 + ddy * i) == null ||
                     getPiece(x1 + ddx * i, y1 + ddy * i).getOwner() != getCurPlayer()) {
-                System.out.println("empty or unfriendly piece" + x1 + ddx + i + " " + 
-                    y1 + ddy + i);
+                //System.out.println("empty or unfriendly piece" + x1 + ddx + i + " " + 
+                //    y1 + ddy + i);
                 return null;
             }
             result.add(getPiece(x1 + ddx * i, y1 + ddy * i));
@@ -686,23 +787,8 @@ public class Abalone extends Game {
         }
     }
     
-    // removes all pieces from the board
-    private void clearBoard() {
-        if (!gameRunning) {
-            for (int i = 0; i < 9; i++) {
-                for (int j = 0; j < 9; j++) {
-                    if (squares[i][j] != null && squares[i][j].getPiece() != null) {
-                        squares[i][j].getPiece().remove();
-                    }
-                }
-            }
-            updateGUIs();
-        }
-    }
-    
     // places pieces on the board as per standard Abalone layout
     private void initPiecesStandard() {
-        if (!gameStarted) {
             for (int i = 0; i < 5; i++) {
                 new AbalonePiece(this, players.get(0), squares[0][i]);
             }
@@ -722,12 +808,11 @@ public class Abalone extends Game {
                 new AbalonePiece(this, players.get(1), squares[8][i]);
             }
             updateGUIs();
-        }
+        
     }
 
     // places pieces on the board as per belgian daisy layout
     private void initPiecesBelgianDaisy() {
-        if (!gameStarted) {
             new AbalonePiece(this, players.get(0), squares[0][0]);
             new AbalonePiece(this, players.get(0), squares[1][0]);
             new AbalonePiece(this, players.get(0), squares[0][1]);
@@ -760,13 +845,12 @@ public class Abalone extends Game {
             new AbalonePiece(this, players.get(1), squares[8][5]);
             new AbalonePiece(this, players.get(1), squares[7][5]);
             updateGUIs();
-        }
+        
         
     }
     
     // places pieces on the board as per german daisy layout
     private void initPiecesGermanDaisy() {
-        if (!gameStarted) {
             new AbalonePiece(this, players.get(0), squares[1][0]);
             new AbalonePiece(this, players.get(0), squares[2][0]);
             new AbalonePiece(this, players.get(0), squares[1][1]);
@@ -799,7 +883,6 @@ public class Abalone extends Game {
             new AbalonePiece(this, players.get(1), squares[7][4]);
             new AbalonePiece(this, players.get(1), squares[6][4]);
             updateGUIs();
-        }
     }
     
     // initializes the gui's for player 1 and player 2
