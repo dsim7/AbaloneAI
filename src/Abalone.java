@@ -22,7 +22,7 @@ public class Abalone extends Game {
     static final Color P1_COLOR = Color.RED;
     static final Color P2_COLOR = Color.BLUE;
     static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
-    static final DecimalFormat FORMAT = new DecimalFormat(".#");
+    static final DecimalFormat FORMAT = new DecimalFormat("#.#");
     private int turns = 1;
     private int maxTurns = 0;
     private double maxTimePerTurn = 0;
@@ -88,14 +88,7 @@ public class Abalone extends Game {
         if (maxTimePerTurn != 0) {
             maxTurnTimer.restart();
         }
-        if (getCurPlayer().equals(getPlayers().get(0))) {
-            turns++;
-            if (maxTurns != 0 && turns >= maxTurns) {
-                System.out.println("Game Over");
-                gameOver = true;
-                pauseTimers();
-            }
-        }
+        turnOver();
         
         
         updateGUIs();
@@ -110,6 +103,21 @@ public class Abalone extends Game {
         }
         
         
+    }
+    
+    private void turnOver() {
+        if (getCurPlayer().equals(getPlayers().get(0))) {
+            turns++;
+            if (isGameOver()) {
+                System.out.println("Game Over");
+                gameOver = true;
+                pauseTimers();
+            }
+        }
+    }
+    
+    private boolean isGameOver() {
+        return maxTurns != 0 && turns >= maxTurns;
     }
     
     // constructor which initializes the board and begins listening for user input
