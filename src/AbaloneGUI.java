@@ -230,7 +230,7 @@ class AbaloneGUIInfoPanel extends JPanel {
                     
                     AbaloneGUI.this.repaint();
                     */
-                    if (!((AbalonePlayer) ab.getCurPlayer()).isAI) {
+                    if (!((AbalonePlayer) ab.getCurPlayer()).isAI && ab.getCanClick()) {
                         if (ab.selection1[0] == -1) {
                             ab.selection1[0] = square.x;
                             ab.selection1[1] = square.y;
@@ -242,11 +242,13 @@ class AbaloneGUIInfoPanel extends JPanel {
                         } else if (ab.directionSelection == null) {
                             //System.out.println("Destination 2: " + square.x + " " + square.y);
                             ab.directionSelection = getDirection();
-                            ab.move(ab.selection1[0],
+                            if (!ab.move(ab.selection1[0],
                                     ab.selection1[1],
                                     ab.selection2[0],
                                     ab.selection2[1],
-                                    ab.directionSelection);
+                                    ab.directionSelection)) {
+                                System.out.println("Invalid move, try again");
+                            }
                             //System.out.println("Direction: " + ab.directionSelection);
                             ab.clearSelection();
                         }
@@ -258,7 +260,7 @@ class AbaloneGUIInfoPanel extends JPanel {
                     // TODO Auto-generated method stub
                     
                 }
-                
+
                 private Abalone.Dir getDirection() {
                     
                     int dx = square.x - ab.selection2[0];

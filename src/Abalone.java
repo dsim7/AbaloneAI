@@ -70,10 +70,18 @@ public class Abalone extends Game {
         new Abalone();
     }
     
+    public boolean getCanClick() {
+        return !gameOver && gameRunning && gameStarted;
+    }
+    
     // switches the current player of the game;
     @Override
     public void nextPlayerTurn() {
         printTurnInfo();
+        if (checkWinner()) {
+            stopTimers();
+            return;
+        }
         super.nextPlayerTurn();
         updateTimeAtTurnStart();
         switchTimers();
@@ -185,18 +193,27 @@ public class Abalone extends Game {
         return moveSuccess;
     }
 
+    private boolean checkWinner() {
+        if (player1.outs >= 6) {
+            System.out.println("Winner: Player 2");
+            return true;
+        } else if (player2.outs >= 6) {
+            System.out.println("Winner: Player 1");
+            return true;
+        }
+        return false;
+    }
+
     // processes input from System.in
     private boolean processInput(String input) {
         String lowerInput = input.toLowerCase();
         if (lowerInput.equals("stop")) { //stops the game and restarts all timers. game is over
             if (gameStarted) {
-                System.out.println("Game Over");
                 stopTimers();
             }
             return true;
         } else if (lowerInput.equals("reset")) {
             if (gameOver) {
-                System.out.println("Reseting");
                 reset();
                 return true;
             } else {
@@ -205,7 +222,6 @@ public class Abalone extends Game {
         } else if (lowerInput.equals("standard")) {
         
             if (!gameOver && !gameStarted) {
-                System.out.println("Standard layout");
                 clearBoard();
                 initPiecesStandard();
             } else {
@@ -214,7 +230,6 @@ public class Abalone extends Game {
             return true;
         } else if (lowerInput.equals("belgian")) {
             if (!gameOver && !gameStarted) {
-                System.out.println("Belgian Daisy layout");
                 clearBoard();
                 initPiecesBelgianDaisy();
             } else {
@@ -223,7 +238,6 @@ public class Abalone extends Game {
             return true;
         } else if (lowerInput.equals("german")) {
             if (!gameOver && !gameStarted) {
-                System.out.println("German Daisy layout");
                 clearBoard();
                 initPiecesGermanDaisy();
             } else {
@@ -232,13 +246,11 @@ public class Abalone extends Game {
             return true;
         } else if (lowerInput.equals("pause")) {
             if (!gameOver && gameStarted && gameRunning) {
-                System.out.println("Pausing");
                 pauseTimers();
             }
             return true;
         } else if (lowerInput.equals("resume") || lowerInput.equals("start")) {
             if (!gameOver) {
-                System.out.println("Starting/Resuming");
                 resumeTimers();
             }
             return true;
@@ -264,14 +276,12 @@ public class Abalone extends Game {
                 System.out.println("Stop and reset the game first");
             }
         } else if (lowerInput.equals("redfirst")) {
-            System.out.println("Setting Red moves first");
             if (!gameStarted) {
                 setRedGoesFirst(true);
             } else {
                 System.out.println("Stop and reset the game first");
             }
         } else if (lowerInput.equals("bluefirst")) {
-            System.out.println("Setting Blue moves first");
             if (!gameStarted) {
                 setRedGoesFirst(false);
             } else {
@@ -421,9 +431,11 @@ public class Abalone extends Game {
     // if the game has not started, determines whether red will move first or not
     private void setRedGoesFirst(boolean b) {
         if (!b) {
+            System.out.println("Setting Blue moves first");
             this.setCurPlayer(getPlayers().get(1));
             this.lastRunningTimer = p2timer;
         } else {
+            System.out.println("Setting Red moves first");
             this.setCurPlayer(getPlayers().get(0));
             this.lastRunningTimer = p1timer;
         }
@@ -452,6 +464,7 @@ public class Abalone extends Game {
 
     // pause timers
     private void pauseTimers() {
+        System.out.println("Pausing");
         this.lastRunningTimer = p1timer.isRunning() ? p1timer : p2timer;
         lastRunningTimer.stop();
         maxTurnTimer.stop();
@@ -525,6 +538,7 @@ public class Abalone extends Game {
     // timers revert to 0 and stop. should be followed up with a reset of the board.
     // player 1 timer will be the one to resume upon resuming
     private void stopTimers() {
+        System.out.println("Game Over");
         p1timer.restart();
         p2timer.restart();
         maxTurnTimer.restart();
@@ -541,6 +555,7 @@ public class Abalone extends Game {
     }
 
     private void reset() {
+        System.out.println("Reseting");
         turns = 1;
         this.player1.timeTaken = 0;
         this.player2.timeTaken = 0;
@@ -554,6 +569,7 @@ public class Abalone extends Game {
 
     // resumes timers
     private void resumeTimers() {
+        System.out.println("Starting/Resuming");
         if (!gameStarted) {
             if (maxTimePerTurn != 0) {
                 maxTurnTimer.start();
@@ -827,100 +843,103 @@ public class Abalone extends Game {
     
     // places pieces on the board as per standard Abalone layout
     private void initPiecesStandard() {
-            for (int i = 0; i < 5; i++) {
-                new AbalonePiece(this, players.get(0), squares[0][i]);
-            }
-            for (int i = 0; i < 6; i++) {
-                new AbalonePiece(this, players.get(0), squares[1][i]);
-            }
-            new AbalonePiece(this, players.get(0), squares[2][2]);
-            new AbalonePiece(this, players.get(0), squares[2][3]);
-            new AbalonePiece(this, players.get(0), squares[2][4]);
-            new AbalonePiece(this, players.get(1), squares[6][6]);
-            new AbalonePiece(this, players.get(1), squares[6][5]);
-            new AbalonePiece(this, players.get(1), squares[6][4]);
-            for (int i = 3; i < 9; i++) {
-                new AbalonePiece(this, players.get(1), squares[7][i]);
-            }
-            for (int i = 4; i < 9; i++) {
-                new AbalonePiece(this, players.get(1), squares[8][i]);
-            }
-            updateGUIs();
+        System.out.println("Standard layout");
+        for (int i = 0; i < 5; i++) {
+            new AbalonePiece(this, players.get(0), squares[0][i]);
+        }
+        for (int i = 0; i < 6; i++) {
+            new AbalonePiece(this, players.get(0), squares[1][i]);
+        }
+        new AbalonePiece(this, players.get(0), squares[2][2]);
+        new AbalonePiece(this, players.get(0), squares[2][3]);
+        new AbalonePiece(this, players.get(0), squares[2][4]);
+        new AbalonePiece(this, players.get(1), squares[6][6]);
+        new AbalonePiece(this, players.get(1), squares[6][5]);
+        new AbalonePiece(this, players.get(1), squares[6][4]);
+        for (int i = 3; i < 9; i++) {
+            new AbalonePiece(this, players.get(1), squares[7][i]);
+        }
+        for (int i = 4; i < 9; i++) {
+            new AbalonePiece(this, players.get(1), squares[8][i]);
+        }
+        updateGUIs();
         
     }
 
     // places pieces on the board as per belgian daisy layout
     private void initPiecesBelgianDaisy() {
-            new AbalonePiece(this, players.get(0), squares[0][0]);
-            new AbalonePiece(this, players.get(0), squares[1][0]);
-            new AbalonePiece(this, players.get(0), squares[0][1]);
-            new AbalonePiece(this, players.get(0), squares[1][1]);
-            new AbalonePiece(this, players.get(0), squares[2][1]);
-            new AbalonePiece(this, players.get(0), squares[1][2]);
-            new AbalonePiece(this, players.get(0), squares[2][2]);
-    
-            new AbalonePiece(this, players.get(0), squares[8][8]);
-            new AbalonePiece(this, players.get(0), squares[7][8]);
-            new AbalonePiece(this, players.get(0), squares[8][7]);
-            new AbalonePiece(this, players.get(0), squares[7][7]);
-            new AbalonePiece(this, players.get(0), squares[6][7]);
-            new AbalonePiece(this, players.get(0), squares[7][6]);
-            new AbalonePiece(this, players.get(0), squares[6][6]);
-            
-            new AbalonePiece(this, players.get(1), squares[0][3]);
-            new AbalonePiece(this, players.get(1), squares[1][3]);
-            new AbalonePiece(this, players.get(1), squares[0][4]);
-            new AbalonePiece(this, players.get(1), squares[1][4]);
-            new AbalonePiece(this, players.get(1), squares[2][4]);
-            new AbalonePiece(this, players.get(1), squares[1][5]);
-            new AbalonePiece(this, players.get(1), squares[2][5]);
-            
-            new AbalonePiece(this, players.get(1), squares[7][3]);
-            new AbalonePiece(this, players.get(1), squares[6][3]);
-            new AbalonePiece(this, players.get(1), squares[8][4]);
-            new AbalonePiece(this, players.get(1), squares[7][4]);
-            new AbalonePiece(this, players.get(1), squares[6][4]);
-            new AbalonePiece(this, players.get(1), squares[8][5]);
-            new AbalonePiece(this, players.get(1), squares[7][5]);
-            updateGUIs();
+        System.out.println("Belgian Daisy layout");
+        new AbalonePiece(this, players.get(0), squares[0][0]);
+        new AbalonePiece(this, players.get(0), squares[1][0]);
+        new AbalonePiece(this, players.get(0), squares[0][1]);
+        new AbalonePiece(this, players.get(0), squares[1][1]);
+        new AbalonePiece(this, players.get(0), squares[2][1]);
+        new AbalonePiece(this, players.get(0), squares[1][2]);
+        new AbalonePiece(this, players.get(0), squares[2][2]);
+
+        new AbalonePiece(this, players.get(0), squares[8][8]);
+        new AbalonePiece(this, players.get(0), squares[7][8]);
+        new AbalonePiece(this, players.get(0), squares[8][7]);
+        new AbalonePiece(this, players.get(0), squares[7][7]);
+        new AbalonePiece(this, players.get(0), squares[6][7]);
+        new AbalonePiece(this, players.get(0), squares[7][6]);
+        new AbalonePiece(this, players.get(0), squares[6][6]);
         
+        new AbalonePiece(this, players.get(1), squares[0][3]);
+        new AbalonePiece(this, players.get(1), squares[1][3]);
+        new AbalonePiece(this, players.get(1), squares[0][4]);
+        new AbalonePiece(this, players.get(1), squares[1][4]);
+        new AbalonePiece(this, players.get(1), squares[2][4]);
+        new AbalonePiece(this, players.get(1), squares[1][5]);
+        new AbalonePiece(this, players.get(1), squares[2][5]);
+        
+        new AbalonePiece(this, players.get(1), squares[7][3]);
+        new AbalonePiece(this, players.get(1), squares[6][3]);
+        new AbalonePiece(this, players.get(1), squares[8][4]);
+        new AbalonePiece(this, players.get(1), squares[7][4]);
+        new AbalonePiece(this, players.get(1), squares[6][4]);
+        new AbalonePiece(this, players.get(1), squares[8][5]);
+        new AbalonePiece(this, players.get(1), squares[7][5]);
+        updateGUIs();
+    
         
     }
     
     // places pieces on the board as per german daisy layout
     private void initPiecesGermanDaisy() {
-            new AbalonePiece(this, players.get(0), squares[1][0]);
-            new AbalonePiece(this, players.get(0), squares[2][0]);
-            new AbalonePiece(this, players.get(0), squares[1][1]);
-            new AbalonePiece(this, players.get(0), squares[2][1]);
-            new AbalonePiece(this, players.get(0), squares[3][1]);
-            new AbalonePiece(this, players.get(0), squares[2][2]);
-            new AbalonePiece(this, players.get(0), squares[3][2]);
-    
-            new AbalonePiece(this, players.get(0), squares[7][8]);
-            new AbalonePiece(this, players.get(0), squares[6][8]);
-            new AbalonePiece(this, players.get(0), squares[7][7]);
-            new AbalonePiece(this, players.get(0), squares[6][7]);
-            new AbalonePiece(this, players.get(0), squares[5][7]);
-            new AbalonePiece(this, players.get(0), squares[6][6]);
-            new AbalonePiece(this, players.get(0), squares[5][6]);
-            
-            new AbalonePiece(this, players.get(1), squares[1][4]);
-            new AbalonePiece(this, players.get(1), squares[2][4]);
-            new AbalonePiece(this, players.get(1), squares[1][5]);
-            new AbalonePiece(this, players.get(1), squares[2][5]);
-            new AbalonePiece(this, players.get(1), squares[3][5]);
-            new AbalonePiece(this, players.get(1), squares[2][6]);
-            new AbalonePiece(this, players.get(1), squares[3][6]);
-            
-            new AbalonePiece(this, players.get(1), squares[6][2]);
-            new AbalonePiece(this, players.get(1), squares[5][2]);
-            new AbalonePiece(this, players.get(1), squares[7][3]);
-            new AbalonePiece(this, players.get(1), squares[6][3]);
-            new AbalonePiece(this, players.get(1), squares[5][3]);
-            new AbalonePiece(this, players.get(1), squares[7][4]);
-            new AbalonePiece(this, players.get(1), squares[6][4]);
-            updateGUIs();
+        System.out.println("German Daisy layout");
+        new AbalonePiece(this, players.get(0), squares[1][0]);
+        new AbalonePiece(this, players.get(0), squares[2][0]);
+        new AbalonePiece(this, players.get(0), squares[1][1]);
+        new AbalonePiece(this, players.get(0), squares[2][1]);
+        new AbalonePiece(this, players.get(0), squares[3][1]);
+        new AbalonePiece(this, players.get(0), squares[2][2]);
+        new AbalonePiece(this, players.get(0), squares[3][2]);
+
+        new AbalonePiece(this, players.get(0), squares[7][8]);
+        new AbalonePiece(this, players.get(0), squares[6][8]);
+        new AbalonePiece(this, players.get(0), squares[7][7]);
+        new AbalonePiece(this, players.get(0), squares[6][7]);
+        new AbalonePiece(this, players.get(0), squares[5][7]);
+        new AbalonePiece(this, players.get(0), squares[6][6]);
+        new AbalonePiece(this, players.get(0), squares[5][6]);
+        
+        new AbalonePiece(this, players.get(1), squares[1][4]);
+        new AbalonePiece(this, players.get(1), squares[2][4]);
+        new AbalonePiece(this, players.get(1), squares[1][5]);
+        new AbalonePiece(this, players.get(1), squares[2][5]);
+        new AbalonePiece(this, players.get(1), squares[3][5]);
+        new AbalonePiece(this, players.get(1), squares[2][6]);
+        new AbalonePiece(this, players.get(1), squares[3][6]);
+        
+        new AbalonePiece(this, players.get(1), squares[6][2]);
+        new AbalonePiece(this, players.get(1), squares[5][2]);
+        new AbalonePiece(this, players.get(1), squares[7][3]);
+        new AbalonePiece(this, players.get(1), squares[6][3]);
+        new AbalonePiece(this, players.get(1), squares[5][3]);
+        new AbalonePiece(this, players.get(1), squares[7][4]);
+        new AbalonePiece(this, players.get(1), squares[6][4]);
+        updateGUIs();
     }
     
     // initializes the gui's for player 1 and player 2
