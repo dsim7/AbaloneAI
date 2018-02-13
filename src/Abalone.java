@@ -188,17 +188,28 @@ public class Abalone extends Game {
     // processes input from System.in
     private boolean processInput(String input) {
         String lowerInput = input.toLowerCase();
-        if (lowerInput.equals("reset") || lowerInput.equals("stop")) { //stops the game and restarts all timers. game is over
+        if (lowerInput.equals("stop")) { //stops the game and restarts all timers. game is over
             if (gameStarted) {
-                System.out.println("Reseting");
+                System.out.println("Game Over");
                 stopTimers();
             }
             return true;
+        } else if (lowerInput.equals("reset")) {
+            if (gameOver) {
+                System.out.println("Reseting");
+                reset();
+                return true;
+            } else {
+                System.out.println("Stop the game first");
+            }
         } else if (lowerInput.equals("standard")) {
+        
             if (!gameOver && !gameStarted) {
                 System.out.println("Standard layout");
                 clearBoard();
                 initPiecesStandard();
+            } else {
+                System.out.println("Stop and reset the game first");
             }
             return true;
         } else if (lowerInput.equals("belgian")) {
@@ -206,6 +217,8 @@ public class Abalone extends Game {
                 System.out.println("Belgian Daisy layout");
                 clearBoard();
                 initPiecesBelgianDaisy();
+            } else {
+                System.out.println("Stop and reset the game first");
             }
             return true;
         } else if (lowerInput.equals("german")) {
@@ -213,6 +226,8 @@ public class Abalone extends Game {
                 System.out.println("German Daisy layout");
                 clearBoard();
                 initPiecesGermanDaisy();
+            } else {
+                System.out.println("Stop and reset the game first");
             }
             return true;
         } else if (lowerInput.equals("pause")) {
@@ -231,36 +246,50 @@ public class Abalone extends Game {
             if (!gameStarted) {
                 System.out.println("Setting Player Vs Player");
                 setAI(PVP);
+            } else {
+                System.out.println("Stop and reset the game first");
             }
         } else if (lowerInput.equals("pvc")) {
             System.out.println("Setting Player Vs Computer");
             if (!gameStarted) {
                 setAI(PVC);
+            } else {
+                System.out.println("Stop and reset the game first");
             }
         } else if (lowerInput.equals("cvc")) {
             System.out.println("Setting Computer vs Computer");
             if (!gameStarted) {
                 setAI(CVC);
+            } else {
+                System.out.println("Stop and reset the game first");
             }
         } else if (lowerInput.equals("redfirst")) {
             System.out.println("Setting Red moves first");
             if (!gameStarted) {
                 setRedGoesFirst(true);
+            } else {
+                System.out.println("Stop and reset the game first");
             }
         } else if (lowerInput.equals("bluefirst")) {
             System.out.println("Setting Blue moves first");
             if (!gameStarted) {
                 setRedGoesFirst(false);
+            } else {
+                System.out.println("Stop and reset the game first");
             }
         } else if (lowerInput.equals("turns")) {
             if (!gameStarted) {
                 System.out.println("Enter number of Turns");
                 settingTurns = true;
+            } else {
+                System.out.println("Stop and reset the game first");
             }
         } else if (lowerInput.equals("time")) {
             if (!gameStarted) {
                 System.out.println("Enter Time per turn");
                 settingTimePerTurn = true;
+            } else {
+                System.out.println("Stop and reset the game first");
             }
         } else {
             try {
@@ -270,9 +299,11 @@ public class Abalone extends Game {
                     System.out.println("Max Turns: " + maxTurns);
                 } else if (settingTimePerTurn) {
                     maxTimePerTurn = intinput;
-                    maxTurnTimer.setInitialDelay(intinput * 1000 + 100);
-                    maxTurnTimer.setDelay(intinput * 1000 + 100);
+                    maxTurnTimer.setInitialDelay(intinput * 1000 + 150);
+                    maxTurnTimer.setDelay(intinput * 1000 + 150);
                     System.out.println("Max Time Per Turn: " + maxTimePerTurn);
+                } else {
+                    System.out.println("Invalid input");
                 }
             } catch (Exception e) {
                 System.out.println("Invalid input");
@@ -391,8 +422,10 @@ public class Abalone extends Game {
     private void setRedGoesFirst(boolean b) {
         if (!b) {
             this.setCurPlayer(getPlayers().get(1));
+            this.lastRunningTimer = p2timer;
         } else {
             this.setCurPlayer(getPlayers().get(0));
+            this.lastRunningTimer = p1timer;
         }
     }
 
@@ -502,14 +535,21 @@ public class Abalone extends Game {
         gameRunning = false;
         gameStarted = false;
         gameOver = true;
-        resetTurns();
 
         updateGUIs();
         // stop ai's TODO
     }
 
-    private void resetTurns() {
-        turns = 0;
+    private void reset() {
+        turns = 1;
+        this.player1.timeTaken = 0;
+        this.player2.timeTaken = 0;
+        this.player1.outs = 0;
+        this.player2.outs = 0;
+        this.maxTimePerTurn = 0;
+        this.maxTurns = 0;
+        gameOver = false;
+        clearBoard();
     }
 
     // resumes timers
