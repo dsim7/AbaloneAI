@@ -50,9 +50,8 @@ public class AbaloneGUI extends JPanel implements GameGUI {
         revalidate();
     }
     
-// panel containing statistics of the game
-class AbaloneGUIInfoPanel extends JPanel {
-        
+    // panel containing statistics of the game
+    class AbaloneGUIInfoPanel extends JPanel {
         JLabel player1 = new JLabel("Player 1");
         JLabel player2 = new JLabel("Player 2");
         JLabel time1 = new JLabel("0");
@@ -150,7 +149,6 @@ class AbaloneGUIInfoPanel extends JPanel {
                     this.add(new AbaloneGUISquare(sq));
                 }
             }
-            
         }
         
         // represents a single square
@@ -193,43 +191,20 @@ class AbaloneGUIInfoPanel extends JPanel {
                     AbalonePlayer owner = (AbalonePlayer) occupant.getOwner();
                     color = owner.color;
                 }
-                
-                
             }
 
             private class Listener implements MouseListener {
                 @Override
-                public void mouseClicked(MouseEvent arg0) {
-                    // TODO Auto-generated method stub
-                    
-                }
+                public void mouseClicked(MouseEvent arg0) {}
 
                 @Override
-                public void mouseEntered(MouseEvent arg0) {
-                    // TODO Auto-generated method stub
-                    
-                }
+                public void mouseEntered(MouseEvent arg0) {}
 
                 @Override
-                public void mouseExited(MouseEvent arg0) {
-                    // TODO Auto-generated method stub
-                    
-                }
+                public void mouseExited(MouseEvent arg0) {}
 
                 @Override
                 public void mousePressed(MouseEvent arg0) {
-                    /*
-                    System.out.println(square.x + " " + square.y);
-                    
-                    GamePlayer player = getGame().getCurPlayer();
-                    if (player.getActionParam("piece") != null) {
-                        player.trigger(square.moveTrigger);
-                    } else {
-                        player.trigger(square.selectTrigger);
-                    }
-                    
-                    AbaloneGUI.this.repaint();
-                    */
                     if (!((AbalonePlayer) ab.getCurPlayer()).isAI && ab.getCanClick()) {
                         if (ab.selection1[0] == -1) {
                             ab.selection1[0] = square.x;
@@ -256,10 +231,7 @@ class AbaloneGUIInfoPanel extends JPanel {
                 }
 
                 @Override
-                public void mouseReleased(MouseEvent arg0) {
-                    // TODO Auto-generated method stub
-                    
-                }
+                public void mouseReleased(MouseEvent arg0) {}
 
                 private Abalone.Dir getDirection() {
                     

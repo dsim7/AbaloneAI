@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
@@ -12,6 +13,14 @@ import javax.swing.Timer;
 import game.Game;
 import game.GamePiece;
 import game.GamePosition;
+
+/*
+ * TODO:
+ * -after reset movement
+ * -time per move counter display
+ * -bigger outs
+ * -save to times to external
+ */
 
 public class Abalone extends Game {
     static final int PVP = 0;
@@ -22,7 +31,7 @@ public class Abalone extends Game {
     static final Color P1_COLOR = Color.RED;
     static final Color P2_COLOR = Color.BLUE;
     static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
-    static final DecimalFormat FORMAT = new DecimalFormat("#.#");
+    static final DecimalFormat FORMAT = new DecimalFormat("0.0");
     private int turns = 1;
     private int maxTurns = 0;
     private double maxTimePerTurn = 0;
@@ -41,7 +50,6 @@ public class Abalone extends Game {
             player2.timeTaken += 0.1;
             updateGUIs();
         }
-        
     });
     private Timer maxTurnTimer = new Timer(1000, new ActionListener() {
         @Override
@@ -142,6 +150,22 @@ public class Abalone extends Game {
         
     }
 
+    public boolean setState(AbaloneState state) {
+        for (AbaloneCoord coord : state.pieces.get(0)) {
+            new AbalonePiece(this, players.get(0), squares[coord.y][coord.x]);
+        }
+        for (AbaloneCoord coord : state.pieces.get(1)) {
+            new AbalonePiece(this, players.get(1), squares[coord.y][coord.x]);
+        }
+        setCurPlayer(getPlayers().get(state.priority.i));
+        return false;
+    }
+    
+    public boolean move(AbaloneState state) {
+        
+        return false;
+    }
+    
     // front end method to make a move, returns true if the move was successful
     // returns false if the game is currently paused or stopped
     // or if the input coordinates are out of bounds or do not exist
@@ -178,7 +202,7 @@ public class Abalone extends Game {
         ArrayList<AbaloneSquare> toSquares = getSquaresToMoveTo(pieces, dir);
         
         // squares you're moving to cannot be occupied by friendlies
-        if (this.checkSquaresOccupiedByFriendly(pieces, toSquares)) {
+        if (Abalone.checkSquaresOccupiedByFriendly(pieces, toSquares, (AbalonePlayer)getCurPlayer())) {
             //System.out.println("friendlies in destination");
             return false;
         }
@@ -612,34 +636,6 @@ public class Abalone extends Game {
         updateGUIs();
     }
 
-    // determines if a move of pieces between x1,y1 and x2,y2 moving in dir direction
-    // is an inline move or not
-    private boolean isInlineMove(int x1, int y1, int x2, int y2, Dir dir) {
-        if ((x1 == x2) && (y1 != y2)) {
-             if (dir == Dir.UL || dir == Dir.DR) {
-                 return true;
-             }
-        }
-        if ((x1 != x2) && (y1 == y2)) {
-            if (dir == Dir.L || dir == Dir.R) {
-                return true;
-            }
-        }
-        if ((x1 != x2) && (y1 != y2)) {
-            if (dir == Dir.UR || dir == Dir.DL) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    // checks if the squares x1,y1 and x2,y2 exist and that dir is not null
-    private boolean checkValidMoveInput(int x1, int y1, int x2, int y2, Dir dir) {
-        //System.out.println("" + x1 + y1 + x2 + y2 + dir);
-        //System.out.println(getSquare(x1, y1) + " " + getSquare(x2, y2));
-        return dir != null && getSquare(x1, y1) != null && getSquare(x2, y2) != null;
-    }
-    
     // returns the square at coordinates x,y returns null if such a square does not
     // exist, such as coordinate 0,8 or if the coordinates are out of bounds
     private AbaloneSquare getSquare(int x, int y) {
@@ -663,11 +659,6 @@ public class Abalone extends Game {
         }
     }
 
-    // checks if coordinates x and y are in bounds 
-    private boolean inBounds(int x, int y) {
-        return x >= 0 && x <= 8 && y >= 0 && y <= 8;
-    }
-    
     // returns the piece at coordinates x,y. returns null if no piece
     // exists or the square at x,y does not exist or x,y is out of bounds
     private AbalonePiece getPiece(int x, int y) {
@@ -711,9 +702,89 @@ public class Abalone extends Game {
         return result;
     }
     
+    // determines if a move of pieces between x1,y1 and x2,y2 moving in dir direction
+    // is an inline move or not
+    boolean isInlineMove(int x1, int y1, int x2, int y2, Dir dir) {
+        if ((x1 == x2) && (y1 != y2)) {
+             if (dir == Dir.UL || dir == Dir.DR) {
+                 return true;
+             }
+        }
+        if ((x1 != x2) && (y1 == y2)) {
+            if (dir == Dir.L || dir == Dir.R) {
+                return true;
+            }
+        }
+        if ((x1 != x2) && (y1 != y2)) {
+            if (dir == Dir.UR || dir == Dir.DL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // checks if the squares x1,y1 and x2,y2 exist and that dir is not null
+    boolean checkValidMoveInput(int x1, int y1, int x2, int y2, Dir dir) {
+        //System.out.println("" + x1 + y1 + x2 + y2 + dir);
+        //System.out.println(getSquare(x1, y1) + " " + getSquare(x2, y2));
+        return dir != null && inBounds(x1, y1) && inBounds(x2, y2);
+    }
+
+    // checks if coordinates x and y are in bounds 
+    boolean inBounds(int x, int y) {
+        return x >= 0 && x <= 8 && y >= 0 && y <= 8;
+    }
+
+    List<AbaloneCoord> getOriginCoords(int x1, int y1, int x2, int y2, Dir dir) {
+        List<AbaloneCoord> result = new ArrayList<AbaloneCoord>();
+        int dx = (x1 - x2);
+        int dy = (y1 - y2);
+        int ddx = getIncrement(dx);
+        int ddy = getIncrement(dy);
+        for (int i = 0; i <= Math.max(Math.abs(dx), Math.abs(dy)); i++) {
+            AbaloneCoord newCoord = new AbaloneCoord(x1 + ddx * i, y1 + ddy * i);
+            result.add(newCoord);
+        }
+        return result;
+    }
+    
+    List<AbaloneCoord> getDestCoords(List<AbaloneCoord> origin, Dir dir) {
+        List<AbaloneCoord> result = new ArrayList<AbaloneCoord>();
+        for (AbaloneCoord coord : origin) {
+            coord.x += dir.dx;
+            coord.y += dir.dy;
+        }
+        return result;
+    }
+    
+    boolean checkAllContained(List<AbaloneCoord> set, List<AbaloneCoord> playerPieces) {
+        for (AbaloneCoord coord : set) {
+            if (!playerPieces.contains(coord)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    boolean checkDestUnoccupied(List<AbaloneCoord> origin, List<AbaloneCoord> dest,
+            List<AbaloneCoord> playerPieces) {
+        for (AbaloneCoord coord : dest) {
+            if (!origin.contains(coord) && playerPieces.contains(coord)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    boolean checkSetSize(List<AbaloneCoord> set) {
+        return set.size() < 4;
+    }
+    
+    //private 
+    
     // returns the sign of x. used to determine which direction to incrementally
     // search when searching between coordinates for pieces
-    private int getIncrement(int x) {
+    int getIncrement(int x) {
         if (x > 0) {
             return -1;
         } else if (x == 0) {
@@ -722,14 +793,23 @@ public class Abalone extends Game {
             return 1;
         }
     }
+
+    private AbalonePiece getPiece(AbaloneCoord coord) {
+        return (AbalonePiece)getSquare(coord).getPiece();
+    }
     
+    private AbaloneSquare getSquare(AbaloneCoord coord) {
+        return squares[coord.y][coord.x];
+    }
+
     // used to determine if a move is legal because pieces can never move to a
     // space currently occupied by a friendly piece unless that friendly piece
     // will also be moving
-    private boolean checkSquaresOccupiedByFriendly(ArrayList<AbalonePiece> pieces, ArrayList<AbaloneSquare> squares) {
+    static private boolean checkSquaresOccupiedByFriendly(ArrayList<AbalonePiece> pieces, ArrayList<AbaloneSquare> squares,
+            AbalonePlayer player) {
         for (AbaloneSquare sq : squares) {
             if (sq != null) {
-                if (sq.containsFriendly(getCurPlayer()) && !pieces.contains(sq.getPiece())) {
+                if (sq.containsFriendly(player) && !pieces.contains(sq.getPiece())) {
                     return true;
                 }
             }
