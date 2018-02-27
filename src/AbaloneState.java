@@ -5,14 +5,12 @@ public class AbaloneState implements GameState {
     List<List<AbaloneCoord>> pieces = new ArrayList<List<AbaloneCoord>>();
     Priority priority;
     
-    //int turn = 1;
     
     public AbaloneState(List<AbaloneCoord> redPieces, List<AbaloneCoord> bluePieces, Priority priority) {
         this.pieces.add(redPieces);
         this.pieces.add(bluePieces);
         this.priority = priority;
         
-        //this.turn = turn;
     }
     
     enum Priority {
@@ -49,8 +47,11 @@ public class AbaloneState implements GameState {
      * @param direction The direction to move
      * 
      */
-    private void move(List<int[]> pieces, int x1, int y1, int x2, int y2, Abalone.Dir direction) {
-        
+    private AbaloneState getNextState(List<int[]> pieces, int x1, int y1, int x2, int y2, Abalone.Dir direction) {
+        if (AbaloneAI.isValidMove(this, x1, y1, x2, y2, direction)) {
+            
+        }
+        return null;
     }
 
     
