@@ -702,6 +702,9 @@ public class Abalone extends Game {
         return result;
     }
     
+    
+    //====== THESE FUNCTIONS ARE TO BE MOVED TO ABALONEAI======== //
+    
     // determines if a move of pieces between x1,y1 and x2,y2 moving in dir direction
     // is an inline move or not
     boolean isInlineMove(int x1, int y1, int x2, int y2, Dir dir) {
@@ -793,6 +796,10 @@ public class Abalone extends Game {
             return 1;
         }
     }
+    
+
+    //============== //
+    
 
     private AbalonePiece getPiece(AbaloneCoord coord) {
         return (AbalonePiece)getSquare(coord).getPiece();

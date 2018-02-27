@@ -50,30 +50,9 @@ public class AbaloneState implements GameState {
      * 
      */
     private void move(List<int[]> pieces, int x1, int y1, int x2, int y2, Abalone.Dir direction) {
-        int dx = x1 - x2;
-        int dy = y1 - y2;
-        int ddx = getIncrement(dx);
-        int ddy = getIncrement(dy);
         
-        for (int i = 0; i <= Math.max(Math.abs(dx), Math.abs(dy)); i++) {
-            for (int[] coord : pieces) {
-                if (coord[0] == x1 + ddx * i && coord[1] == y1 + ddy * i) {
-                    coord[0] += direction.dx;
-                    coord[1] += direction.dy;
-                }
-            }
-        }
     }
-    
-    private int getIncrement(int x) {
-        if (x > 0) {
-            return -1;
-        } else if (x == 0) {
-            return 0;
-        } else {
-            return 1;
-        }
-    }
+
     
     
 }

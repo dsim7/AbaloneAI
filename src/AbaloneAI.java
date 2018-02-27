@@ -12,33 +12,42 @@ public class AbaloneAI {
     }
     
     private boolean isValidMove(AbaloneState state, int x1, int x2, int y1, int y2, Abalone.Dir dir) {
-        if (!isValidParams(x1, x2, y1, y2, dir)) {
-            return false;
-        }
+        // gets the coordinates of the set of moving pieces
         List<AbaloneCoord> origin = getOriginCoords(x1, x2, y1, y2);
+        
+        // determines if the set has at most 3 pieces
         if (!isSetRightSize(origin)) {
             return false;
         }
+        
+        // gets the current player's pieces
         List<AbaloneCoord> playerPieces = state.pieces.get(state.priority.i);
+        
+        // gets the current player's enemy pieces
+        List<AbaloneCoord> enemyPieces = state.pieces.get(state.priority.i == 1 ? 0 : 1);
+        
+        // checks that the set of moving pieces is all owned by the current player
         if (!isAllContained(origin, playerPieces)) {
             return false;
         }
+        
+        // gets the coordinates of the destination of the set of moving pieces
         List<AbaloneCoord> dest = getDestCoords(origin, dir);
+        
+        // checks that the destination coordinates are unoccupied (or are currently
+        // occupied by other pieces that are moving)
         if (!isDestUnoccupied(origin, dest, playerPieces)) {
             return false;
         }
+        
+        
         List<AbaloneCoord> pushed = getSpacesPushed(origin, dir);
         
         
         return true;
     }
-    
- // checks if the squares x1,y1 and x2,y2 exist and that dir is not null
-    boolean isValidParams(int x1, int y1, int x2, int y2, Abalone.Dir dir) {
-        return dir != null && inBounds(x1, y1) && inBounds(x2, y2);
-    }
 
-// checks if coordinates x and y are in bounds 
+    // checks if coordinates x and y are in bounds 
     boolean inBounds(int x, int y) {
         return x >= 0 && x <= 8 && y >= 0 && y <= 8;
     }
