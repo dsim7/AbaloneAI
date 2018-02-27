@@ -47,8 +47,10 @@ public class AbaloneState implements GameState {
      * @param direction The direction to move
      * 
      */
-    private AbaloneState getNextState(AbaloneAction action) {
-        
+    private AbaloneState getNextState(AbaloneMove move) {
+        if (AbaloneAI.isValidMove(this, move.x1, move.y1, move.x2, move.y2, move.direction)) {
+            
+        }
         return null;
     } 
 
