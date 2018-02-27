@@ -28,7 +28,7 @@ public class AbaloneState implements GameState {
         return 0;
     }
     
-
+    
     @Override
     public GameState[] getAllNextStates() {
         return null;
@@ -47,12 +47,12 @@ public class AbaloneState implements GameState {
      * @param direction The direction to move
      * 
      */
-    private AbaloneState getNextState(List<int[]> pieces, int x1, int y1, int x2, int y2, Abalone.Dir direction) {
-        if (AbaloneAI.isValidMove(this, x1, y1, x2, y2, direction)) {
+    private AbaloneState getNextState(AbaloneMove move) {
+        if (AbaloneAI.isValidMove(this, move.x1, move.y1, move.x2, move.y2, move.direction)) {
             
         }
         return null;
-    }
+    } 
 
     
     

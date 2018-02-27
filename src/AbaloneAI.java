@@ -15,6 +15,11 @@ public class AbaloneAI {
         // gets the coordinates of the set of moving pieces
         List<AbaloneCoord> origin = getOriginCoords(x1, x2, y1, y2);
         
+        // checks that origin pieces are aligned
+        if (origin == null) {
+            return false;
+        }
+        
         // determines if the set has at most 3 pieces
         if (!isSetRightSize(origin)) {
             return false;
@@ -58,14 +63,17 @@ public class AbaloneAI {
     static boolean isSetRightSize(List<AbaloneCoord> set) {
         return set.size() < 4;
     }
-
+    
     static List<AbaloneCoord> getOriginCoords(int x1, int y1, int x2, int y2) {
         List<AbaloneCoord> result = new ArrayList<AbaloneCoord>();
         int dx = (x1 - x2);
         int dy = (y1 - y2);
+        if (dx != 0 && dy != 0 && dy != dx) {
+            return null;
+        }
         int ddx = getIncrement(dx);
         int ddy = getIncrement(dy);
-        for (int i = 0; i <= Math.max(Math.abs(dx), Math.abs(dy)); i++) {
+        for (int i = 0; i <= dx; i++) {
             AbaloneCoord newCoord = new AbaloneCoord(x1 + ddx * i, y1 + ddy * i);
             result.add(newCoord);
         }
