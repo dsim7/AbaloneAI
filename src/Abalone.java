@@ -151,13 +151,13 @@ public class Abalone extends Game {
     }
 
     public boolean setState(AbaloneState state) {
-        for (AbaloneCoord coord : state.pieces.get(0)) {
+        for (AbaloneCoord coord : state.player1.pieces) {
             new AbalonePiece(this, players.get(0), squares[coord.y][coord.x]);
         }
-        for (AbaloneCoord coord : state.pieces.get(1)) {
+        for (AbaloneCoord coord : state.player2.pieces) {
             new AbalonePiece(this, players.get(1), squares[coord.y][coord.x]);
         }
-        setCurPlayer(getPlayers().get(state.priority.i));
+        setCurPlayer(getPlayers().get(state.turn % 2));
         return false;
     }
     

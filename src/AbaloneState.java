@@ -2,27 +2,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AbaloneState implements GameState {
-    List<List<AbaloneCoord>> pieces = new ArrayList<List<AbaloneCoord>>();
-    Priority priority;
+    AbalonePlayer player1, player2;
+    int turn;
     
     
-    public AbaloneState(List<AbaloneCoord> redPieces, List<AbaloneCoord> bluePieces, Priority priority) {
-        this.pieces.add(redPieces);
-        this.pieces.add(bluePieces);
-        this.priority = priority;
+    public AbaloneState(AbalonePlayer player1, AbalonePlayer player2, int turn) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.turn = turn;
         
     }
     
-    enum Priority {
-        P1(0), P2(1);
-        
-        int i;
-        
-        Priority(int i) {
-            this.i = i;
-        }
-    }
-
     @Override
     public int getStateValue() {
         return 0;

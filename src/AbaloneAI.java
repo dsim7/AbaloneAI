@@ -11,9 +11,9 @@ public class AbaloneAI {
         return 0;
     }
     
-    public static boolean isValidMove(AbaloneState state, int x1, int x2, int y1, int y2, Abalone.Dir dir) {
+    public static boolean isValidMove(AbaloneState state, int x1, int y1, int x2, int y2, Abalone.Dir dir) {
         // gets the coordinates of the set of moving pieces
-        List<AbaloneCoord> origin = getOriginCoords(x1, x2, y1, y2);
+        List<AbaloneCoord> origin = getOriginCoords(x1, y1, x2, y2);
         
         // checks that origin pieces are aligned
         if (origin == null) {
@@ -26,10 +26,10 @@ public class AbaloneAI {
         }
         
         // gets the current player's pieces
-        List<AbaloneCoord> playerPieces = state.pieces.get(state.priority.i);
+        List<AbaloneCoord> playerPieces = state.turn % 2 == 1 ? state.player1.pieces : state.player2.pieces;
         
         // gets the current player's enemy pieces
-        List<AbaloneCoord> enemyPieces = state.pieces.get(state.priority.i == 1 ? 0 : 1);
+        List<AbaloneCoord> enemyPieces = state.turn % 2 == 1 ? state.player2.pieces : state.player1.pieces;
         
         // checks that the set of moving pieces is all owned by the current player
         if (!isAllContained(origin, playerPieces)) {
@@ -46,7 +46,7 @@ public class AbaloneAI {
         }
         
         // determines if the move is an inline move
-        if (isInlineMove(x1, x2, y1, y2, dir)) {
+        if (isInlineMove(x1, y1, x2, y2, dir)) {
             // gets the 3 spaces in front of an inline move
             List<AbaloneCoord> pushed = getSpacesPushed(origin, dir);
         }
