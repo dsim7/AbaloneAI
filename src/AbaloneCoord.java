@@ -15,18 +15,16 @@ public class AbaloneCoord {
         AbaloneCoord coord = (AbaloneCoord) obj;
         return x == coord.x && y == coord.y;
     }
-<<<<<<< HEAD
     
     @Override
     public String toString() {
         return "Coord: " + x + "," + y;
-=======
+    }
 
     public int hashCode() {
         int hash = 1;
         hash = 31 * hash + x;
         hash = 31 * hash + y;
         return hash;
->>>>>>> c039c09865d340b4b54d3ad2449725782c5ec802
     }
 }
