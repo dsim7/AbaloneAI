@@ -7,15 +7,16 @@ import game.GamePlayer;
 
 public class AbalonePlayer extends GamePlayer {
     Color color;
-    int outs;
+    int outs, priority;
     double timeTaken;
     boolean isAI;
     AbaloneAI ai = new AbaloneAI();
     List<AbaloneCoord> pieces = new ArrayList<AbaloneCoord>();
     
-    public AbalonePlayer(Color color, Game game) {
+    public AbalonePlayer(int priority, Color color, Game game) {
         super(game);
         this.color = color;
+        this.priority = priority;
     }
 
 }

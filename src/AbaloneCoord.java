@@ -15,4 +15,9 @@ public class AbaloneCoord {
         AbaloneCoord coord = (AbaloneCoord) obj;
         return x == coord.x && y == coord.y;
     }
+    
+    @Override
+    public String toString() {
+        return "Coord: " + x + "," + y;
+    }
 }

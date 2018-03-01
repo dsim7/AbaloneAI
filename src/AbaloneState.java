@@ -2,13 +2,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AbaloneState implements GameState {
-    AbalonePlayer player1, player2;
+    List<AbaloneCoord> p1Pieces = new ArrayList<AbaloneCoord>();
+    List<AbaloneCoord> p2Pieces = new ArrayList<AbaloneCoord>();
     int turn;
     
     
-    public AbaloneState(AbalonePlayer player1, AbalonePlayer player2, int turn) {
-        this.player1 = player1;
-        this.player2 = player2;
+    public AbaloneState(List<AbaloneCoord> p1Pieces, List<AbaloneCoord> p2Pieces, int turn) {
+        this.p1Pieces = p1Pieces;
+        this.p2Pieces = p2Pieces;
         this.turn = turn;
         
     }
