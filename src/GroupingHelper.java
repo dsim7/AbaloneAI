@@ -16,14 +16,22 @@ public final class GroupingHelper {
         final List<List<AbaloneCoord>> groups = new ArrayList<List<AbaloneCoord>>();
         final Set<List<AbaloneCoord>> uniqueGroups = new HashSet<List<AbaloneCoord>>();
 
-        for (AbaloneCoord pieceCoordinateAlpha : playerPieces) {
+        for (int i = 0; i < playerPieces.size(); i++) {
+            for (int j = i; j < playerPieces.size(); j++) {
+                if (validateGrouping(playerPieces.get(i), playerPieces.get(j), playerPieces)) {
+                    ArrayList<AbaloneCoord> groupCoordinates = generateCoordinates(playerPieces.get(i), playerPieces.get(j));
+                    uniqueGroups.add(groupCoordinates);
+                }
+            }
+        }
+        /*for (AbaloneCoord pieceCoordinateAlpha : playerPieces) {
             for (AbaloneCoord pieceCoordinateBeta : playerPieces) {
                 if (validateGrouping(pieceCoordinateAlpha, pieceCoordinateBeta, playerPieces)) {
                     ArrayList<AbaloneCoord> groupCoordinates = generateCoordinates(pieceCoordinateAlpha, pieceCoordinateBeta);
                     uniqueGroups.add(groupCoordinates);
                 }
             }
-        }
+        }*/
 
         for (List<AbaloneCoord> group : uniqueGroups) {
             groups.add(group);
