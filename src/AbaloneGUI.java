@@ -21,10 +21,15 @@ import game.GameGUI;
 import game.GamePiece;
 import game.GamePlayer;
 
+/**
+ * The GUI to display the Abalone game
+ * 
+ * @author dylan
+ *
+ */
 public class AbaloneGUI extends JPanel {
     private Abalone ab;
     
-    AbaloneState state;
     AbaloneGUISquare[][] coordSpaces = new AbaloneGUISquare[9][9];
     AbaloneGUIInfoPanel info = new AbaloneGUIInfoPanel();
 
@@ -34,14 +39,22 @@ public class AbaloneGUI extends JPanel {
         this.add(new AbaloneGUIGrid(), BorderLayout.CENTER);
         this.add(info, BorderLayout.SOUTH);
     }
-    
-    public void updateState(AbaloneState state) {
-        this.state = state;
+
+    /**
+     * Updates the GUI's display by reading the Abalone game's current state and
+     * score/time information.
+     * 
+     */
+    public void updateState() {
         this.updateColors();
         this.updateInfo();
         this.repaint();
     }
     
+    /**
+     * Updates only the GUI's score/time information display. 
+     * 
+     */
     public void updateInfo() {
         info.updateInfo();
     }
@@ -55,16 +68,16 @@ public class AbaloneGUI extends JPanel {
                 }
             }
         }
-        if (state == null) {
+        if (ab.state == null) {
             return;
         }
         // player1 
-        List<AbaloneCoord> p1Pieces = state.p1Pieces;
+        List<AbaloneCoord> p1Pieces = ab.state.p1Pieces;
         for (AbaloneCoord p1piece : p1Pieces) {
             coordSpaces[p1piece.y][p1piece.x].color = Color.RED;
         }
         // player2
-        List<AbaloneCoord> p2Pieces = state.p2Pieces;
+        List<AbaloneCoord> p2Pieces = ab.state.p2Pieces;
         for (AbaloneCoord p2piece : p2Pieces) {
             coordSpaces[p2piece.y][p2piece.x].color = Color.BLUE;
         }
@@ -129,13 +142,12 @@ public class AbaloneGUI extends JPanel {
             center.add(turnslabel);
         }
         
-        // update statistics with the most recent information
         private void updateInfo() {
             outs1label.setText("" + ab.player1.outs);
             outs2label.setText("" + ab.player2.outs);
             time1label.setText("" + Abalone.FORMAT.format(ab.player1.timeTaken));
             time2label.setText("" + Abalone.FORMAT.format(ab.player2.timeTaken));
-            turnslabel.setText("" + (state == null ? 0 : state.turn));
+            turnslabel.setText("" + (ab.state == null ? 0 : ab.state.turn));
             repaint();
         }
         
@@ -145,19 +157,19 @@ public class AbaloneGUI extends JPanel {
     
     // panel containing the hexagonal board
     class AbaloneGUIGrid extends JPanel {
-    AbaloneGUIGrid() {
-        this.setBackground(Color.BLACK);
-        this.setLayout(new GridLayout(9,1));
-        for (int i = 8; i >= 0; i--) {
-            this.add(new AbaloneGUIGridStrip(ab.board[i]));
+        private AbaloneGUIGrid() {
+            this.setBackground(Color.BLACK);
+            this.setLayout(new GridLayout(9,1));
+            for (int i = 8; i >= 0; i--) {
+                this.add(new AbaloneGUIGridStrip(ab.board[i]));
+            }
         }
     }
-}
 
 
     // a strip represents one row of squares on the board
     class AbaloneGUIGridStrip extends JPanel {
-        AbaloneGUIGridStrip(AbaloneCoord[] strip) {
+        private AbaloneGUIGridStrip(AbaloneCoord[] strip) {
             this.setBackground(Color.BLACK);
             this.setVisible(true);
             for (AbaloneCoord sq : strip) {
@@ -178,7 +190,7 @@ public class AbaloneGUI extends JPanel {
         //AbaloneSquare square;
         //BasicStroke selectedStroke = new BasicStroke(10);
         
-        AbaloneGUISquare(AbaloneCoord coord) {
+        private AbaloneGUISquare(AbaloneCoord coord) {
             this.setPreferredSize(new Dimension(85,85));
             this.setVisible(true);
             this.setOpaque(false);

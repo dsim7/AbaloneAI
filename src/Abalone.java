@@ -26,18 +26,27 @@ import game.GamePosition;
  * -save to times to external
  */
 
+
+/**
+ * Center of the Abalone game. Contains configurations for the game as it is
+ * played, timers for each player, and an association with a GUI. An Abalone
+ * game processes command line commands to configure the game.
+ * 
+ * @author dylan
+ *
+ */
 public class Abalone extends Game {
-    static final int PVP = 0;
-    static final int PVC = 1;
-    static final int CVC = 2;
-    static final int FRAME_WIDTH = 1000;
-    static final int FRAME_HEIGHT = 1000;
-    static final Color P1_COLOR = Color.RED;
-    static final Color P2_COLOR = Color.BLUE;
-    static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
-    static final DecimalFormat FORMAT = new DecimalFormat("0.0");
+    public static final int PVP = 0;
+    public static final int PVC = 1;
+    public static final int CVC = 2;
+    public static final int FRAME_WIDTH = 1000;
+    public static final int FRAME_HEIGHT = 1000;
+    public static final Color P1_COLOR = Color.RED;
+    public static final Color P2_COLOR = Color.BLUE;
+    public static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
+    public static final DecimalFormat FORMAT = new DecimalFormat("0.0");
     
-    static final AbaloneCoord[] P1_STANDARD = {
+    public static final AbaloneCoord[] P1_STANDARD = {
         new AbaloneCoord(0, 0), new AbaloneCoord(1, 0),
         new AbaloneCoord(2, 0), new AbaloneCoord(3, 0),
         new AbaloneCoord(4, 0), new AbaloneCoord(0, 1),
@@ -47,7 +56,7 @@ public class Abalone extends Game {
         new AbaloneCoord(3, 2), new AbaloneCoord(4, 2)
     };
 
-    static final AbaloneCoord[] P2_STANDARD = {
+    public static final AbaloneCoord[] P2_STANDARD = {
         new AbaloneCoord(4, 8), new AbaloneCoord(5, 8),
         new AbaloneCoord(6, 8), new AbaloneCoord(7, 8),
         new AbaloneCoord(8, 8), new AbaloneCoord(3, 7),
@@ -57,7 +66,7 @@ public class Abalone extends Game {
         new AbaloneCoord(5, 6), new AbaloneCoord(6, 6),
     };
     
-    static final AbaloneCoord[] P1_BELGIAN = {
+    public static final AbaloneCoord[] P1_BELGIAN = {
         new AbaloneCoord(0, 0), new AbaloneCoord(1, 0),
         new AbaloneCoord(2, 0), new AbaloneCoord(3, 0),
         new AbaloneCoord(4, 0), new AbaloneCoord(0, 1),
@@ -67,7 +76,7 @@ public class Abalone extends Game {
         new AbaloneCoord(3, 2), new AbaloneCoord(4, 2)
     };
 
-    static final AbaloneCoord[] P2_BELGIAN = {
+    public static final AbaloneCoord[] P2_BELGIAN = {
         new AbaloneCoord(4, 8), new AbaloneCoord(5, 8),
         new AbaloneCoord(6, 8), new AbaloneCoord(7, 8),
         new AbaloneCoord(8, 8), new AbaloneCoord(3, 7),
@@ -77,7 +86,7 @@ public class Abalone extends Game {
         new AbaloneCoord(5, 6), new AbaloneCoord(6, 6),
     }; 
     
-    static final AbaloneCoord[] P1_GERMAN = {
+    public static final AbaloneCoord[] P1_GERMAN = {
         new AbaloneCoord(0, 0), new AbaloneCoord(1, 0),
         new AbaloneCoord(2, 0), new AbaloneCoord(3, 0),
         new AbaloneCoord(4, 0), new AbaloneCoord(0, 1),
@@ -87,7 +96,7 @@ public class Abalone extends Game {
         new AbaloneCoord(3, 2), new AbaloneCoord(4, 2)
     };
 
-    static final AbaloneCoord[] P2_GERMAN = {
+    public static final AbaloneCoord[] P2_GERMAN = {
         new AbaloneCoord(4, 8), new AbaloneCoord(5, 8),
         new AbaloneCoord(6, 8), new AbaloneCoord(7, 8),
         new AbaloneCoord(8, 8), new AbaloneCoord(3, 7),
@@ -135,12 +144,8 @@ public class Abalone extends Game {
             }
         }
     };
-
-    
     private Timer lastRunningTimer = p1timer;
-    AbalonePlayer player1 = new AbalonePlayer(0, P1_COLOR, this);
-    AbalonePlayer player2 = new AbalonePlayer(1, P2_COLOR, this);
-    
+
     private boolean gameRunning = false;
     private boolean gameStarted = false;
     private boolean gameOver = false;
@@ -150,13 +155,13 @@ public class Abalone extends Game {
     private boolean settingTimePerTurn = false;
     Dir directionSelection;
     
+    private AbaloneGUI gui;
 
-    
     AbaloneState state;
-    AbaloneGUI gui;
+    AbalonePlayer player1 = new AbalonePlayer(0, P1_COLOR, this);
+    AbalonePlayer player2 = new AbalonePlayer(1, P2_COLOR, this);
     AbaloneCoord selection1, selection2;
     AbaloneCoord[][] board = new AbaloneCoord[9][9];
-    
     
     public static void main(String[] args) {
         new Abalone();
@@ -184,18 +189,23 @@ public class Abalone extends Game {
         
     }
 
+    /**
+     * Determines whether the game is ready for users to click pieces and play the game.
+     * 
+     * @return true if the game is not over, the game has started, and the game is running
+     */
     public boolean getCanClick() {
         return !gameOver && gameRunning && gameStarted;
     }
     
-    // switches the current player of the game;
+    /**
+     * Rotate player turns. 
+     */
     public void nextTurn() {
+        super.nextPlayerTurn();
         printTurnInfo();
-        
         switchTimers();
-        
         checkMaxTurns();
-        
         updateGUI();
         
         // ai
@@ -302,7 +312,6 @@ public class Abalone extends Game {
 
     */
     
-    // processes input from System.in
     private boolean processInput(String input) {
         String lowerInput = input.toLowerCase();
         if (lowerInput.equals("stop")) { //stops the game and restarts all timers. game is over
@@ -321,7 +330,7 @@ public class Abalone extends Game {
         
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_STANDARD, P2_STANDARD);
+                initState(P1_STANDARD, P2_STANDARD, 1);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -329,7 +338,7 @@ public class Abalone extends Game {
         } else if (lowerInput.equals("belgian")) {
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_BELGIAN, P2_BELGIAN);
+                initState(P1_BELGIAN, P2_BELGIAN, 1);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -337,7 +346,7 @@ public class Abalone extends Game {
         } else if (lowerInput.equals("german")) {
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_GERMAN, P2_GERMAN);
+                initState(P1_GERMAN, P2_GERMAN, 1);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -421,33 +430,20 @@ public class Abalone extends Game {
         }
         return false;
     }
-
-    private boolean executeAIMove(AbaloneMove move) {
-        return true;
-    }
     
     private void printTurnInfo() {
         if (moveThisTurn != null) {
+            double timeTakenThisTurn = ((AbalonePlayer)getCurPlayer()).timeTaken - timeAtTurnStart;
             System.out.println("Player " + (getPlayers().indexOf(getCurPlayer()) + 1) + 
                     ": " + moveThisTurn.x1 + 
                     "," + moveThisTurn.y1 +
                     " to " + moveThisTurn.x2 + 
                     "," + moveThisTurn.y2 + 
                     " moving " + moveThisTurn.direction + 
-                    " in " + FORMAT.format(getTimeTakenThisTurn()) + "s");
+                    " in " + FORMAT.format(timeTakenThisTurn) + "s");
         }
     }
     
-    // get the time that has elapsed this turn
-    private double getTimeTakenThisTurn() {
-        return ((AbalonePlayer)getCurPlayer()).timeTaken - timeAtTurnStart;
-        
-    }
-    
-    
-    
-    
-
     /*
     int x1, y1, x2, y2;
     String[] parsed = input.split(" ");
@@ -994,10 +990,10 @@ public class Abalone extends Game {
         }
     }
     
-    private void initState(AbaloneCoord[] p1array, AbaloneCoord[] p2array) {
+    private void initState(AbaloneCoord[] p1array, AbaloneCoord[] p2array, int turn) {
         List<AbaloneCoord> p1PiecesStandard = Arrays.asList(p1array);
         List<AbaloneCoord> p2PiecesStandard = Arrays.asList(p2array);
-        state = new AbaloneState(p1PiecesStandard, p2PiecesStandard, 1);
+        state = new AbaloneState(p1PiecesStandard, p2PiecesStandard, turn);
         updateGUI();
     }
 
@@ -1132,13 +1128,24 @@ public class Abalone extends Game {
     }
     
     private void updateGUI() {
-        gui.updateState(state);
+        gui.updateState();
     }
     
     private void updateGUIInfo() {
         gui.updateInfo();
     }
     
+    /**
+     * Attempts to perform a move indicated by a player.
+     * 
+     * POST: The state of the game will be updated to the resulting state
+     * of the move if the move is successful.
+     * 
+     * @param coord1 The coordinate of one end of the group to be moved
+     * @param coord2 The coordinate of the other end of the group to be moved
+     * @param dir The direction the group is to be moved
+     * @return true if the move is successful
+     */
     public boolean move(AbaloneCoord coord1, AbaloneCoord coord2, Dir dir) {
         System.out.println(coord1);
         System.out.println(coord2);
