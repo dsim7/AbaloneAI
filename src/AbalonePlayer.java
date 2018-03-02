@@ -2,10 +2,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import game.Game;
-import game.GamePlayer;
-
-public class AbalonePlayer extends GamePlayer {
+public class AbalonePlayer {
+    Abalone abalone;
     Color color;
     int outs, priority;
     double timeTaken;
@@ -13,8 +11,8 @@ public class AbalonePlayer extends GamePlayer {
     AbaloneAI ai = new AbaloneAI();
     List<AbaloneCoord> pieces = new ArrayList<AbaloneCoord>();
     
-    public AbalonePlayer(int priority, Color color, Game game) {
-        super(game);
+    public AbalonePlayer(int priority, Color color, Abalone game) {
+        this.abalone = game;
         this.color = color;
         this.priority = priority;
     }

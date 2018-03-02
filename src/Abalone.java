@@ -6,7 +6,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -14,9 +13,6 @@ import java.util.Scanner;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-import game.Game;
-import game.GamePiece;
-import game.GamePosition;
 
 /*
  * TODO:
@@ -35,7 +31,7 @@ import game.GamePosition;
  * @author dylan
  *
  */
-public class Abalone extends Game {
+public class Abalone {
     public static final int PVP = 0;
     public static final int PVC = 1;
     public static final int CVC = 2;
@@ -116,14 +112,14 @@ public class Abalone extends Game {
         @Override
         public void actionPerformed(ActionEvent e) {
             player1.timeTaken += 0.1;
-            gui.updateInfo();
+            updateGUIInfo();
         }
     });
     private Timer p2timer = new Timer(100, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             player2.timeTaken += 0.1;
-            gui.updateInfo();
+            updateGUIInfo();
         }
     });
     private Timer maxTurnTimer = new Timer(1000, new ActionListener() {
@@ -160,6 +156,7 @@ public class Abalone extends Game {
     AbaloneState state;
     AbalonePlayer player1 = new AbalonePlayer(0, P1_COLOR, this);
     AbalonePlayer player2 = new AbalonePlayer(1, P2_COLOR, this);
+    AbalonePlayer curPlayer = player1;
     AbaloneCoord selection1, selection2;
     AbaloneCoord[][] board = new AbaloneCoord[9][9];
     
@@ -168,10 +165,7 @@ public class Abalone extends Game {
     }
     
     // constructor which initializes the board and begins listening for user input
-    public Abalone() {
-        this.addPlayer(player1);
-        this.addPlayer(player2);
-    
+    public Abalone() {    
         this.initSquares();
         this.initGUIs();
         //this.initStateStandard();
@@ -202,7 +196,6 @@ public class Abalone extends Game {
      * Rotate player turns. 
      */
     public void nextTurn() {
-        super.nextPlayerTurn();
         printTurnInfo();
         switchTimers();
         checkMaxTurns();
@@ -219,6 +212,18 @@ public class Abalone extends Game {
         }
         */
         
+    }
+    
+    public void nextPlayerTurn() {
+        if (curPlayer == player1) {
+            setCurPlayer(player2);
+        } else {
+            setCurPlayer(player1);
+        }
+    }
+    
+    public AbalonePlayer getCurPlayer() {
+        return curPlayer;
     }
     
     private void checkMaxTurns() {
@@ -433,8 +438,8 @@ public class Abalone extends Game {
     
     private void printTurnInfo() {
         if (moveThisTurn != null) {
-            double timeTakenThisTurn = ((AbalonePlayer)getCurPlayer()).timeTaken - timeAtTurnStart;
-            System.out.println("Player " + (getPlayers().indexOf(getCurPlayer()) + 1) + 
+            double timeTakenThisTurn = curPlayer.timeTaken - timeAtTurnStart;
+            System.out.println("Player " + (curPlayer.priority + 1) + 
                     ": " + moveThisTurn.x1 + 
                     "," + moveThisTurn.y1 +
                     " to " + moveThisTurn.x2 + 
@@ -523,31 +528,29 @@ public class Abalone extends Game {
     private void setRedGoesFirst(boolean b) {
         if (!b) {
             System.out.println("Setting Blue moves first");
-            this.setCurPlayer(getPlayers().get(1));
+            this.setCurPlayer(player2);
             this.lastRunningTimer = p2timer;
         } else {
             System.out.println("Setting Red moves first");
-            this.setCurPlayer(getPlayers().get(0));
+            this.setCurPlayer(player1);
             this.lastRunningTimer = p1timer;
         }
     }
 
     // sets whether it is PVP, PVC, or CVC
     private void setAI(int x) {
-        AbalonePlayer p1 = (AbalonePlayer) getPlayers().get(0);
-        AbalonePlayer p2 = (AbalonePlayer) getPlayers().get(1);
         switch(x) {
         case 0 :
-            p1.isAI = false;
-            p2.isAI = false;
+            player1.isAI = false;
+            player2.isAI = false;
             break;
         case 1 : 
-            p1.isAI = false;
-            p2.isAI = true;
+            player1.isAI = false;
+            player2.isAI = true;
             break;
         case 2 :
-            p1.isAI = true;
-            p2.isAI = true;
+            player1.isAI = true;
+            player2.isAI = true;
             break;
         }
         
@@ -611,7 +614,7 @@ public class Abalone extends Game {
     
     // switches which timer is running between player1 and player2
     private void switchTimers() {
-        timeAtTurnStart = ((AbalonePlayer)getCurPlayer()).timeTaken;
+        timeAtTurnStart = curPlayer.timeTaken;
         
         if (p1timer.isRunning()) {
             p1timer.stop();
@@ -1161,6 +1164,10 @@ public class Abalone extends Game {
         selection1 = null;
         selection2 = null;
         directionSelection = null;
+    }
+    
+    public void setCurPlayer(AbalonePlayer player) {
+        this.curPlayer = player;
     }
     
 

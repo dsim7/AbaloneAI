@@ -16,11 +16,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import game.Game; 
-import game.GameGUI;
-import game.GamePiece;
-import game.GamePlayer;
-
 /**
  * The GUI to display the Abalone game
  * 
@@ -30,8 +25,8 @@ import game.GamePlayer;
 public class AbaloneGUI extends JPanel {
     private Abalone ab;
     
-    AbaloneGUISquare[][] coordSpaces = new AbaloneGUISquare[9][9];
-    AbaloneGUIInfoPanel info = new AbaloneGUIInfoPanel();
+    private AbaloneGUISquare[][] coordSpaces = new AbaloneGUISquare[9][9];
+    private AbaloneGUIInfoPanel info = new AbaloneGUIInfoPanel();
 
     AbaloneGUI(Abalone ab) {
         this.ab = ab;
@@ -228,7 +223,7 @@ public class AbaloneGUI extends JPanel {
     
             @Override
             public void mousePressed(MouseEvent arg0) {
-                if (!((AbalonePlayer) ab.getCurPlayer()).isAI && ab.getCanClick()) {
+                if (!(ab.getCurPlayer()).isAI && ab.getCanClick()) {
                     System.out.println(coord);
                     if (ab.selection1 == null) {
                         ab.selection1 = coord;
