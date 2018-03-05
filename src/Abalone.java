@@ -196,7 +196,7 @@ public class Abalone {
      * Rotate player turns. 
      */
     public void nextTurn() {
-        printTurnInfo();
+        //printTurnInfo();
         switchTimers();
         checkMaxTurns();
         updateGUI();
@@ -435,7 +435,9 @@ public class Abalone {
         }
         return false;
     }
-    
+
+    /*
+    Affected by AbaloneMove change
     private void printTurnInfo() {
         if (moveThisTurn != null) {
             double timeTakenThisTurn = curPlayer.timeTaken - timeAtTurnStart;
@@ -448,6 +450,7 @@ public class Abalone {
                     " in " + FORMAT.format(timeTakenThisTurn) + "s");
         }
     }
+    */
     
     /*
     int x1, y1, x2, y2;

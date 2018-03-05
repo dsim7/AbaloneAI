@@ -1,15 +1,13 @@
+import java.util.List;
 
 public class AbaloneMove {
-    int x1, x2, y1, y2;
-    Abalone.Dir direction;
+    private List<AbaloneCoord> pieces;
+    private Abalone.Dir direction;
+    private boolean isInlineMove;
     
-    AbaloneMove(int x1, int y1, int x2, int y2, Abalone.Dir direction) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
+    AbaloneMove(List<AbaloneCoord> pieces, Abalone.Dir direction, boolean isInlineMove) {
+        this.pieces = pieces;
         this.direction = direction;
+        this.isInlineMove = isInlineMove;
     }
-    
-    
 }
