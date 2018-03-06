@@ -1,6 +1,7 @@
+import java.util.List;
 
 public interface GameState {
-    GameState[] getAllNextStates();
+    List<GameState> getAllNextStates();
     
     int getStateValue();
     
