@@ -36,14 +36,16 @@ public class MoveHelperTest {
         coordinates.add(new AbaloneCoord(1,1));
         coordinates.add(new AbaloneCoord(2,1));
         coordinates.add(new AbaloneCoord(3,1));
-        coordinates.add(new AbaloneCoord(5,1));
         return coordinates;
     }
 
     private Set<AbaloneCoord> generatePlayerTwoPieces() {
 
         Set<AbaloneCoord> coordinates = new HashSet<>();
+        coordinates.add(new AbaloneCoord(0,1));
         coordinates.add(new AbaloneCoord(4,1));
+        coordinates.add(new AbaloneCoord(2,2));
+        coordinates.add(new AbaloneCoord(5,1));
         return coordinates;
     }
 
