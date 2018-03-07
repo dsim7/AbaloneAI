@@ -25,28 +25,58 @@ public class AbaloneState implements GameState {
         return null;
     }
 
-    /*
     /**
-     * Changes the coordinates of pieces
+     * Generates the new state based off the move passed in.
      * 
-     * PRECONDITION: all coordinates between x1,y1 and x2,y2 exist within the list pieces
-     * 
-     * @param pieces The list of pieces in which the pieces to move reside in
-     * @param x1 The x-coordinate of one end of the pieces to move
-     * @param y1 The y-coordinate of one end of the pieces to move
-     * @param x2 The x-coordinate of the other end of the pieces to move
-     * @param y2 The y-coordinate of the other end of the pieces to move
-     * @param direction The direction to move
-     * 
+     * @param move: (List<AbaloneCoord> pieces, Abalone.Dir direction, boolean isInlineMove)
      */
-    /*
     private AbaloneState getNextState(AbaloneMove move) {
-        if (AbaloneAI.isValidMove(this, move.x1, move.y1, move.x2, move.y2, move.direction)) {
+        
+        List<AbaloneCoord> movingPieces;
+        List<AbaloneCoord> pushedPieces;
+        Abalone.Dir direction;
+        List<AbaloneCoord> p1Pces = new ArrayList<AbaloneCoord>();
+        List<AbaloneCoord> p2Pces = new ArrayList<AbaloneCoord>();
+        
+        movingPieces = move.getMovingPieces();
+        pushedPieces = move.getPushedPieces();
+        direction = move.getDirection();
+        
+        for(AbaloneCoord coord : p1Pieces) {
+            p1Pces.add(coord);
+        }
+        
+        for(AbaloneCoord coord : p2Pieces) {
+            p2Pces.add(coord);
+        }
+        
+        for(AbaloneCoord coord : movingPieces) {
+            
+            for(int i = 0; i < p1Pces.size(); i++) {
+                
+                if(coord.equals(p1Pces.get(i))) {
+                    
+                }
+                
+            }
+        }
+        
+        for(AbaloneCoord coord : pushedPieces) {
+            
+            for(int i = 0; i < p2Pces.size(); i++) {
+                
+                if(coord.equals(p2Pces.get(i))) {
+                    
+                }
+                
+            } 
             
         }
-        return null;
-    }
-    */
+        
+        AbaloneState newState = new AbaloneState(p1Pces, p2Pces, turn + 1);
+        
+        return newState;
+    } 
 
     
     
