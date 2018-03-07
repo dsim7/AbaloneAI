@@ -1,13 +1,16 @@
+package abalone;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AbaloneState {
-    List<AbaloneCoord> p1Pieces = new ArrayList<AbaloneCoord>();
-    List<AbaloneCoord> p2Pieces = new ArrayList<AbaloneCoord>();
+    Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
+    Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
     int turn;
     
     
-    public AbaloneState(List<AbaloneCoord> p1Pieces, List<AbaloneCoord> p2Pieces, int turn) {
+    public AbaloneState(Set<AbaloneCoord> p1Pieces, Set<AbaloneCoord> p2Pieces, int turn) {
         this.p1Pieces = p1Pieces;
         this.p2Pieces = p2Pieces;
         this.turn = turn;
@@ -19,10 +22,10 @@ public class AbaloneState {
     }
     
     public List<AbaloneState> getAllNextStates() {
-        List<AbaloneCoord> p1Pieces = new ArrayList<AbaloneCoord>();
-        List<AbaloneCoord> p2Pieces = new ArrayList<AbaloneCoord>();
-        List<AbaloneCoord> p1Pieces2 = new ArrayList<AbaloneCoord>();
-        List<AbaloneCoord> p2Pieces2 = new ArrayList<AbaloneCoord>();
+        Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
+        Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
+        Set<AbaloneCoord> p1Pieces2 = new HashSet<AbaloneCoord>();
+        Set<AbaloneCoord> p2Pieces2 = new HashSet<AbaloneCoord>();
         p1Pieces.add(new AbaloneCoord(0,0));
         p1Pieces.add(new AbaloneCoord(1,0));
         p1Pieces.add(new AbaloneCoord(2,0));
@@ -40,6 +43,7 @@ public class AbaloneState {
         
         return listOfStates;
     }
+
     
     /**
      * Changes the coordinates of pieces
@@ -55,9 +59,7 @@ public class AbaloneState {
      * 
      */
     private AbaloneState getNextState(AbaloneMove move) {
-        if (AbaloneAI.isValidMove(this, move.x1, move.y1, move.x2, move.y2, move.direction)) {
-            
-        }
+        
         return null;
     } 
     
@@ -76,7 +78,6 @@ public class AbaloneState {
         toWrite = toWrite.replaceAll(",$", "");
         return toWrite;
     }
-
     
     
 }

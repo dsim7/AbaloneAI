@@ -1,8 +1,9 @@
+package abalone;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AbaloneAI {
-    
+    /*
     public static boolean isValidMove(AbaloneState state, int x1, int y1, int x2, int y2, Abalone.Dir dir) {
         // gets the coordinates of the set of moving pieces
         List<AbaloneCoord> origin = getOriginCoords(x1, y1, x2, y2);
@@ -18,10 +19,10 @@ public class AbaloneAI {
         }
         
         // gets the current player's pieces
-        List<AbaloneCoord> playerPieces = state.turn % 2 == 1 ? state.p1Pieces : state.p2Pieces;
+        Set<AbaloneCoord> playerPieces = state.turn % 2 == 1 ? state.p1Pieces : state.p2Pieces;
         
         // gets the current player's enemy pieces
-        List<AbaloneCoord> enemyPieces = state.turn % 2 == 1 ? state.p2Pieces : state.p1Pieces;
+        Set<AbaloneCoord> enemyPieces = state.turn % 2 == 1 ? state.p2Pieces : state.p1Pieces;
         
         // checks that the set of moving pieces is all owned by the current player
         if (!isAllContained(origin, playerPieces)) {
@@ -169,6 +170,6 @@ public class AbaloneAI {
         return result;
     }
     
-    
+    */
     
 }

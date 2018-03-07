@@ -1,13 +1,18 @@
+package test;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+
+import abalone.AbaloneCoord;
+import abalone.GroupingHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
 public class GroupingHelperTest {
 
     @Test
@@ -53,8 +58,8 @@ public class GroupingHelperTest {
         assertTrue(groups.size() == 22);
     }
 
-    public List<AbaloneCoord> mockPlayerPieceCoordinatesWithTriangle3Pieces() {
-        final List<AbaloneCoord> playerPieces = new ArrayList<AbaloneCoord>();
+    public Set<AbaloneCoord> mockPlayerPieceCoordinatesWithTriangle3Pieces() {
+        final HashSet<AbaloneCoord> playerPieces = new HashSet<AbaloneCoord>();
         playerPieces.add(new AbaloneCoord(0,0));
         playerPieces.add(new AbaloneCoord(1,1));
         playerPieces.add(new AbaloneCoord(1,0));
@@ -62,16 +67,16 @@ public class GroupingHelperTest {
         return playerPieces;
     }
 
-    public List<AbaloneCoord> mockPlayerPieceCoordinatesWithInline2Pieces() {
-        final List<AbaloneCoord> playerPieces = new ArrayList<AbaloneCoord>();
+    public Set<AbaloneCoord> mockPlayerPieceCoordinatesWithInline2Pieces() {
+        final Set<AbaloneCoord> playerPieces = new HashSet<AbaloneCoord>();
         playerPieces.add(new AbaloneCoord(0,0));
         playerPieces.add(new AbaloneCoord(1,1));
 
         return playerPieces;
     }
 
-    public List<AbaloneCoord> mockPlayerPieceCoordinatesWithInline3Pieces() {
-        final List<AbaloneCoord> playerPieces = new ArrayList<AbaloneCoord>();
+    public Set<AbaloneCoord> mockPlayerPieceCoordinatesWithInline3Pieces() {
+        final Set<AbaloneCoord> playerPieces = new HashSet<AbaloneCoord>();
         playerPieces.add(new AbaloneCoord(0,0));
         playerPieces.add(new AbaloneCoord(1,1));
         playerPieces.add(new AbaloneCoord(2,2));
@@ -79,8 +84,8 @@ public class GroupingHelperTest {
         return playerPieces;
     }
 
-    public List<AbaloneCoord> mockPlayerPieceCoordinatesWithInline4Pieces() {
-        final List<AbaloneCoord> playerPieces = new ArrayList<AbaloneCoord>();
+    public Set<AbaloneCoord> mockPlayerPieceCoordinatesWithInline4Pieces() {
+        final Set<AbaloneCoord> playerPieces = new HashSet<AbaloneCoord>();
         playerPieces.add(new AbaloneCoord(0,0));
         playerPieces.add(new AbaloneCoord(1,0));
         playerPieces.add(new AbaloneCoord(2,0));
@@ -89,8 +94,8 @@ public class GroupingHelperTest {
         return playerPieces;
     }
 
-    public List<AbaloneCoord> mockPlayerPieceCoordinatesWithInline5Pieces() {
-        final List<AbaloneCoord> playerPieces = new ArrayList<AbaloneCoord>();
+    public Set<AbaloneCoord> mockPlayerPieceCoordinatesWithInline5Pieces() {
+        final Set<AbaloneCoord> playerPieces = new HashSet<AbaloneCoord>();
         playerPieces.add(new AbaloneCoord(0,0));
         playerPieces.add(new AbaloneCoord(1,0));
         playerPieces.add(new AbaloneCoord(2,0));
@@ -100,9 +105,9 @@ public class GroupingHelperTest {
         return playerPieces;
     }
 
-    public List<AbaloneCoord> mockPlayerPieceCoordinatesWithMiddle7Pieces() {
+    public Set<AbaloneCoord> mockPlayerPieceCoordinatesWithMiddle7Pieces() {
         // 3,4 3,3 4,3 5,4 5,5 4,4 4,5
-        final List<AbaloneCoord> playerPieces = new ArrayList<AbaloneCoord>();
+        final Set<AbaloneCoord> playerPieces = new HashSet<AbaloneCoord>();
         playerPieces.add(new AbaloneCoord(3,4));
         playerPieces.add(new AbaloneCoord(3,3));
         playerPieces.add(new AbaloneCoord(4,3));

@@ -1,3 +1,4 @@
+package abalone;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,14 +13,17 @@ public final class GroupingHelper {
      * Given coordinates of pieces, generate groups.
      * @return List<List<AbaloneCoord>>
      */
-    public static List<List<AbaloneCoord>> generateGroups(final List<AbaloneCoord> playerPieces) {
+    public static List<List<AbaloneCoord>> generateGroups(final Set<AbaloneCoord> playerPieces) {
+        AbaloneCoord[] playerPiecesArr = playerPieces.toArray(new AbaloneCoord[playerPieces.size()]);
+        
         final List<List<AbaloneCoord>> groups = new ArrayList<List<AbaloneCoord>>();
         final Set<List<AbaloneCoord>> uniqueGroups = new HashSet<List<AbaloneCoord>>();
-
-        for (int i = 0; i < playerPieces.size(); i++) {
-            for (int j = i; j < playerPieces.size(); j++) {
-                if (validateGrouping(playerPieces.get(i), playerPieces.get(j), playerPieces)) {
-                    ArrayList<AbaloneCoord> groupCoordinates = generateCoordinates(playerPieces.get(i), playerPieces.get(j));
+        
+        
+        for (int i = 0; i < playerPiecesArr.length; i++) {
+            for (int j = i; j < playerPiecesArr.length; j++) {
+                if (validateGrouping(playerPiecesArr[i], playerPiecesArr[j], playerPieces)) {
+                    ArrayList<AbaloneCoord> groupCoordinates = generateCoordinates(playerPiecesArr[i], playerPiecesArr[j]);
                     uniqueGroups.add(groupCoordinates);
                 }
             }
@@ -137,7 +141,7 @@ public final class GroupingHelper {
 
     private static boolean validateGrouping(final AbaloneCoord alpha,
                                             final AbaloneCoord beta,
-                                            final List<AbaloneCoord> playerPieces) {
+                                            final Set<AbaloneCoord> playerPieces) {
 
         /**
          * Both X and Y are the same. In this case, we are looking at a single coordinate.

@@ -1,8 +1,9 @@
+package abalone;
 
 public class AbaloneCoord {
     int x,y;
     
-    AbaloneCoord(int x, int y) {
+    public AbaloneCoord(int x, int y) {
         this.x = x;
         this.y = y;
     }

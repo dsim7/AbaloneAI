@@ -1,3 +1,4 @@
+package abalone;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -8,6 +9,7 @@ import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -63,12 +65,12 @@ public class AbaloneGUI extends JPanel {
             return;
         }
         // player1 
-        List<AbaloneCoord> p1Pieces = ab.state.p1Pieces;
+        Set<AbaloneCoord> p1Pieces = ab.state.p1Pieces;
         for (AbaloneCoord p1piece : p1Pieces) {
             coordSpaces[p1piece.y][p1piece.x].color = Color.RED;
         }
         // player2
-        List<AbaloneCoord> p2Pieces = ab.state.p2Pieces;
+        Set<AbaloneCoord> p2Pieces = ab.state.p2Pieces;
         for (AbaloneCoord p2piece : p2Pieces) {
             coordSpaces[p2piece.y][p2piece.x].color = Color.BLUE;
         }

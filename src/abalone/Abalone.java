@@ -1,3 +1,4 @@
+package abalone;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -13,8 +14,11 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.Timer;
@@ -171,8 +175,9 @@ public class Abalone {
     public static void main(String[] args) {
         if (args.length > 0) {
             String inputFilename = args[0];
-            String outputFilename = "Test" + args[0].charAt(4) + ".board";
-            new Abalone(new File(inputFilename), new File(outputFilename));
+            String boardOutFilename = "Test" + args[0].charAt(4) + ".board";
+            String moveOutFilename = "Test" + args[0].charAt(4) + ".moves";
+            new Abalone(new File(inputFilename), new File(boardOutFilename), new File(moveOutFilename));
         } else {
             new Abalone();
         }
@@ -194,10 +199,10 @@ public class Abalone {
         }   
     }
     
-    public Abalone(File inputFile, File outputFile) {
+    public Abalone(File inputFile, File boardoutFile, File moveoutfile) {
         System.out.println("Testing file");
         this.readTestFile(inputFile);
-        this.printAllTestNextStates(outputFile);
+        this.printResults(boardoutFile, moveoutfile);
     }
 
     /**
@@ -213,7 +218,7 @@ public class Abalone {
      * Rotate player turns. 
      */
     public void nextTurn() {
-        printTurnInfo();
+        //printTurnInfo();
         switchTimers();
         checkMaxTurns();
         updateGUI();
@@ -356,7 +361,9 @@ public class Abalone {
         }
         return false;
     }
-    
+
+    /*
+    Affected by AbaloneMove change
     private void printTurnInfo() {
         if (moveThisTurn != null) {
             double timeTakenThisTurn = curPlayer.timeTaken - timeAtTurnStart;
@@ -369,6 +376,7 @@ public class Abalone {
                     " in " + FORMAT.format(timeTakenThisTurn) + "s");
         }
     }
+    */
     
     // if the game has not started, determines whether red will move first or not
     private void setRedGoesFirst(boolean b) {
@@ -532,8 +540,8 @@ public class Abalone {
     }
     
     private void initState(AbaloneCoord[] p1array, AbaloneCoord[] p2array, int turn) {
-        List<AbaloneCoord> p1PiecesStandard = Arrays.asList(p1array);
-        List<AbaloneCoord> p2PiecesStandard = Arrays.asList(p2array);
+        Set<AbaloneCoord> p1PiecesStandard = new HashSet<AbaloneCoord>(Arrays.asList(p1array));
+        Set<AbaloneCoord> p2PiecesStandard = new HashSet<AbaloneCoord>(Arrays.asList(p2array));
         state = new AbaloneState(p1PiecesStandard, p2PiecesStandard, turn);
         updateGUI();
     }
@@ -605,8 +613,8 @@ public class Abalone {
             
             System.out.println("Scan in complete");
             int turn = (turnString.equals("w") ? 1 : 0);
-            List<AbaloneCoord> blackPieces = new ArrayList<AbaloneCoord>();
-            List<AbaloneCoord> whitePieces = new ArrayList<AbaloneCoord>();
+            Set<AbaloneCoord> blackPieces = new HashSet<AbaloneCoord>();
+            Set<AbaloneCoord> whitePieces = new HashSet<AbaloneCoord>();
             
             // populate lists
             int i = 0;
@@ -614,8 +622,8 @@ public class Abalone {
                 char ownerChar = coords[i].charAt(2);
                 
                 if (ownerChar == 'b') {
-                    int read_x = coords[i].charAt(0) - 65;
-                    int read_y = coords[i].charAt(1) - 49;
+                    int read_x = coords[i].charAt(1) - 49;
+                    int read_y = coords[i].charAt(0) - 65;
                     System.out.println(read_y);
                     blackPieces.add(new AbaloneCoord(read_x, read_y));
                     i++;
@@ -627,8 +635,8 @@ public class Abalone {
                 char ownerChar = coords[i].charAt(2);
                 
                 if (ownerChar == 'w') {
-                    int read_x = coords[i].charAt(0) - 65;
-                    int read_y = coords[i].charAt(1) - 49;
+                    int read_x = coords[i].charAt(1) - 49;
+                    int read_y = coords[i].charAt(0) - 65;
                     whitePieces.add(new AbaloneCoord(read_x, read_y));
                     i++;
                 } else {
@@ -646,21 +654,31 @@ public class Abalone {
         }
     }
     
-    private void printAllTestNextStates(File outfile) {
-        System.out.println("printing to " + outfile.getName());
+    private void printResults(File boardoutfile, File moveoutfile) {
+        System.out.println("printing to " + boardoutfile.getName());
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+            BufferedWriter boardWriter = new BufferedWriter(new FileWriter(boardoutfile));
+            BufferedWriter moveWriter = new BufferedWriter(new FileWriter(moveoutfile));
             
             List<AbaloneState> allNextStates = testState.getAllNextStates();
-            List<AbaloneCoord> playerPieces = testState.turn % 2 == 0 ? testState.p1Pieces : testState.p2Pieces;
-            List<List<AbaloneCoord>> allGroupings = GroupingHelper.generateGroups(playerPieces);
-            List<AbaloneMove> allMoves = MoveHelper.generateAllMoves(allGroupings, testState.p1Pieces, testState.p2Pieces);
             
+            System.out.println("Writing to .board");
             for (AbaloneState nextState : allNextStates) {
-                writer.write(nextState.toString() + "\n");
+                boardWriter.write(nextState.toString() + "\n");
             }
             
-            writer.close();
+            boardWriter.close();
+            
+            Set<AbaloneCoord> playerPieces = testState.turn % 2 == 0 ? testState.p1Pieces : testState.p2Pieces;
+            List<List<AbaloneCoord>> allGroupings = GroupingHelper.generateGroups(playerPieces);
+            List<AbaloneMove> allMoves = MoveHelper.generateAllMoves(allGroupings, testState.p1Pieces, testState.p2Pieces);
+            System.out.println("Writing to .move");
+            for (AbaloneMove move : allMoves) {
+                moveWriter.write(move.toString() + "\n");
+            }
+            
+            moveWriter.close();
+            
         } catch (IOException ex) {
             ex.printStackTrace();
         }
