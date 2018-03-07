@@ -55,7 +55,8 @@ public class AbaloneState implements GameState {
             for(int i = 0; i < p1Pces.size(); i++) {
                 
                 if(coord.equals(p1Pces.get(i))) {
-                    
+                    p1Pces.remove(i);
+                    p1Pces.add(new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy));
                 }
                 
             }
@@ -66,7 +67,8 @@ public class AbaloneState implements GameState {
             for(int i = 0; i < p2Pces.size(); i++) {
                 
                 if(coord.equals(p2Pces.get(i))) {
-                    
+                    p2Pces.remove(i);
+                    p2Pces.add(new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy));
                 }
                 
             } 
