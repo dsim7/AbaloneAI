@@ -21,12 +21,10 @@ public class AbaloneMove {
     
     public List<AbaloneCoord> getMovingPieces() {
         return movingPieces;
-        
     }
     
     public List<AbaloneCoord> getPushedPieces() {
         return pushingPieces;
-        
     }
     
     public int getNumPushedPieces() {

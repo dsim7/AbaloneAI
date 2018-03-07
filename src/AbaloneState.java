@@ -28,7 +28,11 @@ public class AbaloneState implements GameState {
     /**
      * Generates the new state based off the move passed in.
      * 
-     * @param move: (List<AbaloneCoord> pieces, Abalone.Dir direction, boolean isInlineMove)
+     * @param move: (List<AbaloneCoord> movingPieces,
+                List<AbaloneCoord> pushingPieces,
+                Abalone.Dir direction,
+                boolean isInlineMove,
+                int numPushedPieces)
      */
     private AbaloneState getNextState(AbaloneMove move) {
         
