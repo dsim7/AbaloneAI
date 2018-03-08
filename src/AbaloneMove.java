@@ -27,6 +27,10 @@ public class AbaloneMove {
         return pushingPieces;
     }
     
+    public boolean getIsInlineMove() {
+        return isInlineMove;
+    }
+    
     public int getNumPushedPieces() {
         return numPushedPieces;
     }
@@ -34,4 +38,6 @@ public class AbaloneMove {
     public Abalone.Dir getDirection() {
         return direction;
     }
+    
+    
 }
