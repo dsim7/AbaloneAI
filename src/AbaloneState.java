@@ -37,11 +37,10 @@ public class AbaloneState implements GameState {
         
         List<AbaloneMove> moves = MoveHelper.generateAllMoves(null, null, null); // this would pass in real information
         List<AbaloneState> newStates = new ArrayList<AbaloneState>();
-
-        AbaloneState newState = new AbaloneState(p1Pieces, p2Pieces, turn);
-        
+ 
         for (int j = 0; j < moves.size(); j++) {
 
+            AbaloneState newState = new AbaloneState(p1Pieces, p2Pieces, turn);
             newState.getNextState(moves.get(j));
             newStates.add(newState);
 
