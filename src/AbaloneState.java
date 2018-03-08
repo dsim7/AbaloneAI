@@ -13,7 +13,6 @@ public class AbaloneState implements GameState {
         this.p1Pieces = p1Pieces;
         this.p2Pieces = p2Pieces;
         this.turn = turn;
-
     }
 
     public List<AbaloneCoord> getP1Pieces() {
@@ -31,25 +30,20 @@ public class AbaloneState implements GameState {
 
     @Override
     /**
-     * Takes the list of moves, iterates through it, and calls getNextState()
-     * on every move, then adds all the new states into a List of <AbaloneState>
+     * Takes the list of moves, iterates through it, and calls getNextState() on
+     * every move, then adds all the new states into a List of <AbaloneState>
      */
     public List<AbaloneState> getAllNextStates() {
-        List<AbaloneMove> moves = MoveHelper.generateAllMoves(null, null, null); // this would pass in legit information
+        
+        List<AbaloneMove> moves = MoveHelper.generateAllMoves(null, null, null); // this would pass in real information
         List<AbaloneState> newStates = new ArrayList<AbaloneState>();
-        List<AbaloneCoord> P1pieces = new ArrayList<AbaloneCoord>();
-        List<AbaloneCoord> P2pieces = new ArrayList<AbaloneCoord>();
 
+        AbaloneState newState = new AbaloneState(p1Pieces, p2Pieces, turn);
+        
         for (int j = 0; j < moves.size(); j++) {
-           /* if (moves.get(j).getIsInlineMove()) { */ // only passes the move to getNextState if it is an inline move, obviously we need to generate for broadside too tho
-                P1pieces = moves.get(j).getMovingPieces();
-                P2pieces = moves.get(j).getPushedPieces();
 
-                AbaloneState newState = new AbaloneState(P1pieces, P2pieces, turn);
-
-                newState.getNextState(moves.get(j));
-                newStates.add(newState);
-          //  }
+            newState.getNextState(moves.get(j));
+            newStates.add(newState);
 
         }
 
@@ -69,11 +63,19 @@ public class AbaloneState implements GameState {
         List<AbaloneCoord> movingPieces;
         List<AbaloneCoord> pushedPieces;
         Abalone.Dir direction;
-        
+
         movingPieces = move.getMovingPieces();
         pushedPieces = move.getPushedPieces();
         direction = move.getDirection();
 
+        for (AbaloneCoord coord : p1Pieces) {
+            newP1Pces.add(coord);
+        }
+        
+        for (AbaloneCoord coord : p2Pieces) {
+            newP2Pces.add(coord);
+        }
+        
         if (turn % 2 == 0) {
 
             for (AbaloneCoord coord : movingPieces) {
@@ -81,6 +83,7 @@ public class AbaloneState implements GameState {
                 for (int i = 0; i < p1Pieces.size(); i++) {
 
                     if (coord.equals(p1Pieces.get(i))) {
+                        newP1Pces.remove(i);
                         newP1Pces.add(new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy));
                     }
                 }
@@ -91,6 +94,7 @@ public class AbaloneState implements GameState {
                 for (int i = 0; i < p2Pieces.size(); i++) {
 
                     if (coord.equals(p2Pieces.get(i))) {
+                        newP2Pces.remove(i);
                         newP2Pces.add(new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy));
                     }
                 }
@@ -103,6 +107,7 @@ public class AbaloneState implements GameState {
                 for (int i = 0; i < p1Pieces.size(); i++) {
 
                     if (coord.equals(p1Pieces.get(i))) {
+                        newP1Pces.remove(i);
                         newP1Pces.add(new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy));
                     }
                 }
@@ -113,14 +118,15 @@ public class AbaloneState implements GameState {
                 for (int i = 0; i < p2Pieces.size(); i++) {
 
                     if (coord.equals(p2Pieces.get(i))) {
+                        newP2Pces.remove(i);
                         newP2Pces.add(new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy));
                     }
                 }
             }
         }
 
-        newState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
-
+        newState = new AbaloneState(newP1Pces, newP2Pces, turn + 1); 
+         
         return newState;
     }
 
