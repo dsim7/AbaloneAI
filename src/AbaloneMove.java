@@ -18,4 +18,26 @@ public class AbaloneMove {
         this.isInlineMove = isInlineMove;
         this.numPushedPieces = numPushedPieces;
     }
+    
+    public List<AbaloneCoord> getMovingPieces() {
+        return movingPieces;
+    }
+    
+    public List<AbaloneCoord> getPushedPieces() {
+        return pushingPieces;
+    }
+    
+    public boolean getIsInlineMove() {
+        return isInlineMove;
+    }
+    
+    public int getNumPushedPieces() {
+        return numPushedPieces;
+    }
+    
+    public Abalone.Dir getDirection() {
+        return direction;
+    }
+    
+    
 }
