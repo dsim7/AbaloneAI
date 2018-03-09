@@ -50,11 +50,11 @@ public class AbaloneState {
         AbaloneState nextState = new AbaloneState(p1Pieces, p2Pieces, turn);
 
         for (int j = 0; j < moves.size(); j++) {
-            
             AbaloneState ref;
             ref = nextState.getNextState(moves.get(j));
-            allNextStates.add(ref);
-            
+            if (ref != null) {   // move was a suicide move
+                allNextStates.add(ref);
+            }
         } 
         
         return allNextStates;
@@ -89,6 +89,10 @@ public class AbaloneState {
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
                 if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
                     newP1Pces.add(newCoord);
+                } else {
+                    if (turn % 2 == 0) {  // player1 piece moved player1 piece off bounds
+                        return null;
+                    }
                 }
             } else {
                 newP1Pces.add(new AbaloneCoord(coord.x, coord.y));
@@ -100,6 +104,10 @@ public class AbaloneState {
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
                 if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
                     newP2Pces.add(newCoord);
+                } else {
+                    if (turn % 2 == 1) { // player2 piece moved player2 piece off bounds
+                        return null;
+                    }
                 }
             } else {
                 newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
