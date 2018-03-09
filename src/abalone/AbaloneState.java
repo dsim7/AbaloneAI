@@ -83,18 +83,15 @@ public class AbaloneState {
             }
         }
         
-        Set<AbaloneCoord> movingPlayerPieces = (turn % 2 == 0 ? newP1Pces : newP2Pces);
-        Set<AbaloneCoord> pushedPlayerPieces = (turn % 2 == 0 ? newP2Pces : newP1Pces);
-        
         // copy player pieces, move if it is a moving piece
         for (AbaloneCoord coord : p1Pieces) {
             if (!changedPieces.add(coord)) {   // if add fails, it is a moving piece
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
                 if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
-                    movingPlayerPieces.add(newCoord);
+                    newP1Pces.add(newCoord);
                 }
             } else {
-                movingPlayerPieces.add(new AbaloneCoord(coord.x, coord.y));
+                newP1Pces.add(new AbaloneCoord(coord.x, coord.y));
             }
         }
         // copy player pieces, move if it is a pushed piece
@@ -102,10 +99,10 @@ public class AbaloneState {
             if (!changedPieces.add(coord)) {  // if add fails, it is a pushed piece
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
                 if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
-                    pushedPlayerPieces.add(newCoord);
+                    newP2Pces.add(newCoord);
                 }
             } else {
-                pushedPlayerPieces.add(new AbaloneCoord(coord.x, coord.y));
+                newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
             }
         
         }
@@ -114,14 +111,22 @@ public class AbaloneState {
     }
 
     public String toString() {
-        TreeSet<AbaloneCoord> ordered = new TreeSet<AbaloneCoord>();
+        TreeSet<AbaloneCoord> p1ordered = new TreeSet<AbaloneCoord>();
+        TreeSet<AbaloneCoord> p2ordered = new TreeSet<AbaloneCoord>();
+        for (AbaloneCoord p1coord : p1Pieces) {
+            p1ordered.add(p1coord);
+        }
+        for (AbaloneCoord p2coord : p2Pieces) {
+            p2ordered.add(p2coord);
+        }
+        
         String toWrite = "";
-        for (AbaloneCoord blackPiece : this.p1Pieces) {
+        for (AbaloneCoord blackPiece : p1ordered) {
             char row = (char) (blackPiece.y + 65);
             int col = blackPiece.x + 1;
             toWrite += "" + row + col + "b,";
         }
-        for (AbaloneCoord whitePiece : this.p2Pieces) {
+        for (AbaloneCoord whitePiece : p2ordered) {
             char row = (char) (whitePiece.y + 65);
             int col = whitePiece.x + 1;
             toWrite += "" + row + col + "w,";
