@@ -48,15 +48,14 @@ public class AbaloneState {
         
         List<AbaloneMove> moves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);                                                                    
         List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
-        AbaloneState nextState;
 
         for (int j = 0; j < moves.size(); j++) {
-
-            nextState = this.getNextState(moves.get(j));
-            allNextStates.add(nextState);
-
+            
+            
+            allNextStates.add(this.getNextState(moves.get(j)));
+            
         }
-
+        
         return allNextStates;
     }
 
@@ -77,15 +76,27 @@ public class AbaloneState {
         movingPieces = move.getMovingPieces();
         pushedPieces = move.getPushedPieces();
         direction = move.getDirection();
+        newP1Pces.clear();
+        newP2Pces.clear();
 
         for (AbaloneCoord coord : p1Pieces) {
-            newP1Pces.add(coord);
+            newP1Pces.add(new AbaloneCoord(coord.x, coord.y));
         }
 
         for (AbaloneCoord coord : p2Pieces) {
-            newP2Pces.add(coord);
+            newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
         }
-
+        System.out.println();
+       /* System.out.println("P1's original");
+        for (AbaloneCoord coord : newP1Pces) {
+            System.out.print(" " + coord);
+        }
+        System.out.println(); */
+        System.out.println("P2's orignal");
+        for (AbaloneCoord coord : newP2Pces) {
+            System.out.print(" " + coord);
+        }
+       
         if (turn % 2 == 0) {
 
             for (AbaloneCoord coord : movingPieces) {
@@ -135,6 +146,16 @@ public class AbaloneState {
         }
 
         nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
+      /*  System.out.println();
+        System.out.println("P1's new");
+        for (AbaloneCoord coord : newP1Pces) {
+            System.out.print(" " + coord);
+        } */
+        System.out.println();
+        System.out.println("P2's new");
+        for (AbaloneCoord coord : newP2Pces) {
+            System.out.print(" " + coord);
+        }
 
         return nextState;
     }
@@ -142,13 +163,13 @@ public class AbaloneState {
     public String toString() {
         String toWrite = "";
         for (AbaloneCoord blackPiece : this.p1Pieces) {
-            char row = (char) (blackPiece.x + 65);
-            int col = blackPiece.y + 1;
+            char row = (char) (blackPiece.y + 65);
+            int col = blackPiece.x + 1;
             toWrite += "" + row + col + "b,";
         }
         for (AbaloneCoord whitePiece : this.p2Pieces) {
-            char row = (char) (whitePiece.x + 65);
-            int col = whitePiece.y + 1;
+            char row = (char) (whitePiece.y + 65);
+            int col = whitePiece.x + 1;
             toWrite += "" + row + col + "w,";
         }
         toWrite = toWrite.replaceAll(",$", "");
