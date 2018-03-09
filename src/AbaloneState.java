@@ -1,25 +1,26 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class AbaloneState implements GameState {
-    List<AbaloneCoord> p1Pieces = new ArrayList<AbaloneCoord>();
-    List<AbaloneCoord> p2Pieces = new ArrayList<AbaloneCoord>();
+    HashSet<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
+    HashSet<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
     int turn;
-    List<AbaloneCoord> newP1Pces = new ArrayList<AbaloneCoord>();
-    List<AbaloneCoord> newP2Pces = new ArrayList<AbaloneCoord>();
-    AbaloneState newState;
+    HashSet<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
+    HashSet<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
+    AbaloneState nextState;
 
-    public AbaloneState(List<AbaloneCoord> p1Pieces, List<AbaloneCoord> p2Pieces, int turn) {
+    public AbaloneState(HashSet<AbaloneCoord> p1Pieces, HashSet<AbaloneCoord> p2Pieces, int turn) {
         this.p1Pieces = p1Pieces;
         this.p2Pieces = p2Pieces;
         this.turn = turn;
     }
 
-    public List<AbaloneCoord> getP1Pieces() {
+    public HashSet<AbaloneCoord> getP1Pieces() {
         return newP1Pces;
     }
 
-    public List<AbaloneCoord> getP2Pieces() {
+    public HashSet<AbaloneCoord> getP2Pieces() {
         return newP2Pces;
     }
 
@@ -35,23 +36,24 @@ public class AbaloneState implements GameState {
      */
     public List<AbaloneState> getAllNextStates() {
 
-        List<AbaloneMove> moves = MoveHelper.generateAllMoves(null, null, null); // this
-                                                                                 // would
-                                                                                 // pass
-                                                                                 // in
-                                                                                 // real
-                                                                                 // information
-        List<AbaloneState> newStates = new ArrayList<AbaloneState>();
+        List<List<AbaloneCoord>> groups = new ArrayList<List<AbaloneCoord>>();
+        
+        if(turn % 2 == 0) {
+            groups = GroupingHelper.generateGroups(p1Pieces);
+        }
+        
+        List<AbaloneMove> moves = MoveHelper.generateAllMoves(null, null, null); // pass in real info
+        List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
 
         for (int j = 0; j < moves.size(); j++) {
 
-            AbaloneState newState = new AbaloneState(p1Pieces, p2Pieces, turn);
-            newState.getNextState(moves.get(j));
-            newStates.add(newState);
+            AbaloneState nextState = new AbaloneState(p1Pieces, p2Pieces, turn);
+            nextState.getNextState(moves.get(j));
+            allNextStates.add(nextState);
 
         }
 
-        return newStates;
+        return allNextStates;
     }
 
     /**
@@ -83,34 +85,35 @@ public class AbaloneState implements GameState {
         if (turn % 2 == 0) {
 
             for (AbaloneCoord coord : movingPieces) {
-
-                for (int i = 0; i < p1Pieces.size(); i++) {
-
-                    if (coord.equals(p1Pieces.get(i))) {
-                        newP1Pces.get(i).setCoord(coord.x + direction.dx, coord.y + direction.dy);
+                
+                for (AbaloneCoord coords : p1Pieces ) {
+                    if(coord.equals(coords)) {
+                        newP1Pces.remove(coords);
+                        newP1Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
                     }
                 }
             }
             if (pushedPieces != null) {
                 for (AbaloneCoord coord : pushedPieces) {
-
-                    for (int i = 0; i < p2Pieces.size(); i++) {
-
-                        if (coord.equals(p2Pieces.get(i))) {
-                            newP2Pces.get(i).setCoord(coord.x + direction.dx, coord.y + direction.dy);
+                    
+                    for(AbaloneCoord coords : p2Pieces) {
+                        if(coord.equals(coords)) {
+                            newP2Pces.remove(coords);
+                            newP2Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
                         }
                     }
+                 
                 }
             }
 
         } else {
             if (pushedPieces != null) {
                 for (AbaloneCoord coord : pushedPieces) {
-
-                    for (int i = 0; i < p1Pieces.size(); i++) {
-
-                        if (coord.equals(p1Pieces.get(i))) {
-                            newP1Pces.get(i).setCoord(coord.x + direction.dx, coord.y + direction.dy);
+                    
+                    for(AbaloneCoord coords : p1Pieces) {
+                        if(coord.equals(coords)) {
+                            newP1Pces.remove(coords);
+                            newP1Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
                         }
                     }
                 }
@@ -118,18 +121,18 @@ public class AbaloneState implements GameState {
 
             for (AbaloneCoord coord : movingPieces) {
 
-                for (int i = 0; i < p2Pieces.size(); i++) {
-
-                    if (coord.equals(p2Pieces.get(i))) {
-                        newP2Pces.get(i).setCoord(coord.x + direction.dx, coord.y + direction.dy);
+                for (AbaloneCoord coords : p2Pieces) {
+                    if(coord.equals(coords)) {
+                        newP2Pces.remove(coords);
+                        newP2Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
                     }
                 }
             }
         }
 
-        newState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
+        nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
 
-        return newState;
+        return nextState;
     }
 
 }

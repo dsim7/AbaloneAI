@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -67,12 +68,12 @@ public class AbaloneGUI extends JPanel {
             return;
         }
         // player1 
-        List<AbaloneCoord> p1Pieces = ab.state.p1Pieces;
+        HashSet<AbaloneCoord> p1Pieces = ab.state.p1Pieces;
         for (AbaloneCoord p1piece : p1Pieces) {
             coordSpaces[p1piece.y][p1piece.x].color = Color.RED;
         }
         // player2
-        List<AbaloneCoord> p2Pieces = ab.state.p2Pieces;
+        HashSet<AbaloneCoord> p2Pieces = ab.state.p2Pieces;
         for (AbaloneCoord p2piece : p2Pieces) {
             coordSpaces[p2piece.y][p2piece.x].color = Color.BLUE;
         }

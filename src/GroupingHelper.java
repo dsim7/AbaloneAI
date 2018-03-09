@@ -13,6 +13,7 @@ public final class GroupingHelper {
      * @return List<List<AbaloneCoord>>
      */
     public static List<List<AbaloneCoord>> generateGroups(final List<AbaloneCoord> playerPieces) {
+        
         final List<List<AbaloneCoord>> groups = new ArrayList<List<AbaloneCoord>>();
         final Set<List<AbaloneCoord>> uniqueGroups = new HashSet<List<AbaloneCoord>>();
 
