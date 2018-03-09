@@ -49,11 +49,26 @@ public class AbaloneState {
         List<AbaloneMove> moves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);                                                                    
         List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
 
-        for (int j = 0; j < moves.size(); j++) {
+       /* for (int j = 0; j < moves.size(); j++) {
             
             
-            allNextStates.add(this.getNextState(moves.get(j)));
+            AbaloneState nextState = this.getNextState(moves.get(j));
+            allNextStates.add(nextState);
             
+        } */
+        
+        AbaloneState a = this;
+        AbaloneState b = this;
+      
+        a.getNextState(moves.get(0));
+        b.getNextState(moves.get(1));
+        
+        allNextStates.add(a);
+        allNextStates.add(b);
+        
+        System.out.println("\nAfter the return");
+        for(AbaloneCoord coord : a.newP2Pces) {
+            System.out.print(" " + coord);
         }
         
         return allNextStates;
