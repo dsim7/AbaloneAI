@@ -69,8 +69,10 @@ public class AbaloneState {
      */
     AbaloneState getNextState(AbaloneMove move) {
 
-        Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
-        Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
+        Set<AbaloneCoord> newP1PieceSet = new HashSet<AbaloneCoord>();
+        Set<AbaloneCoord> newP2PieceSet = new HashSet<AbaloneCoord>();
+        List<AbaloneCoord> newP1PieceList = new ArrayList<>();
+        List<AbaloneCoord> newP2PieceList = new ArrayList<>();
         List<AbaloneCoord> movingPieces;
         List<AbaloneCoord> pushedPieces;
         Abalone.Dir direction;
@@ -78,15 +80,17 @@ public class AbaloneState {
         movingPieces = move.getMovingPieces();
         pushedPieces = move.getPushedPieces();
         direction = move.getDirection();
-        newP1Pces.clear();
-        newP2Pces.clear();
+        newP1PieceSet.clear();
+        newP2PieceSet.clear();
+        newP1PieceList.clear();
+        newP2PieceList.clear();
 
         for (AbaloneCoord coord : p1Pieces) {
-            newP1Pces.add(new AbaloneCoord(coord.x, coord.y));
+            newP1PieceList.add(new AbaloneCoord(coord.x, coord.y));
         }
 
         for (AbaloneCoord coord : p2Pieces) {
-            newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
+            newP2PieceList.add(new AbaloneCoord(coord.x, coord.y));
         }
        
         if (turn % 2 == 0) {
@@ -95,8 +99,8 @@ public class AbaloneState {
                 
                 for (AbaloneCoord coords : p1Pieces ) {
                     if(coord.equals(coords)) {
-                        newP1Pces.remove(coords);
-                        newP1Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
+                        newP1PieceList.remove(coords);
+                        newP1PieceList.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
                     }
                 }
             }
@@ -105,8 +109,8 @@ public class AbaloneState {
                     
                     for(AbaloneCoord coords : p2Pieces) {
                         if(coord.equals(coords)) {
-                            newP2Pces.remove(coords);
-                            newP2Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
+                            newP2PieceList.remove(coords);
+                            newP2PieceList.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
                         }
                     }
                  
@@ -117,8 +121,8 @@ public class AbaloneState {
                 for (AbaloneCoord coord : pushedPieces) {
                     for(AbaloneCoord coords : p1Pieces) {
                         if(coord.equals(coords)) {
-                            newP1Pces.remove(coords);
-                            newP1Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
+                            newP1PieceList.remove(coords);
+                            newP1PieceList.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
                         }
                     }
                 }
@@ -128,14 +132,21 @@ public class AbaloneState {
 
                 for (AbaloneCoord coords : p2Pieces) {
                     if(coord.equals(coords)) {
-                        newP2Pces.remove(coords);
-                        newP2Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
+                        newP2PieceList.remove(coords);
+                        newP2PieceList.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
                     }
                 }
             }
         }
-
-        AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
+        
+        for(AbaloneCoord coord: newP1PieceList) {
+            newP1PieceSet.add(new AbaloneCoord(coord.x, coord.y));
+        }
+        for(AbaloneCoord coord: newP2PieceList) {
+            newP2PieceSet.add(new AbaloneCoord(coord.x, coord.y));
+        }
+        
+        AbaloneState nextState = new AbaloneState(newP1PieceSet, newP2PieceSet, turn + 1);
 
         return nextState;
     }
