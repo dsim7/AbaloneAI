@@ -10,12 +10,21 @@ public class AbaloneState {
     Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
     Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
     int turn;
+    AbaloneState nextState;
 
     public AbaloneState(Set<AbaloneCoord> p1Pieces, Set<AbaloneCoord> p2Pieces, int turn) {
         this.p1Pieces = p1Pieces;
         this.p2Pieces = p2Pieces;
         this.turn = turn;
 
+    }
+
+    public Set<AbaloneCoord> getP1Pieces() {
+        return p1Pieces;
+    }
+
+    public Set<AbaloneCoord> getP2Pieces() {
+        return p2Pieces;
     }
 
     public int getStateValue() {
@@ -38,11 +47,15 @@ public class AbaloneState {
         
         List<AbaloneMove> moves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);                                                                    
         List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
+        AbaloneState nextState = new AbaloneState(p1Pieces, p2Pieces, turn);
 
         for (int j = 0; j < moves.size(); j++) {
-            AbaloneState nextState = this.getNextState(moves.get(j));
-            allNextStates.add(nextState);
-        }
+            
+            AbaloneState ref;
+            ref = nextState.getNextState(moves.get(j));
+            allNextStates.add(ref);
+            
+        } 
         
         return allNextStates;
     }
@@ -75,8 +88,6 @@ public class AbaloneState {
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
                 if (newCoord.isValid()) {
                     newP1Pces.add(newCoord);
-                } else { 
-                    System.out.println("Piece pushed out: " + newCoord);
                 }
             } else {
                 newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
@@ -92,32 +103,7 @@ public class AbaloneState {
                 newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
             }
         }
-       /*
-        // determine who is the moving player and who is pushed player
-        List<AbaloneCoord> movingPlayerPieces = (turn % 2 == 0 ? newP1Pces : newP2Pces);
-        List<AbaloneCoord> pushedPlayerPieces = (turn % 2 == 0 ? newP2Pces : newP1Pces);
-        
-        // move moving pieces
-        for (AbaloneCoord movingPiece : movingPieces) {
-            for (AbaloneCoord playerPiece : movingPlayerPieces) {
-                if (movingPiece.equals(playerPiece)) {
-                    playerPiece.setCoord(playerPiece.x + direction.dx, playerPiece.y + direction.dy);
-                }
-            }
-        }
-        // move pushed pieces
-        if (pushedPieces != null) {
-            for (AbaloneCoord pushedPiece : pushedPieces) {
-                for(AbaloneCoord playerPiece : pushedPlayerPieces) {
-                    if (pushedPiece.equals(playerPiece)) {
-                        playerPiece.setCoord(playerPiece.x + direction.dx, playerPiece.y + direction.dy);
-                    }
-                }
-            }
-        }
-*/
         AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
-
         return nextState;
     }
 

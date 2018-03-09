@@ -58,7 +58,8 @@ public class AbaloneCoord implements Comparable {
             return -1;
         }
         AbaloneCoord ab = (AbaloneCoord) o;
-        int value = ab.y * 8 + ab.x;
-        return ;
+        int ovalue = ab.y * 8 + ab.x;
+        int thisvalue = this.y * 8 + this.x;
+        return thisvalue - ovalue;
     }
 }
