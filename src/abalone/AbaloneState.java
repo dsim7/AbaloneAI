@@ -42,9 +42,11 @@ public class AbaloneState {
 
         if (turn % 2 == 0) {
             groups = GroupingHelper.generateGroups(p1Pieces);
+        } else {
+            groups = GroupingHelper.generateGroups(p2Pieces);
         }
-
-        List<AbaloneMove> moves = MoveHelper.generateAllMoves(null, null, null); // pass in real info                                                                            
+        
+        List<AbaloneMove> moves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);                                                                    
         List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
 
         for (int j = 0; j < moves.size(); j++) {
