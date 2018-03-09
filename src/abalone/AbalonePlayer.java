@@ -9,8 +9,6 @@ public class AbalonePlayer {
     int outs, priority;
     double timeTaken;
     boolean isAI;
-    AbaloneAI ai = new AbaloneAI();
-    List<AbaloneCoord> pieces = new ArrayList<AbaloneCoord>();
     
     public AbalonePlayer(int priority, Color color, Abalone game) {
         this.abalone = game;

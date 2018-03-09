@@ -18,8 +18,6 @@ public final class MoveHelper {
             List<AbaloneMove> groupMoves =  generateAllMovesForThisGroup(group, playerOnePieces, playerTwoPieces);
             legalMoves.addAll(groupMoves);
         }
-        
-        System.out.println("Generate all moves: " + legalMoves);
 
         return legalMoves;
     }
@@ -216,30 +214,12 @@ public final class MoveHelper {
             }
 
             if (isValidMove) {
-                moves.add(new AbaloneMove(group, direction, false));
+                moves.add(new AbaloneMove(group, null, direction, false, 0));
             }
         }
 
         return moves;
     }
-
-    /*
-    private static List<AbaloneMove> generateInlineMoves() {
-        return null;
-    }
-
-    private static AbaloneCoord getMaximumFrontPiece(final List<AbaloneCoord> coordinates) {
-        for (AbaloneCoord coordinate : coordinates) {
-
-        }
-    }
-
-    private static AbaloneCoord getMinimumFrontPiece(final List<AbaloneCoord> coordinates) {
-        for (AbaloneCoord coordinate : coordinates) {
-
-        }
-    }
-    */
 
     private static List<AbaloneMove> generateInlineMove(final int size,
                                                         final AbaloneCoord frontPiece,
@@ -252,6 +232,7 @@ public final class MoveHelper {
         final AbaloneCoord destination = new AbaloneCoord(frontPiece.x, frontPiece.y);
 
         boolean isValidMove = false;
+        int numPushedPieces = 0;
         for (int i = 0; i < size; i++) {
             destination.x += direction.dx;
             destination.y += direction.dy;
@@ -271,10 +252,16 @@ public final class MoveHelper {
                     break;
                 }
             }
+            numPushedPieces++;
         }
 
         if (isValidMove) {
-            moves.add(new AbaloneMove(group, direction, true));
+            List<AbaloneCoord> pushedPieces = new ArrayList<>();
+            for (int i = 1; i <= numPushedPieces; i++) {
+                pushedPieces.add(new AbaloneCoord(frontPiece.x + i * direction.dx, frontPiece.y + i * direction.dy));
+            }
+
+            moves.add(new AbaloneMove(group, pushedPieces, direction, true, numPushedPieces));
         }
 
         return moves;

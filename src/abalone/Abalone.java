@@ -292,39 +292,36 @@ public class Abalone {
                 resumeTimers();
             }
             return true;
-        } else if (lowerInput.equals("pvp")) {
+            // modes
+        } else if (lowerInput.equals("bluecomp")) {
             if (!gameStarted) {
-                System.out.println("Setting Player Vs Player");
-                setAI(PVP);
+                System.out.println("Setting Blue to Comp");
+                setBlueComp(true);
             } else {
                 System.out.println("Stop and reset the game first");
             }
-        } else if (lowerInput.equals("pvc")) {
-            System.out.println("Setting Player Vs Computer");
+        } else if (lowerInput.equals("blueplayer")) {
+            System.out.println("Setting Blue to Player");
             if (!gameStarted) {
-                setAI(PVC);
+                setBlueComp(false);
             } else {
                 System.out.println("Stop and reset the game first");
             }
-        } else if (lowerInput.equals("cvc")) {
-            System.out.println("Setting Computer vs Computer");
+        } else if (lowerInput.equals("redcomp")) {
+            System.out.println("Setting Red to Comp");
             if (!gameStarted) {
-                setAI(CVC);
+                setRedComp(true);
             } else {
                 System.out.println("Stop and reset the game first");
             }
-        } else if (lowerInput.equals("redfirst")) {
+        } else if (lowerInput.equals("redplayer")) {
+            System.out.println("Setting Red to Player");
             if (!gameStarted) {
-                setRedGoesFirst(true);
+                setRedComp(false);
             } else {
                 System.out.println("Stop and reset the game first");
             }
-        } else if (lowerInput.equals("bluefirst")) {
-            if (!gameStarted) {
-                setRedGoesFirst(false);
-            } else {
-                System.out.println("Stop and reset the game first");
-            }
+            // turn and time limit
         } else if (lowerInput.equals("turns")) {
             if (!gameStarted) {
                 System.out.println("Enter number of Turns");
@@ -361,53 +358,22 @@ public class Abalone {
         }
         return false;
     }
-
-    /*
-    Affected by AbaloneMove change
-    private void printTurnInfo() {
-        if (moveThisTurn != null) {
-            double timeTakenThisTurn = curPlayer.timeTaken - timeAtTurnStart;
-            System.out.println("Player " + (curPlayer.priority + 1) + 
-                    ": " + moveThisTurn.x1 + 
-                    "," + moveThisTurn.y1 +
-                    " to " + moveThisTurn.x2 + 
-                    "," + moveThisTurn.y2 + 
-                    " moving " + moveThisTurn.direction + 
-                    " in " + FORMAT.format(timeTakenThisTurn) + "s");
-        }
-    }
-    */
     
     // if the game has not started, determines whether red will move first or not
-    private void setRedGoesFirst(boolean b) {
-        if (!b) {
-            System.out.println("Setting Blue moves first");
-            this.setCurPlayer(player2);
-            this.lastRunningTimer = p2timer;
+    private void setRedComp(boolean comp) {
+        if (comp) {
+            player2.isAI = true;
         } else {
-            System.out.println("Setting Red moves first");
-            this.setCurPlayer(player1);
-            this.lastRunningTimer = p1timer;
+            player2.isAI = false;
         }
     }
-
-    // sets whether it is PVP, PVC, or CVC
-    private void setAI(int x) {
-        switch(x) {
-        case 0 :
-            player1.isAI = false;
-            player2.isAI = false;
-            break;
-        case 1 : 
-            player1.isAI = false;
-            player2.isAI = true;
-            break;
-        case 2 :
+    
+    private void setBlueComp(boolean comp) {
+        if (comp) {
             player1.isAI = true;
-            player2.isAI = true;
-            break;
+        } else {
+            player1.isAI = false;
         }
-        
     }
 
     // pause timers

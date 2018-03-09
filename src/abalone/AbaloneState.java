@@ -22,24 +22,7 @@ public class AbaloneState {
     }
     
     public List<AbaloneState> getAllNextStates() {
-        Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
-        Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
-        Set<AbaloneCoord> p1Pieces2 = new HashSet<AbaloneCoord>();
-        Set<AbaloneCoord> p2Pieces2 = new HashSet<AbaloneCoord>();
-        p1Pieces.add(new AbaloneCoord(0,0));
-        p1Pieces.add(new AbaloneCoord(1,0));
-        p1Pieces.add(new AbaloneCoord(2,0));
-        p1Pieces.add(new AbaloneCoord(3,0));
-        p1Pieces2.add(new AbaloneCoord(1,1));
-        p1Pieces2.add(new AbaloneCoord(1,2));
-        p1Pieces2.add(new AbaloneCoord(1,3));
-        p2Pieces.add(new AbaloneCoord(4,1));
-        p2Pieces.add(new AbaloneCoord(4,2));
-        p2Pieces.add(new AbaloneCoord(4,3));
-        p2Pieces2.add(new AbaloneCoord(4,4));
         List<AbaloneState> listOfStates = new ArrayList<AbaloneState>();
-        listOfStates.add(new AbaloneState(p1Pieces, p2Pieces, 1));
-        listOfStates.add(new AbaloneState(p1Pieces2, p2Pieces2, 1));
         
         return listOfStates;
     }
