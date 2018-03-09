@@ -9,8 +9,6 @@ public class AbaloneState {
     Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
     Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
     int turn;
-    Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
-    Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
     AbaloneState nextState;
 
     public AbaloneState(Set<AbaloneCoord> p1Pieces, Set<AbaloneCoord> p2Pieces, int turn) {
@@ -21,11 +19,11 @@ public class AbaloneState {
     }
 
     public Set<AbaloneCoord> getP1Pieces() {
-        return newP1Pces;
+        return p1Pieces;
     }
 
     public Set<AbaloneCoord> getP2Pieces() {
-        return newP2Pces;
+        return p2Pieces;
     }
 
     public int getStateValue() {
@@ -67,7 +65,7 @@ public class AbaloneState {
         allNextStates.add(b);
         
         System.out.println("\nAfter the return");
-        for(AbaloneCoord coord : a.newP2Pces) {
+        for(AbaloneCoord coord : a.p2Pieces) {
             System.out.print(" " + coord);
         }
         
@@ -84,6 +82,8 @@ public class AbaloneState {
      */
     AbaloneState getNextState(AbaloneMove move) {
 
+        Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
+        Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
         List<AbaloneCoord> movingPieces;
         List<AbaloneCoord> pushedPieces;
         Abalone.Dir direction;
