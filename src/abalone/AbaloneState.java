@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class AbaloneState {
     Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
@@ -55,79 +56,73 @@ public class AbaloneState {
      *            int numPushedPieces)
      */
     AbaloneState getNextState(AbaloneMove move) {
-
         Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
         Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
-        List<AbaloneCoord> movingPieces;
-        List<AbaloneCoord> pushedPieces;
-        Abalone.Dir direction;
+        List<AbaloneCoord> movingPieces = move.getMovingPieces();
+        List<AbaloneCoord> pushedPieces = move.getPushedPieces();
+        Abalone.Dir direction = move.getDirection();
 
-        movingPieces = move.getMovingPieces();
-        pushedPieces = move.getPushedPieces();
-        direction = move.getDirection();
-        newP1Pces.clear();
-        newP2Pces.clear();
-
+        Set<AbaloneCoord> set = new HashSet<AbaloneCoord>(movingPieces);
+        if (pushedPieces != null) {
+            for (AbaloneCoord coord : pushedPieces) {
+                set.add(coord);
+            }
+        }
+        
+        // copy player pieces
         for (AbaloneCoord coord : p1Pieces) {
-            newP1Pces.add(new AbaloneCoord(coord.x, coord.y));
+            if (!set.add(coord)) {
+                AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
+                if (newCoord.isValid()) {
+                    newP1Pces.add(newCoord);
+                } else { 
+                    System.out.println("Piece pushed out: " + newCoord);
+                }
+            } else {
+                newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
+            }
         }
-
         for (AbaloneCoord coord : p2Pieces) {
-            newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
+            if (!set.add(coord)) {
+                AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
+                if (newCoord.isValid()) {
+                    newP2Pces.add(newCoord);
+                }
+            } else {
+                newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
+            }
         }
-       
-        if (turn % 2 == 0) {
-
-            for (AbaloneCoord coord : movingPieces) {
-                
-                for (AbaloneCoord coords : p1Pieces ) {
-                    if(coord.equals(coords)) {
-                        newP1Pces.remove(coords);
-                        newP1Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
-                    }
+       /*
+        // determine who is the moving player and who is pushed player
+        List<AbaloneCoord> movingPlayerPieces = (turn % 2 == 0 ? newP1Pces : newP2Pces);
+        List<AbaloneCoord> pushedPlayerPieces = (turn % 2 == 0 ? newP2Pces : newP1Pces);
+        
+        // move moving pieces
+        for (AbaloneCoord movingPiece : movingPieces) {
+            for (AbaloneCoord playerPiece : movingPlayerPieces) {
+                if (movingPiece.equals(playerPiece)) {
+                    playerPiece.setCoord(playerPiece.x + direction.dx, playerPiece.y + direction.dy);
                 }
             }
-            if (pushedPieces != null) {
-                for (AbaloneCoord coord : pushedPieces) {
-                    
-                    for(AbaloneCoord coords : p2Pieces) {
-                        if(coord.equals(coords)) {
-                            newP2Pces.remove(coords);
-                            newP2Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
-                        }
-                    }
-                 
-                }
-            }
-        } else {
-            if (pushedPieces != null) {
-                for (AbaloneCoord coord : pushedPieces) {
-                    for(AbaloneCoord coords : p1Pieces) {
-                        if(coord.equals(coords)) {
-                            newP1Pces.remove(coords);
-                            newP1Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
-                        }
-                    }
-                }
-            }
-
-            for (AbaloneCoord coord : movingPieces) {
-
-                for (AbaloneCoord coords : p2Pieces) {
-                    if(coord.equals(coords)) {
-                        newP2Pces.remove(coords);
-                        newP2Pces.add(new AbaloneCoord(coords.x + direction.dx, coord.y + direction.dy));
+        }
+        // move pushed pieces
+        if (pushedPieces != null) {
+            for (AbaloneCoord pushedPiece : pushedPieces) {
+                for(AbaloneCoord playerPiece : pushedPlayerPieces) {
+                    if (pushedPiece.equals(playerPiece)) {
+                        playerPiece.setCoord(playerPiece.x + direction.dx, playerPiece.y + direction.dy);
                     }
                 }
             }
         }
-
+*/
         AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
 
         return nextState;
     }
 
     public String toString() {
+        TreeSet<AbaloneCoord> ordered = new TreeSet<AbaloneCoord>();
         String toWrite = "";
         for (AbaloneCoord blackPiece : this.p1Pieces) {
             char row = (char) (blackPiece.y + 65);

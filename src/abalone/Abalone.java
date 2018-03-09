@@ -590,7 +590,6 @@ public class Abalone {
                 if (ownerChar == 'b') {
                     int read_x = coords[i].charAt(1) - 49;
                     int read_y = coords[i].charAt(0) - 65;
-                    System.out.println(read_y);
                     blackPieces.add(new AbaloneCoord(read_x, read_y));
                     i++;
                 } else {

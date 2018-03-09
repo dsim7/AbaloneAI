@@ -1,40 +1,12 @@
 package abalone;
 
-public class AbaloneCoord {
+public class AbaloneCoord implements Comparable {
     int x,y;
     
     public AbaloneCoord(int x, int y) {
-        if (x < 0 || x > 8 || y < 0 || y > 8) {
-            this.x = -1;
-            this.y = -1;
-        } else if (x == 0 && y > 4) {
-            this.x = -1;
-            this.y = -1;
-        } else if (x == 1 && y > 5) {
-            this.x = -1;
-            this.y = -1;
-        } else if (x == 2 && y > 6) {
-            this.x = -1;
-            this.y = -1;
-        } else if (x == 3 && y > 7) {
-            this.x = -1;
-            this.y = -1;
-        } else if (x == 5 && y < 1) {
-            this.x = -1;
-            this.y = -1;
-        } else if (x == 6 && y < 2) {
-            this.x = -1;
-            this.y = -1;
-        } else if (x == 7 && y < 3) {
-            this.x = -1;
-            this.y = -1;
-        } else if (x == 8 && y < 4) {
-            this.x = -1;
-            this.y = -1;
-        } else {
-            this.x = x;
-            this.y = y;
-        }
+        this.x = x;
+        this.y = y;
+        
     }
     
     public void setX(int new_x) {
@@ -48,6 +20,15 @@ public class AbaloneCoord {
     public void setCoord(int new_x, int new_y) {
         x = new_x;
         y = new_y;
+    }
+    
+    public boolean isValid() {
+        if ((x < 0 || x > 8 || y < 0 || y > 8) || 
+                (x == 0 && y > 4) || (x == 1 && y > 5) || (x == 2 && y > 6) || (x == 3 && y > 7) || 
+                (x == 5 && y < 1) || (x == 6 && y < 2) || (x == 7 && y < 3) || (x == 8 && y < 4)) {
+            return false;
+        }
+        return true;
     }
     
     @Override
@@ -69,5 +50,15 @@ public class AbaloneCoord {
         hash = 31 * hash + x;
         hash = 31 * hash + y;
         return hash;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof AbaloneCoord)) {
+            return -1;
+        }
+        AbaloneCoord ab = (AbaloneCoord) o;
+        int value = ab.y * 8 + ab.x;
+        return ;
     }
 }
