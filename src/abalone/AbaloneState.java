@@ -9,23 +9,12 @@ public class AbaloneState {
     Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
     Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
     int turn;
-    Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
-    Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
-    AbaloneState nextState;
 
     public AbaloneState(Set<AbaloneCoord> p1Pieces, Set<AbaloneCoord> p2Pieces, int turn) {
         this.p1Pieces = p1Pieces;
         this.p2Pieces = p2Pieces;
         this.turn = turn;
 
-    }
-
-    public Set<AbaloneCoord> getP1Pieces() {
-        return newP1Pces;
-    }
-
-    public Set<AbaloneCoord> getP2Pieces() {
-        return newP2Pces;
     }
 
     public int getStateValue() {
@@ -49,26 +38,9 @@ public class AbaloneState {
         List<AbaloneMove> moves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);                                                                    
         List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
 
-       /* for (int j = 0; j < moves.size(); j++) {
-            
-            
+        for (int j = 0; j < moves.size(); j++) {
             AbaloneState nextState = this.getNextState(moves.get(j));
             allNextStates.add(nextState);
-            
-        } */
-        
-        AbaloneState a = this;
-        AbaloneState b = this;
-      
-        a.getNextState(moves.get(0));
-        b.getNextState(moves.get(1));
-        
-        allNextStates.add(a);
-        allNextStates.add(b);
-        
-        System.out.println("\nAfter the return");
-        for(AbaloneCoord coord : a.newP2Pces) {
-            System.out.print(" " + coord);
         }
         
         return allNextStates;
@@ -84,6 +56,8 @@ public class AbaloneState {
      */
     AbaloneState getNextState(AbaloneMove move) {
 
+        Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
+        Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
         List<AbaloneCoord> movingPieces;
         List<AbaloneCoord> pushedPieces;
         Abalone.Dir direction;
@@ -100,16 +74,6 @@ public class AbaloneState {
 
         for (AbaloneCoord coord : p2Pieces) {
             newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
-        }
-        System.out.println();
-       /* System.out.println("P1's original");
-        for (AbaloneCoord coord : newP1Pces) {
-            System.out.print(" " + coord);
-        }
-        System.out.println(); */
-        System.out.println("P2's orignal");
-        for (AbaloneCoord coord : newP2Pces) {
-            System.out.print(" " + coord);
         }
        
         if (turn % 2 == 0) {
@@ -135,11 +99,9 @@ public class AbaloneState {
                  
                 }
             }
-
         } else {
             if (pushedPieces != null) {
                 for (AbaloneCoord coord : pushedPieces) {
-                    
                     for(AbaloneCoord coords : p1Pieces) {
                         if(coord.equals(coords)) {
                             newP1Pces.remove(coords);
@@ -160,17 +122,7 @@ public class AbaloneState {
             }
         }
 
-        nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
-      /*  System.out.println();
-        System.out.println("P1's new");
-        for (AbaloneCoord coord : newP1Pces) {
-            System.out.print(" " + coord);
-        } */
-        System.out.println();
-        System.out.println("P2's new");
-        for (AbaloneCoord coord : newP2Pces) {
-            System.out.print(" " + coord);
-        }
+        AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
 
         return nextState;
     }
