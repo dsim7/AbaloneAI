@@ -37,4 +37,25 @@ public class AbaloneMove {
         toString = toString.replaceAll(",$", "");
         return toString;
     }
+    
+    public List<AbaloneCoord> getMovingPieces() {
+        return movingPieces;
+    }
+    
+    public List<AbaloneCoord> getPushedPieces() {
+        return pushingPieces;
+    }
+    
+    public boolean getIsInlineMove() {
+        return isInlineMove;
+    }
+    
+    public int getNumPushedPieces() {
+        return numPushedPieces;
+    }
+    
+    public Abalone.Dir getDirection() {
+        return direction;
+    }
+    
 }

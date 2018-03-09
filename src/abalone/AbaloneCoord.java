@@ -37,6 +37,19 @@ public class AbaloneCoord {
         }
     }
     
+    public void setX(int new_x) {
+        x = new_x;
+    }
+    
+    public void setY(int new_y) {
+        y = new_y;
+    }
+    
+    public void setCoord(int new_x, int new_y) {
+        x = new_x;
+        y = new_y;
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof AbaloneCoord)) {

@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,6 +70,7 @@ public class AbaloneGUI extends JPanel {
         for (AbaloneCoord p1piece : p1Pieces) {
             coordSpaces[p1piece.y][p1piece.x].color = Color.RED;
         }
+        
         // player2
         Set<AbaloneCoord> p2Pieces = ab.state.p2Pieces;
         for (AbaloneCoord p2piece : p2Pieces) {

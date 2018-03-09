@@ -15,6 +15,7 @@ public final class GroupingHelper {
      */
     public static List<List<AbaloneCoord>> generateGroups(final Set<AbaloneCoord> playerPieces) {
         AbaloneCoord[] playerPiecesArr = playerPieces.toArray(new AbaloneCoord[playerPieces.size()]);
+
         
         final List<List<AbaloneCoord>> groups = new ArrayList<List<AbaloneCoord>>();
         final Set<List<AbaloneCoord>> uniqueGroups = new HashSet<List<AbaloneCoord>>();
