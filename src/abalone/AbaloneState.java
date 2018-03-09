@@ -75,33 +75,39 @@ public class AbaloneState {
         List<AbaloneCoord> pushedPieces = move.getPushedPieces();
         Abalone.Dir direction = move.getDirection();
 
-        Set<AbaloneCoord> set = new HashSet<AbaloneCoord>(movingPieces);
+        // add movingPieces and pushedPieces into the same set of changed pieces
+        Set<AbaloneCoord> changedPieces = new HashSet<AbaloneCoord>(movingPieces);
         if (pushedPieces != null) {
             for (AbaloneCoord coord : pushedPieces) {
-                set.add(coord);
+                changedPieces.add(coord);
             }
         }
         
-        // copy player pieces
+        Set<AbaloneCoord> movingPlayerPieces = (turn % 2 == 0 ? newP1Pces : newP2Pces);
+        Set<AbaloneCoord> pushedPlayerPieces = (turn % 2 == 0 ? newP2Pces : newP1Pces);
+        
+        // copy player pieces, move if it is a moving piece
         for (AbaloneCoord coord : p1Pieces) {
-            if (!set.add(coord)) {
+            if (!changedPieces.add(coord)) {   // if add fails, it is a moving piece
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
-                if (newCoord.isValid()) {
-                    newP1Pces.add(newCoord);
+                if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
+                    movingPlayerPieces.add(newCoord);
                 }
             } else {
-                newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
+                movingPlayerPieces.add(new AbaloneCoord(coord.x, coord.y));
             }
         }
+        // copy player pieces, move if it is a pushed piece
         for (AbaloneCoord coord : p2Pieces) {
-            if (!set.add(coord)) {
+            if (!changedPieces.add(coord)) {  // if add fails, it is a pushed piece
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
-                if (newCoord.isValid()) {
-                    newP2Pces.add(newCoord);
+                if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
+                    pushedPlayerPieces.add(newCoord);
                 }
             } else {
-                newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
+                pushedPlayerPieces.add(new AbaloneCoord(coord.x, coord.y));
             }
+        
         }
         AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
         return nextState;
