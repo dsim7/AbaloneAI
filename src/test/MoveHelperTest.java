@@ -17,7 +17,7 @@ public class MoveHelperTest {
 
     @Test
     public void testGenerateAllMoves() {
-        List<List<AbaloneCoord>> group = generateMockGroups();
+        Set<List<AbaloneCoord>> group = generateMockGroups();
         Set<AbaloneCoord> p1Pieces = generatePlayerOnePieces();
         Set<AbaloneCoord> p2Pieces = generatePlayerTwoPieces();
 
@@ -25,9 +25,9 @@ public class MoveHelperTest {
         assertNotNull(moves);
     }
 
-    private List<List<AbaloneCoord>> generateMockGroups() {
+    private Set<List<AbaloneCoord>> generateMockGroups() {
 
-        List<List<AbaloneCoord>> groups = new ArrayList<>();
+        Set<List<AbaloneCoord>> groups = new HashSet<>();
         List<AbaloneCoord> group = new ArrayList<>();
         group.add(new AbaloneCoord(1,1));
         group.add(new AbaloneCoord(2,1));

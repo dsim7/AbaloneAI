@@ -1,0 +1,66 @@
+2018/03/18 20:20:58: New Game Started
+2018/03/18 20:21:05: (4,1) moving DL broadside (1521429665825)
+2018/03/18 20:22:19: New Game Started
+2018/03/18 20:22:25: (4,1) moving DL broadside (1521429745146.0)
+2018/03/18 20:31:46: New Game Started
+2018/03/18 20:31:54: (4,1) moving DL broadside (2.7)
+2018/03/18 20:32:12: New Game Started
+2018/03/18 20:32:19: (4,1) moving DL broadside (2.3)
+2018/03/18 20:42:03: New Game Started
+2018/03/18 20:42:09: (4,1) moving DL broadside (2.5)
+2018/03/18 20:43:33: New Game Started
+2018/03/18 20:43:40: (4,1) moving DL broadside (2.3)
+2018/03/18 20:43:45: (4,1) moving DL broadside (4.6)
+2018/03/18 20:43:50: (4,1) moving DL broadside (4.7)
+2018/03/18 20:51:25: New Game Started
+2018/03/18 20:51:31: Player java.awt.Color[r=255,g=0,b=0] (4,1) moving DL broadside (2.4sec)
+2018/03/18 20:51:59: Player java.awt.Color[r=0,g=0,b=255] (4,1) moving DL broadside (27.9sec)
+2018/03/18 20:52:58: New Game Started
+2018/03/18 20:53:05: Player 01 (4,1) moving DL broadside (2.0sec)
+2018/03/18 20:57:21: New Game Started
+2018/03/18 20:57:35: Player 01 (4,1) DL broadside (7.5sec)
+2018/03/18 20:59:30: New Game Started
+2018/03/18 20:59:41: Player 01 (2,2) DL broadside (4.1sec)
+2018/03/18 21:02:06: New Game Started
+2018/03/18 21:02:13: Player 1 (2,2) UL broadside (2.2sec)
+2018/03/18 21:04:11: New Game Started
+2018/03/18 21:04:19: Player 1 (2,2) UL broadside (3.0sec)
+2018/03/18 21:04:48: New Game Started
+2018/03/18 21:04:57: Player 1 (2,2) UL broadside (1.9sec)
+2018/03/18 21:05:00: Player 2 (2,2) UL broadside (2.7sec)
+2018/03/19 14:42:47: New Game Started
+2018/03/19 15:00:18: New Game Started
+2018/03/19 15:00:26: Player 1 (2,2) UL broadside (2.2sec)
+2018/03/19 15:00:28: Player 2 (4,6),(5,6) DR broadside (2.1sec)
+2018/03/19 15:00:31: Player 1 (3,2),(4,2) UL broadside (2.9sec)
+2018/03/19 15:00:34: Player 2 (5,5),(6,6) DL inline (3.4sec)
+2018/03/19 15:00:37: Player 1 (2,1),(3,1) UL broadside (2.8sec)
+2018/03/19 15:00:40: Player 2 (4,4),(4,5) L broadside (3.2sec)
+2018/03/19 15:00:44: Player 1 (2,2) L broadside (3.6sec)
+2018/03/19 15:00:47: Player 2 (3,5) L broadside (2.7sec)
+2018/03/19 15:00:48: Player 1 (1,2),(2,3) UR inline (1.3sec)
+2018/03/19 15:01:01: Player 2 (4,5),(5,5) L inline (12.2sec)
+2018/03/19 15:02:39: New Game Started
+2018/03/19 15:02:57: Player 1 (2,2),(3,2) UL broadside (13.9sec)
+2018/03/19 15:03:44: New Game Started
+2018/03/19 15:05:14: New Game Started
+2018/03/19 15:05:43: New Game Started
+2018/03/19 15:05:49: Player 1 (2,2),(3,2),(4,2) UL broadside (2.5sec)
+2018/03/19 15:05:52: Player 2 (5,6),(5,7),(5,8) DR inline (2.9sec)
+2018/03/19 15:06:01: Player 1 (2,3),(3,3),(4,3) R inline (9.1sec)
+2018/03/19 15:06:05: Player 2 (5,5),(5,6),(5,7) DR inline (4.2sec)
+2018/03/19 15:06:07: Player 1 (3,3),(4,3),(5,3) R inline (1.2sec)
+2018/03/19 15:06:09: Player 2 (5,5),(6,6) DL inline (2.5sec)
+2018/03/19 15:06:11: Player 1 (4,3),(5,3),(6,3) R inline (1.5sec)
+2018/03/19 15:06:12: Player 2 (4,4),(5,5) DL inline (1.6sec)
+2018/03/19 15:06:16: Player 1 (0,1) UL broadside (4.0sec)
+2018/03/19 15:06:20: Player 2 (3,3) L broadside (3.0sec)
+2018/03/19 15:06:21: Player 1 (0,2) DR broadside (1.8sec)
+2018/03/19 15:06:23: Player 2 (4,4),(5,4) DL broadside (1.4sec)
+2018/03/19 15:06:33: Player 1 (7,3) UL broadside (10.2sec)
+2018/03/19 15:06:35: Player 2 (2,3),(3,3),(4,3) R inline (1.8sec)
+2018/03/19 15:06:37: Player 1 (7,4) UL broadside (1.5sec)
+2018/03/19 15:06:39: Player 2 (3,3),(4,3),(5,3) R inline (2.2sec)
+2018/03/19 15:07:15: New Game Started
+2018/03/19 16:08:30: New Game Started
+2018/03/20 11:33:06: New Game Started

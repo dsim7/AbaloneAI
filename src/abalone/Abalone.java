@@ -11,7 +11,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,13 +26,6 @@ import javax.swing.JFrame;
 import javax.swing.Timer;
 
 
-/*
- * TODO:
- * -after reset movement
- * -time per move counter display
- * -bigger outs
- * -save to times to external
- */
 
 
 /**
@@ -50,7 +45,8 @@ public class Abalone {
     public static final Color P1_COLOR = Color.RED;
     public static final Color P2_COLOR = Color.BLUE;
     public static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
-    public static final DecimalFormat FORMAT = new DecimalFormat("0.0");
+    public static final DecimalFormat TIME_FORMAT = new DecimalFormat("0.0");
+    public static final SimpleDateFormat TIME_STAMP_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     
     public static final AbaloneCoord[] P1_STANDARD = {
         new AbaloneCoord(0, 0), new AbaloneCoord(1, 0),
@@ -116,19 +112,22 @@ public class Abalone {
     private int maxTurns = 0;
     private double maxTimePerTurn = 0;
     private Scanner console = new Scanner(System.in);
-    //AbaloneSquare[][] squares = new AbaloneSquare[9][9];
+    private File logFile = new File("move_log.txt");
+    private FileWriter logWriter;
     
     private Timer p1timer = new Timer(100, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            player1.timeTaken += 0.1;
+            getPlayers()[0].timeTaken += 0.1;
+            getPlayers()[0].roundTimeTaken += 0.1;
             updateGUIInfo();
         }
     });
     private Timer p2timer = new Timer(100, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            player2.timeTaken += 0.1;
+            getPlayers()[1].timeTaken += 0.1;
+            getPlayers()[1].roundTimeTaken += 0.1;
             updateGUIInfo();
         }
     });
@@ -137,7 +136,7 @@ public class Abalone {
         public void actionPerformed(ActionEvent e) {
             nextPlayerTurn();
             System.out.println("Turn is up");
-            gui.updateInfo();
+            updateGUIInfo();
         }
     });
     private KeyListener keyListener = new KeyAdapter() {
@@ -155,20 +154,17 @@ public class Abalone {
     private boolean gameRunning = false;
     private boolean gameStarted = false;
     private boolean gameOver = false;
-    private double timeAtTurnStart = 0;
-    private AbaloneMove moveThisTurn;
     private boolean settingTurns = false;
     private boolean settingTimePerTurn = false;
-    Dir directionSelection;
+    private AbaloneCoord selection1, selection2;
+    private Dir directionSelection;
     
     private AbaloneGUI gui;
 
-    AbaloneState state;
-    AbalonePlayer player1 = new AbalonePlayer(0, P1_COLOR, this);
-    AbalonePlayer player2 = new AbalonePlayer(1, P2_COLOR, this);
-    AbalonePlayer curPlayer = player1;
-    AbaloneCoord selection1, selection2;
-    AbaloneCoord[][] board = new AbaloneCoord[9][9];
+    private AbaloneState state;
+    private AbalonePlayer[] players = {new AbalonePlayer(0, P1_COLOR, this), new AbalonePlayer(1, P2_COLOR, this)};
+    private AbalonePlayer curPlayer = getPlayers()[0];
+    private AbaloneCoord[][] board = new AbaloneCoord[9][9];
     
     private AbaloneState testState;
     
@@ -191,18 +187,21 @@ public class Abalone {
         p1timer.setRepeats(true);
         p2timer.setRepeats(true);
         
+        log("New Game Started");
+        
         while (console.hasNextLine()) {
-            if (this.processInput(console.nextLine())) {
-                //System.out.println("Player turn: " + getCurPlayer());
-            }
+            processInput(console.nextLine());
             updateGUI();
-        }   
+        }
+
+        
     }
     
     public Abalone(File inputFile, File boardoutFile, File moveoutfile) {
         System.out.println("Testing file");
-        this.readTestFile(inputFile);
-        this.printResults(boardoutFile, moveoutfile);
+        if (this.readTestFile(inputFile)) {
+            this.printNextStatesResults(boardoutFile, moveoutfile);
+        }
     }
 
     /**
@@ -214,31 +213,51 @@ public class Abalone {
         return !gameOver && gameRunning && gameStarted;
     }
     
-    /**
-     * Rotate player turns. 
-     */
-    public void nextTurn() {
-        //printTurnInfo();
-        switchTimers();
-        checkMaxTurns();
-        updateGUI();
-        
+    public AbalonePlayer getCurPlayer() {
+        return getPlayers()[getState().turn % 2];
     }
-    
-    public void nextPlayerTurn() {
-        if (curPlayer == player1) {
-            setCurPlayer(player2);
-        } else {
-            setCurPlayer(player1);
+
+    public void clicked(AbaloneCoord coord) {
+        if (selection1 == null) {
+            selection1 = coord;
+        } else if (selection2 == null) {
+            selection2 = coord;
+        } else if (directionSelection == null) {
+            directionSelection = getDirection(coord);
+            if (!move(selection1,
+                    selection2,
+                    directionSelection)) {
+                System.out.println("Invalid move, try again");
+            }
+            clearSelection();
         }
     }
     
-    public AbalonePlayer getCurPlayer() {
-        return curPlayer;
+    private Abalone.Dir getDirection(AbaloneCoord coord) {
+        int dx = coord.x - selection2.x;
+        int dy = coord.y - selection2.y;
+        for (Abalone.Dir dir : Abalone.Dir.values()) {
+            if (dir.dx == dx && dir.dy == dy) {
+                return dir;
+            }
+        }
+        return null;
+    }
+    
+    private void nextPlayerTurn() {
+        if (curPlayer == getPlayers()[0]) {
+            curPlayer = getPlayers()[1];
+        } else {
+            curPlayer = getPlayers()[0];
+        }
+        switchTimers();
+        updateGUI();
+
+        checkMaxTurns();
     }
     
     private void checkMaxTurns() {
-        if (state.turn > maxTurns) {
+        if (getState().turn > maxTurns && maxTurns != 0) {
             stopTimers();
         }
     }
@@ -250,6 +269,7 @@ public class Abalone {
                 stopTimers();
             }
             return true;
+            
         } else if (lowerInput.equals("reset")) {
             if (gameOver) {
                 resetTimers();
@@ -257,6 +277,7 @@ public class Abalone {
             } else {
                 System.out.println("Stop the game first");
             }
+            
         } else if (lowerInput.equals("standard")) {
         
             if (!gameOver && !gameStarted) {
@@ -266,6 +287,7 @@ public class Abalone {
                 System.out.println("Stop and reset the game first");
             }
             return true;
+        
         } else if (lowerInput.equals("belgian")) {
             if (!gameOver && !gameStarted) {
                 clearBoard();
@@ -274,6 +296,7 @@ public class Abalone {
                 System.out.println("Stop and reset the game first");
             }
             return true;
+        
         } else if (lowerInput.equals("german")) {
             if (!gameOver && !gameStarted) {
                 clearBoard();
@@ -282,16 +305,19 @@ public class Abalone {
                 System.out.println("Stop and reset the game first");
             }
             return true;
+        
         } else if (lowerInput.equals("pause")) {
             if (!gameOver && gameStarted && gameRunning) {
                 pauseTimers();
             }
             return true;
+        
         } else if (lowerInput.equals("resume") || lowerInput.equals("start")) {
             if (!gameOver) {
                 resumeTimers();
             }
             return true;
+        
             // modes
         } else if (lowerInput.equals("bluecomp")) {
             if (!gameStarted) {
@@ -300,6 +326,7 @@ public class Abalone {
             } else {
                 System.out.println("Stop and reset the game first");
             }
+        
         } else if (lowerInput.equals("blueplayer")) {
             System.out.println("Setting Blue to Player");
             if (!gameStarted) {
@@ -307,6 +334,7 @@ public class Abalone {
             } else {
                 System.out.println("Stop and reset the game first");
             }
+        
         } else if (lowerInput.equals("redcomp")) {
             System.out.println("Setting Red to Comp");
             if (!gameStarted) {
@@ -314,6 +342,7 @@ public class Abalone {
             } else {
                 System.out.println("Stop and reset the game first");
             }
+        
         } else if (lowerInput.equals("redplayer")) {
             System.out.println("Setting Red to Player");
             if (!gameStarted) {
@@ -321,6 +350,7 @@ public class Abalone {
             } else {
                 System.out.println("Stop and reset the game first");
             }
+        
             // turn and time limit
         } else if (lowerInput.equals("turns")) {
             if (!gameStarted) {
@@ -329,6 +359,7 @@ public class Abalone {
             } else {
                 System.out.println("Stop and reset the game first");
             }
+        
         } else if (lowerInput.equals("time")) {
             if (!gameStarted) {
                 System.out.println("Enter Time per turn");
@@ -336,6 +367,7 @@ public class Abalone {
             } else {
                 System.out.println("Stop and reset the game first");
             }
+        
         } else {
             try {
                 int intinput = Integer.parseInt(lowerInput);
@@ -362,24 +394,24 @@ public class Abalone {
     // if the game has not started, determines whether red will move first or not
     private void setRedComp(boolean comp) {
         if (comp) {
-            player2.isAI = true;
+            getPlayers()[1].isAI = true;
         } else {
-            player2.isAI = false;
+            getPlayers()[1].isAI = false;
         }
     }
     
     private void setBlueComp(boolean comp) {
         if (comp) {
-            player1.isAI = true;
+            getPlayers()[0].isAI = true;
         } else {
-            player1.isAI = false;
+            getPlayers()[0].isAI = false;
         }
     }
 
     // pause timers
     private void pauseTimers() {
         System.out.println("Pausing");
-        this.lastRunningTimer = p1timer.isRunning() ? p1timer : p2timer;
+        lastRunningTimer = p1timer.isRunning() ? p1timer : p2timer;
         lastRunningTimer.stop();
         maxTurnTimer.stop();
         gameRunning = false;
@@ -401,16 +433,17 @@ public class Abalone {
         gameStarted = false;
         gameOver = true;
 
-        gui.updateInfo();
+        updateGUIInfo();
         // stop ai's TODO
     }
 
     private void resetTimers() {
         System.out.println("Reseting");
-        player1.timeTaken = 0;
-        player2.timeTaken = 0;
-        player1.outs = 0;
-        player2.outs = 0;
+        for (AbalonePlayer player : getPlayers()) {
+            player.timeTaken = 0;
+            player.roundTimeTaken = 0;
+            player.outs = 0;
+        }
         maxTimePerTurn = 0;
         maxTurns = 0;
         gameOver = false;
@@ -433,15 +466,15 @@ public class Abalone {
     }
     
     // switches which timer is running between player1 and player2
-    private void switchTimers() {
-        timeAtTurnStart = curPlayer.timeTaken;
-        
+    private void switchTimers() {        
         if (p1timer.isRunning()) {
             p1timer.stop();
             p2timer.start();
+            getPlayers()[1].roundTimeTaken = 0;
         } else {
             p2timer.stop();
             p1timer.start();
+            getPlayers()[0].roundTimeTaken = 0;
         }
         
         if (maxTimePerTurn != 0) {
@@ -451,7 +484,7 @@ public class Abalone {
 
     // removes all pieces from the board
     private void clearBoard() {
-        state = null;
+        setState(null);
         updateGUI();
     }
 
@@ -461,47 +494,47 @@ public class Abalone {
         
         // 1
         for (int i = 0; i < 5; i++) {
-            board[0][i] = new AbaloneCoord(i, 0);
+            getBoard()[0][i] = new AbaloneCoord(i, 0);
         }
         
         // 2
         for (int i = 0; i < 6; i++) {
-            board[1][i] = new AbaloneCoord(i, 1);
+            getBoard()[1][i] = new AbaloneCoord(i, 1);
         }
         
         // 3
         for (int i = 0; i < 7; i++) {
-            board[2][i] = new AbaloneCoord(i, 2);
+            getBoard()[2][i] = new AbaloneCoord(i, 2);
         }
         
         // 4
         for (int i = 0; i < 8; i++) {
-            board[3][i] = new AbaloneCoord(i, 3);
+            getBoard()[3][i] = new AbaloneCoord(i, 3);
         }
         
         // 5
         for (int i = 0; i < 9; i++) {
-            board[4][i] = new AbaloneCoord(i, 4);
+            getBoard()[4][i] = new AbaloneCoord(i, 4);
         }
         
         // 6
         for (int i = 1; i < 9; i++) {
-            board[5][i] = new AbaloneCoord(i, 5);
+            getBoard()[5][i] = new AbaloneCoord(i, 5);
         }
         
         // 7
         for (int i = 2; i < 9; i++) {
-            board[6][i] = new AbaloneCoord(i, 6);
+            getBoard()[6][i] = new AbaloneCoord(i, 6);
         }
         
         // 8
         for (int i = 3; i < 9; i++) {
-            board[7][i] = new AbaloneCoord(i, 7);
+            getBoard()[7][i] = new AbaloneCoord(i, 7);
         }
         
         // 9
         for (int i = 4; i < 9; i++) {
-            board[8][i] = new AbaloneCoord(i, 8);
+            getBoard()[8][i] = new AbaloneCoord(i, 8);
         }
     }
     
@@ -514,7 +547,6 @@ public class Abalone {
 
     // initializes the gui's for player 1 and player 2
     private void initGUIs() {
-        
         gui = new AbaloneGUI(this);
         
         JFrame frame1 = new JFrame();
@@ -549,28 +581,47 @@ public class Abalone {
      * @param dir The direction the group is to be moved
      * @return true if the move is successful
      */
-    public boolean move(AbaloneCoord coord1, AbaloneCoord coord2, Dir dir) {
-        System.out.println(coord1);
-        System.out.println(coord2);
-        System.out.println(dir);
-        
-        // TODO update state with new state as a result of the move
-        
-        return false;
+    private boolean move(AbaloneCoord coord1, AbaloneCoord coord2, Dir dir) {
+        AbaloneMove move = composeMove(coord1, coord2, dir);
+        if (move != null) {
+            setState(move);
+            logMove(move);
+            nextPlayerTurn();
+            clearSelection();
+            return true;
+        } else {
+            System.out.println("Invalid Move");
+            clearSelection();
+            return false;
+        }
+    }
+    
+    private AbaloneMove composeMove(AbaloneCoord coord1, AbaloneCoord coord2, Dir dir) {
+        // TODO
+        Set<AbaloneCoord> playerPieces = getState().turn % 2 == 0 ? getState().p1Pieces : getState().p2Pieces;
+        Set<AbaloneCoord> enemyPieces = getState().turn % 2 == 0 ? getState().p2Pieces : getState().p1Pieces;
+        if (GroupingHelper.validateGrouping(coord1, coord2, enemyPieces)) {
+            List<AbaloneCoord> group = GroupingHelper.generateCoordinates(coord1, coord2);
+            AbaloneMove move = MoveHelper.generateMove(group, dir, playerPieces, enemyPieces);
+            return move;
+        } else {
+            System.out.println("Invalid Grouping");
+        }
+        return null;
+    }
+    
+    private void setState(AbaloneMove move) {
+        state = state.getNextState(move);
     }
 
     // clears all currently selected squares and directions
-    public void clearSelection() {
+    private void clearSelection() {
         selection1 = null;
         selection2 = null;
         directionSelection = null;
     }
     
-    public void setCurPlayer(AbalonePlayer player) {
-        this.curPlayer = player;
-    }
-    
-    private void readTestFile(File infile) {
+    private boolean readTestFile(File infile) {
         System.out.println("Reading " + infile.getName());
         try {
             Scanner scan = new Scanner(infile);
@@ -614,12 +665,14 @@ public class Abalone {
             System.out.println("Setting test state");
             testState = new AbaloneState(blackPieces, whitePieces, turn);
             scan.close();
+            return true;
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+            System.out.println("Input File Not Found");
+            return false;
         }
     }
     
-    private void printResults(File boardoutfile, File moveoutfile) {
+    private void printNextStatesResults(File boardoutfile, File moveoutfile) {
         System.out.println("printing to " + boardoutfile.getName());
         try {
             BufferedWriter boardWriter = new BufferedWriter(new FileWriter(boardoutfile));
@@ -635,7 +688,7 @@ public class Abalone {
             boardWriter.close();
             
             Set<AbaloneCoord> playerPieces = testState.turn % 2 == 0 ? testState.p1Pieces : testState.p2Pieces;
-            List<List<AbaloneCoord>> allGroupings = GroupingHelper.generateGroups(playerPieces);
+            Set<List<AbaloneCoord>> allGroupings = GroupingHelper.generateGroups(playerPieces);
             List<AbaloneMove> allMoves = MoveHelper.generateAllMoves(allGroupings, testState.p1Pieces, testState.p2Pieces);
             System.out.println("Writing to .move");
             for (AbaloneMove move : allMoves) {
@@ -649,6 +702,36 @@ public class Abalone {
         }
     }
     
+    private void logMove(AbaloneMove move) {
+        if (move != null) {
+            log(getCurPlayer().toString() + " " + move.toString() + " (" + TIME_FORMAT.format(curPlayer.roundTimeTaken) + "sec)");
+        }
+    }
+    
+    private void log(String string) {
+        try {
+            logWriter = new FileWriter(logFile, true);
+            Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+            logWriter.write(TIME_STAMP_FORMAT.format(timeStamp) + ": " + string + "\n");
+            System.out.print(TIME_STAMP_FORMAT.format(timeStamp) + ": " + string + "\n");
+            logWriter.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public AbalonePlayer[] getPlayers() {
+        return players;
+    }
+
+    public AbaloneState getState() {
+        return state;
+    }
+
+    public AbaloneCoord[][] getBoard() {
+        return board;
+    }
+
     // enumeration of Directions
     // each direction has a delta x and delta y which represent the difference in x
     // and y which result from moving in that direction
@@ -664,4 +747,5 @@ public class Abalone {
         }
     }
 }
+
 

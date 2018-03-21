@@ -6,18 +6,15 @@ public class AbaloneMove {
     private List<AbaloneCoord> pushingPieces;
     private Abalone.Dir direction;
     private boolean isInlineMove;
-    private int numPushedPieces;
     
     AbaloneMove(List<AbaloneCoord> movingPieces,
                 List<AbaloneCoord> pushingPieces,
                 Abalone.Dir direction,
-                boolean isInlineMove,
-                int numPushedPieces) {
+                boolean isInlineMove) {
         this.movingPieces = movingPieces;
         this.pushingPieces = pushingPieces;
         this.direction = direction;
         this.isInlineMove = isInlineMove;
-        this.numPushedPieces = numPushedPieces;
     }
     
     public String toString() {
@@ -26,14 +23,15 @@ public class AbaloneMove {
             toString += "(" + piece.x + "," + piece.y + "),";
         }
         toString = toString.replaceAll(",$", "");
-        toString += " moving: " + direction.toString()
-                + (isInlineMove ? " inline" : " broadside")
-                + " pushing: ";
+        toString += " " + direction.toString()
+                + (isInlineMove ? " inline" : " broadside");
+        /*
         if (pushingPieces != null) {
+            toString += " pushing: ";
             for (AbaloneCoord piece : pushingPieces) {
                 toString += "(" + piece.x + "," + piece.y + "),";
             }
-        }
+        }*/
         toString = toString.replaceAll(",$", "");
         return toString;
     }
@@ -48,10 +46,6 @@ public class AbaloneMove {
     
     public boolean getIsInlineMove() {
         return isInlineMove;
-    }
-    
-    public int getNumPushedPieces() {
-        return numPushedPieces;
     }
     
     public Abalone.Dir getDirection() {

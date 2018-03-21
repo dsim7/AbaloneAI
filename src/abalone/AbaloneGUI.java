@@ -27,7 +27,7 @@ public class AbaloneGUI extends JPanel {
     private AbaloneGUISquare[][] coordSpaces = new AbaloneGUISquare[9][9];
     private AbaloneGUIInfoPanel info = new AbaloneGUIInfoPanel();
 
-    AbaloneGUI(Abalone ab) {
+    public AbaloneGUI(Abalone ab) {
         this.ab = ab;
         this.setLayout(new BorderLayout());
         this.add(new AbaloneGUIGrid(), BorderLayout.CENTER);
@@ -62,17 +62,17 @@ public class AbaloneGUI extends JPanel {
                 }
             }
         }
-        if (ab.state == null) {
+        if (ab.getState() == null) {
             return;
         }
         // player1 
-        Set<AbaloneCoord> p1Pieces = ab.state.p1Pieces;
+        Set<AbaloneCoord> p1Pieces = ab.getState().p1Pieces;
         for (AbaloneCoord p1piece : p1Pieces) {
             coordSpaces[p1piece.y][p1piece.x].color = Color.RED;
         }
         
         // player2
-        Set<AbaloneCoord> p2Pieces = ab.state.p2Pieces;
+        Set<AbaloneCoord> p2Pieces = ab.getState().p2Pieces;
         for (AbaloneCoord p2piece : p2Pieces) {
             coordSpaces[p2piece.y][p2piece.x].color = Color.BLUE;
         }
@@ -80,7 +80,7 @@ public class AbaloneGUI extends JPanel {
     
     
     // panel containing statistics of the game
-    class AbaloneGUIInfoPanel extends JPanel {
+    private class AbaloneGUIInfoPanel extends JPanel {
         JLabel player1label = new JLabel("Player 1");
         JLabel player2label = new JLabel("Player 2");
         JLabel time1label = new JLabel("0");
@@ -88,8 +88,10 @@ public class AbaloneGUI extends JPanel {
         JLabel outs1label = new JLabel("0");
         JLabel outs2label = new JLabel("0");
         JLabel turnslabel = new JLabel("0");
+        JLabel roundTime1label = new JLabel("0");
+        JLabel roundTime2label = new JLabel("0");
         
-        AbaloneGUIInfoPanel() {
+        private AbaloneGUIInfoPanel() {
             this.setVisible(true);
             this.setLayout(new BorderLayout());
             this.setPreferredSize(new Dimension(100,100));
@@ -109,6 +111,10 @@ public class AbaloneGUI extends JPanel {
             outs2label.setForeground(Abalone.P2_COLOR);
             turnslabel.setFont(Abalone.INFO_FONT);
             turnslabel.setForeground(Color.WHITE);
+            roundTime1label.setFont(Abalone.INFO_FONT);
+            roundTime1label.setForeground(Abalone.P1_COLOR);
+            roundTime2label.setFont(Abalone.INFO_FONT);
+            roundTime2label.setForeground(Abalone.P2_COLOR);
             
             JPanel p1 = new JPanel();
             p1.setLayout(new GridLayout());
@@ -130,19 +136,23 @@ public class AbaloneGUI extends JPanel {
             
             p1.add(player1label);
             p1.add(time1label);
+            p1.add(roundTime1label);
             p1.add(outs1label);
             p2.add(player2label);
             p2.add(time2label);
+            p2.add(roundTime2label);
             p2.add(outs2label);
             center.add(turnslabel);
         }
         
         private void updateInfo() {
-            outs1label.setText("" + ab.player1.outs);
-            outs2label.setText("" + ab.player2.outs);
-            time1label.setText("" + Abalone.FORMAT.format(ab.player1.timeTaken));
-            time2label.setText("" + Abalone.FORMAT.format(ab.player2.timeTaken));
-            turnslabel.setText("" + (ab.state == null ? 0 : ab.state.turn));
+            outs1label.setText("" + ab.getPlayers()[0].outs);
+            outs2label.setText("" + ab.getPlayers()[1].outs);
+            time1label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[0].timeTaken));
+            time2label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[1].timeTaken));
+            roundTime1label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[0].roundTimeTaken));
+            roundTime2label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[1].roundTimeTaken));
+            turnslabel.setText("" + (ab.getState() == null ? 0 : ab.getState().turn));
             repaint();
         }
         
@@ -151,19 +161,19 @@ public class AbaloneGUI extends JPanel {
 
     
     // panel containing the hexagonal board
-    class AbaloneGUIGrid extends JPanel {
+    private class AbaloneGUIGrid extends JPanel {
         private AbaloneGUIGrid() {
             this.setBackground(Color.BLACK);
             this.setLayout(new GridLayout(9,1));
             for (int i = 8; i >= 0; i--) {
-                this.add(new AbaloneGUIGridStrip(ab.board[i]));
+                this.add(new AbaloneGUIGridStrip(ab.getBoard()[i]));
             }
         }
     }
 
 
     // a strip represents one row of squares on the board
-    class AbaloneGUIGridStrip extends JPanel {
+    private class AbaloneGUIGridStrip extends JPanel {
         private AbaloneGUIGridStrip(AbaloneCoord[] strip) {
             this.setBackground(Color.BLACK);
             this.setVisible(true);
@@ -179,7 +189,7 @@ public class AbaloneGUI extends JPanel {
 
 
     // represents a single square
-    class AbaloneGUISquare extends JPanel {
+    private class AbaloneGUISquare extends JPanel {
         Color color;
         AbaloneCoord coord;
         //AbaloneSquare square;
@@ -224,41 +234,13 @@ public class AbaloneGUI extends JPanel {
             @Override
             public void mousePressed(MouseEvent arg0) {
                 if (!(ab.getCurPlayer()).isAI && ab.getCanClick()) {
-                    System.out.println(coord);
-                    if (ab.selection1 == null) {
-                        ab.selection1 = coord;
-                    } else if (ab.selection2 == null) {
-                        ab.selection2 = coord;
-                    } else if (ab.directionSelection == null) {
-                        ab.directionSelection = getDirection();
-                        if (!ab.move(ab.selection1,
-                                ab.selection2,
-                                ab.directionSelection)) {
-                            System.out.println("Invalid move, try again");
-                        }
-                        //System.out.println("Direction: " + ab.directionSelection);
-                        ab.clearSelection();
-                    }
+                    ab.clicked(coord);
                 }
             }
     
             @Override
             public void mouseReleased(MouseEvent arg0) {}
     
-            private Abalone.Dir getDirection() {
-                
-                int dx = coord.x - ab.selection2.x;
-                int dy = coord.y - ab.selection2.y;
-                //System.out.println("" + dx);
-                //System.out.println("" + dy);
-                for (Abalone.Dir dir : Abalone.Dir.values()) {
-                    //System.out.println(dir + " " + dir.dx + " " + dir.dy);
-                    if (dir.dx == dx && dir.dy == dy) {
-                        return dir;
-                    }
-                }
-                return null;
-            }
             
         }
     }

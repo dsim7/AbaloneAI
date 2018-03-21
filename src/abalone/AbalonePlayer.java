@@ -9,11 +9,16 @@ public class AbalonePlayer {
     int outs, priority;
     double timeTaken;
     boolean isAI;
+    double roundTimeTaken;
     
     public AbalonePlayer(int priority, Color color, Abalone game) {
         this.abalone = game;
         this.color = color;
         this.priority = priority;
+    }
+    
+    public String toString() {
+        return "Player " + (priority + 1);
     }
 
 }

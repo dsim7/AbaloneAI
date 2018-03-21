@@ -36,24 +36,15 @@ public class AbaloneState {
      * every move, then adds all the new states into a List of <AbaloneState>
      */
     public List<AbaloneState> getAllNextStates() {
-
-        List<List<AbaloneCoord>> groups = new ArrayList<List<AbaloneCoord>>();
-
-        if (turn % 2 == 0) {
-            groups = GroupingHelper.generateGroups(p1Pieces);
-        } else {
-            groups = GroupingHelper.generateGroups(p2Pieces);
-        }
-        
+        Set<List<AbaloneCoord>> groups = GroupingHelper.generateGroups(turn % 2 == 0 ? p1Pieces : p2Pieces); 
         List<AbaloneMove> moves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);                                                                    
         List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
-        AbaloneState nextState = new AbaloneState(p1Pieces, p2Pieces, turn);
 
         for (int j = 0; j < moves.size(); j++) {
-            AbaloneState ref;
-            ref = nextState.getNextState(moves.get(j));
-            if (ref != null) {   // move was a suicide move
-                allNextStates.add(ref);
+            AbaloneState nextState;
+            nextState = this.getNextState(moves.get(j));
+            if (nextState != null) {   // move was a suicide move
+                allNextStates.add(nextState);
             }
         } 
         
@@ -68,7 +59,7 @@ public class AbaloneState {
      *            pushingPieces, Abalone.Dir direction, boolean isInlineMove,
      *            int numPushedPieces)
      */
-    AbaloneState getNextState(AbaloneMove move) {
+    public AbaloneState getNextState(AbaloneMove move) {
         Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
         Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
         List<AbaloneCoord> movingPieces = move.getMovingPieces();
@@ -89,11 +80,11 @@ public class AbaloneState {
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
                 if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
                     newP1Pces.add(newCoord);
-                } else {
+                } /* else {
                     if (turn % 2 == 0) {  // player1 piece moved player1 piece off bounds
                         return null;
                     }
-                }
+                } */
             } else {
                 newP1Pces.add(new AbaloneCoord(coord.x, coord.y));
             }
@@ -104,11 +95,11 @@ public class AbaloneState {
                 AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
                 if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
                     newP2Pces.add(newCoord);
-                } else {
+                } /*else {
                     if (turn % 2 == 1) { // player2 piece moved player2 piece off bounds
                         return null;
                     }
-                }
+                } */
             } else {
                 newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
             }

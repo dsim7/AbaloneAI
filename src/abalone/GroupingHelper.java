@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Generates groups based on the player's pieces on the board.
+ * Generates groups based on the player's pieces on the board. A group is
+ * defined as a set of 1 to 3 marbles acting as a candidate for a legal move.
  */
 public final class GroupingHelper {
 
@@ -13,35 +14,34 @@ public final class GroupingHelper {
      * Given coordinates of pieces, generate groups.
      * @return List<List<AbaloneCoord>>
      */
-    public static List<List<AbaloneCoord>> generateGroups(final Set<AbaloneCoord> playerPieces) {
+    public static Set<List<AbaloneCoord>> generateGroups(final Set<AbaloneCoord> playerPieces) {
         AbaloneCoord[] playerPiecesArr = playerPieces.toArray(new AbaloneCoord[playerPieces.size()]);
 
-        
-        final List<List<AbaloneCoord>> groups = new ArrayList<List<AbaloneCoord>>();
         final Set<List<AbaloneCoord>> uniqueGroups = new HashSet<List<AbaloneCoord>>();
-        
         
         for (int i = 0; i < playerPiecesArr.length; i++) {
             for (int j = i; j < playerPiecesArr.length; j++) {
+                List<AbaloneCoord> groupCoordinates = generateCoordinates(playerPiecesArr[i], playerPiecesArr[j], playerPieces);
+                if (groupCoordinates != null) {
+                    uniqueGroups.add(groupCoordinates);
+                }
+                /*
                 if (validateGrouping(playerPiecesArr[i], playerPiecesArr[j], playerPieces)) {
                     ArrayList<AbaloneCoord> groupCoordinates = generateCoordinates(playerPiecesArr[i], playerPiecesArr[j]);
                     uniqueGroups.add(groupCoordinates);
                 }
+                */
             }
         }
 
-        for (List<AbaloneCoord> group : uniqueGroups) {
-            groups.add(group);
-        }
-
-        return groups;
+        return uniqueGroups;
     }
 
     /**
      * Given two coordinates that form a group, generates a list of coordinates that represents the group.
      * @return List<AbaloneCoord>
      */
-    private static ArrayList<AbaloneCoord> generateCoordinates(final AbaloneCoord alpha,
+    public static ArrayList<AbaloneCoord> generateCoordinates(final AbaloneCoord alpha,
                                                           final AbaloneCoord beta) {
         ArrayList<AbaloneCoord> coordinates = new ArrayList<>();
 
@@ -140,7 +140,7 @@ public final class GroupingHelper {
         return coordinates;
     }
 
-    private static boolean validateGrouping(final AbaloneCoord alpha,
+    public static boolean validateGrouping(final AbaloneCoord alpha,
                                             final AbaloneCoord beta,
                                             final Set<AbaloneCoord> playerPieces) {
 
@@ -227,7 +227,48 @@ public final class GroupingHelper {
 
         return false;
     }
+    
+    private static List<AbaloneCoord> generateCoordinates(AbaloneCoord alpha,
+                                                      AbaloneCoord beta,
+                                                      Set<AbaloneCoord> playerPieces) {
+        List<AbaloneCoord> result = new ArrayList<AbaloneCoord>();
+        
+        // single grouping
+        if (alpha.equals(beta)) {
+            result.add(alpha);
+            return result;
+        }
+        
+        // aligned
+        int delta_x = beta.x - alpha.x;
+        int delta_y = beta.y - alpha.y;
+        if (delta_x != 0 && delta_y != 0 && delta_x != delta_y) {
+            return null;
+        }
 
+        // in range
+        int range = Math.max(Math.abs(delta_x), Math.abs(delta_y));
+        if (range > 2) {
+            return null;
+        }
+        
+        // check middle is friendly
+        if (range == 2) {
+            int x_increment = Integer.signum(delta_x);
+            int y_increment = Integer.signum(delta_y);
+            AbaloneCoord middleCoord = new AbaloneCoord(alpha.x + x_increment, alpha.y + y_increment);
+            if (playerPieces.contains(middleCoord)) {
+                result.add(middleCoord);
+            } else {
+                return null;
+            }
+        }
+
+        result.add(alpha);
+        result.add(beta);
+        return result;
+    }
+    
     /* Do not instantiate this. */
     private GroupingHelper() {}
 }
