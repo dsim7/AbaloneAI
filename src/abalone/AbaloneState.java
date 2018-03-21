@@ -10,7 +10,6 @@ public class AbaloneState {
     Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
     Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
     int turn;
-    AbaloneState nextState;
 
     public AbaloneState(Set<AbaloneCoord> p1Pieces, Set<AbaloneCoord> p2Pieces, int turn) {
         this.p1Pieces = p1Pieces;

@@ -251,6 +251,9 @@ public final class GroupingHelper {
         if (range > 2) {
             return null;
         }
+
+        result.add(alpha);
+        result.add(beta);
         
         // check middle is friendly
         if (range == 2) {
@@ -263,9 +266,6 @@ public final class GroupingHelper {
                 return null;
             }
         }
-
-        result.add(alpha);
-        result.add(beta);
         return result;
     }
     
