@@ -250,11 +250,8 @@ public class Abalone {
     }
     
     private void nextPlayerTurn() {
-        if (curPlayer == getPlayers()[0]) {
-            curPlayer = getPlayers()[1];
-        } else {
-            curPlayer = getPlayers()[0];
-        }
+        System.out.println("Switching turns");
+        curPlayer = getPlayers()[state.turn % 2];
                 
         switchTimers();
         updateGUI();
@@ -294,7 +291,7 @@ public class Abalone {
         
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_STANDARD, P2_STANDARD, 0);
+                initState(P1_STANDARD, P2_STANDARD, -1);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -303,7 +300,7 @@ public class Abalone {
         } else if (lowerInput.equals("belgian")) {
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_BELGIAN, P2_BELGIAN, 0);
+                initState(P1_BELGIAN, P2_BELGIAN, -1);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -312,7 +309,7 @@ public class Abalone {
         } else if (lowerInput.equals("german")) {
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_GERMAN, P2_GERMAN, 0);
+                initState(P1_GERMAN, P2_GERMAN, -1);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -340,16 +337,16 @@ public class Abalone {
             }
         
         } else if (lowerInput.equals("blueplayer")) {
-            System.out.println("Setting Blue to Player");
             if (!gameStarted) {
+                System.out.println("Setting Blue to Player");
                 setBlueComp(false);
             } else {
                 System.out.println("Stop and reset the game first");
             }
         
         } else if (lowerInput.equals("redcomp")) {
-            System.out.println("Setting Red to Comp");
             if (!gameStarted) {
+                System.out.println("Setting Red to Comp");
                 setRedComp(true);
             } else {
                 System.out.println("Stop and reset the game first");
@@ -463,6 +460,8 @@ public class Abalone {
                 maxTurnTimer.start();
             }
             gameStarted = true;
+            state.turn++;
+            nextPlayerTurn();
         }
         lastRunningTimer.start();
         gameRunning = true;
@@ -543,6 +542,7 @@ public class Abalone {
     }
     
     private void initState(AbaloneCoord[] p1array, AbaloneCoord[] p2array, int turn) {
+        System.out.println("Setting board");
         Set<AbaloneCoord> p1PiecesStandard = new HashSet<AbaloneCoord>(Arrays.asList(p1array));
         Set<AbaloneCoord> p2PiecesStandard = new HashSet<AbaloneCoord>(Arrays.asList(p2array));
         state = new AbaloneState(p1PiecesStandard, p2PiecesStandard, turn);
@@ -600,7 +600,6 @@ public class Abalone {
     }
     
     private AbaloneMove composeMove(AbaloneCoord coord1, AbaloneCoord coord2, Dir dir) {
-        // TODO
         Set<AbaloneCoord> playerPieces = getState().turn % 2 == 0 ? getState().p1Pieces : getState().p2Pieces;
         Set<AbaloneCoord> enemyPieces = getState().turn % 2 == 0 ? getState().p2Pieces : getState().p1Pieces;
         List<AbaloneCoord> group = GroupingHelper.generateCoordinates(coord1, coord2);
