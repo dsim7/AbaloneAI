@@ -224,9 +224,9 @@ public class Abalone {
             selection2 = coord;
         } else if (directionSelection == null) {
             directionSelection = getDirection(coord);
-            if (!move(selection1,
+            if (!move(composeMove(selection1,
                     selection2,
-                    directionSelection)) {
+                    directionSelection))) {
                 System.out.println("Invalid move, try again");
             }
             clearSelection();
@@ -250,10 +250,23 @@ public class Abalone {
         } else {
             curPlayer = getPlayers()[0];
         }
+                
         switchTimers();
         updateGUI();
-
+        
         checkMaxTurns();
+
+        AbaloneMove AIMove = getAIMove();
+        if (AIMove != null) {
+            move(AIMove);
+        }
+    }
+    
+    private AbaloneMove getAIMove() {
+        if (curPlayer.isAI) {
+            
+        }
+        return null;
     }
     
     private void checkMaxTurns() {
@@ -581,8 +594,7 @@ public class Abalone {
      * @param dir The direction the group is to be moved
      * @return true if the move is successful
      */
-    private boolean move(AbaloneCoord coord1, AbaloneCoord coord2, Dir dir) {
-        AbaloneMove move = composeMove(coord1, coord2, dir);
+    private boolean move(AbaloneMove move) {
         if (move != null) {
             setState(move);
             logMove(move);
