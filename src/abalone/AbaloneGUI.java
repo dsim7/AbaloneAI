@@ -152,7 +152,7 @@ public class AbaloneGUI extends JPanel {
             time2label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[1].timeTaken));
             roundTime1label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[0].roundTimeTaken));
             roundTime2label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[1].roundTimeTaken));
-            turnslabel.setText("" + (ab.getState() == null ? 0 : ab.getState().turn));
+            turnslabel.setText("" + (ab.getState() == null ? 0 : (ab.getState().turn + 1)));
             repaint();
         }
         
@@ -233,9 +233,7 @@ public class AbaloneGUI extends JPanel {
     
             @Override
             public void mousePressed(MouseEvent arg0) {
-                if (!(ab.getCurPlayer()).isAI && ab.getCanClick()) {
-                    ab.clicked(coord);
-                }
+                ab.clicked(coord);
             }
     
             @Override

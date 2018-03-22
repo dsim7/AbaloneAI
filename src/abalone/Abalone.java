@@ -218,18 +218,23 @@ public class Abalone {
     }
 
     public void clicked(AbaloneCoord coord) {
-        if (selection1 == null) {
-            selection1 = coord;
-        } else if (selection2 == null) {
-            selection2 = coord;
-        } else if (directionSelection == null) {
-            directionSelection = getDirection(coord);
-            if (!move(composeMove(selection1,
-                    selection2,
-                    directionSelection))) {
-                System.out.println("Invalid move, try again");
+        //System.out.println(getCurPlayer());
+        if (!curPlayer.isAI && getCanClick()) {
+            if (selection1 == null) {
+                selection1 = coord;
+            } else if (selection2 == null) {
+                selection2 = coord;
+            } else if (directionSelection == null) {
+                directionSelection = getDirection(coord);
+                if (!move(composeMove(selection1,
+                        selection2,
+                        directionSelection))) {
+                    System.out.println("Invalid move, try again");
+                }
+                clearSelection();
             }
-            clearSelection();
+        } else {
+            System.out.println("Can't click right now");
         }
     }
     
@@ -256,17 +261,11 @@ public class Abalone {
         
         checkMaxTurns();
 
-        AbaloneMove AIMove = getAIMove();
-        if (AIMove != null) {
-            move(AIMove);
-        }
-    }
-    
-    private AbaloneMove getAIMove() {
         if (curPlayer.isAI) {
-            
+            System.out.println("getting AI to move");
+            AbaloneAI ai = new AbaloneAI(state);
+            move(ai.getBestMove());
         }
-        return null;
     }
     
     private void checkMaxTurns() {
@@ -295,7 +294,7 @@ public class Abalone {
         
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_STANDARD, P2_STANDARD, 1);
+                initState(P1_STANDARD, P2_STANDARD, 0);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -304,7 +303,7 @@ public class Abalone {
         } else if (lowerInput.equals("belgian")) {
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_BELGIAN, P2_BELGIAN, 1);
+                initState(P1_BELGIAN, P2_BELGIAN, 0);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -313,7 +312,7 @@ public class Abalone {
         } else if (lowerInput.equals("german")) {
             if (!gameOver && !gameStarted) {
                 clearBoard();
-                initState(P1_GERMAN, P2_GERMAN, 1);
+                initState(P1_GERMAN, P2_GERMAN, 0);
             } else {
                 System.out.println("Stop and reset the game first");
             }
@@ -406,19 +405,11 @@ public class Abalone {
     
     // if the game has not started, determines whether red will move first or not
     private void setRedComp(boolean comp) {
-        if (comp) {
-            getPlayers()[1].isAI = true;
-        } else {
-            getPlayers()[1].isAI = false;
-        }
+        getPlayers()[0].isAI = comp;
     }
     
     private void setBlueComp(boolean comp) {
-        if (comp) {
-            getPlayers()[0].isAI = true;
-        } else {
-            getPlayers()[0].isAI = false;
-        }
+        getPlayers()[1].isAI = comp;
     }
 
     // pause timers
@@ -497,7 +488,7 @@ public class Abalone {
 
     // removes all pieces from the board
     private void clearBoard() {
-        setState(null);
+        state = null;
         updateGUI();
     }
 
@@ -596,7 +587,7 @@ public class Abalone {
      */
     private boolean move(AbaloneMove move) {
         if (move != null) {
-            setState(move);
+            setToNextState(move);
             logMove(move);
             nextPlayerTurn();
             clearSelection();
@@ -612,8 +603,8 @@ public class Abalone {
         // TODO
         Set<AbaloneCoord> playerPieces = getState().turn % 2 == 0 ? getState().p1Pieces : getState().p2Pieces;
         Set<AbaloneCoord> enemyPieces = getState().turn % 2 == 0 ? getState().p2Pieces : getState().p1Pieces;
-        if (GroupingHelper.validateGrouping(coord1, coord2, enemyPieces)) {
-            List<AbaloneCoord> group = GroupingHelper.generateCoordinates(coord1, coord2);
+        List<AbaloneCoord> group = GroupingHelper.generateCoordinates(coord1, coord2);
+        if (group != null) {
             AbaloneMove move = MoveHelper.generateMove(group, dir, playerPieces, enemyPieces);
             return move;
         } else {
@@ -622,7 +613,7 @@ public class Abalone {
         return null;
     }
     
-    private void setState(AbaloneMove move) {
+    private void setToNextState(AbaloneMove move) {
         state = state.getNextState(move);
     }
 

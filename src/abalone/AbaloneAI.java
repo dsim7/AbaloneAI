@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AbaloneAI implements Runnable {
-    public AbaloneMove bestMove;
+    private AbaloneMove bestMove;
     private AbaloneState state;
     
     AbaloneAI(AbaloneState state) {
@@ -18,6 +18,10 @@ public class AbaloneAI implements Runnable {
     @Override
     public void run() {
         iterativeDeepening(state);
+    }
+    
+    public AbaloneMove getBestMove() {
+        return state.getAllNextMoves().get(0);
     }
     
     private void iterativeDeepening(AbaloneState state) {

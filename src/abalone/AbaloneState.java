@@ -30,13 +30,17 @@ public class AbaloneState {
         return 0;
     }
 
+    public List<AbaloneMove> getAllNextMoves() {
+        Set<List<AbaloneCoord>> groups = GroupingHelper.generateGroups(turn % 2 == 0 ? p1Pieces : p2Pieces); 
+        return MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);   
+    }
+    
     /**
      * Takes the list of moves, iterates through it, and calls getNextState() on
      * every move, then adds all the new states into a List of <AbaloneState>
      */
     public List<AbaloneState> getAllNextStates() {
-        Set<List<AbaloneCoord>> groups = GroupingHelper.generateGroups(turn % 2 == 0 ? p1Pieces : p2Pieces); 
-        List<AbaloneMove> moves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);                                                                    
+        List<AbaloneMove> moves = getAllNextMoves();                                                                    
         List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
 
         for (int j = 0; j < moves.size(); j++) {
