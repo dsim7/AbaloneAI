@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -165,6 +163,7 @@ public class Abalone {
     private AbalonePlayer[] players = {new AbalonePlayer(0, P1_COLOR, this), new AbalonePlayer(1, P2_COLOR, this)};
     private AbalonePlayer curPlayer = getPlayers()[0];
     private AbaloneCoord[][] board = new AbaloneCoord[9][9];
+    private AbaloneAI aiThread;
     
     private AbaloneState testState;
     
@@ -414,6 +413,10 @@ public class Abalone {
         maxTurnTimer.stop();
         gameRunning = false;
         // stop ai's TODO
+        
+        if (aiThread != null) {
+            aiThread.pause();
+        }
     }
     
     // timers revert to 0 and stop. should be followed up with a reset of the board.
@@ -430,12 +433,16 @@ public class Abalone {
         gameRunning = false;
         gameStarted = false;
         gameOver = true;
-
         updateGUIInfo();
+        
         // stop ai's TODO
+        if (aiThread != null) {
+            aiThread.stop();
+        }
     }
 
     public void resetTimers() {
+        stopTimers();
         System.out.println("Reseting");
         for (AbalonePlayer player : getPlayers()) {
             player.timeTaken = 0;
@@ -463,6 +470,9 @@ public class Abalone {
         lastRunningTimer.start();
         gameRunning = true;
         
+        if (aiThread != null) {
+            aiThread.resume();
+        }
     }
     
     // switches which timer is running between player1 and player2
@@ -485,9 +495,8 @@ public class Abalone {
     public void getAIMove() {
         if (curPlayer.isAI) {
             System.out.println("Getting AI to move");
-            AbaloneAI ai = new AbaloneAI(state);
-            move(ai.getBestMove());
-            switchTimers();
+            aiThread = new AbaloneAI(this);
+            (new Thread(aiThread)).start();
         } else {
             System.out.println("Player is not an AI");
         }
@@ -503,7 +512,7 @@ public class Abalone {
 
     // removes all pieces from the board
     private void clearBoard() {
-        state = null;
+        initState(P1_STANDARD, P2_STANDARD, -1);
         updateGUI();
     }
 
@@ -569,17 +578,25 @@ public class Abalone {
     private void initGUIs() {
         gui = new AbaloneGUI(this);
         
-        JFrame frame1 = new JFrame();
-        frame1.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-        frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame1.setVisible(true);
+        new AbaloneGUIThread().start();
         
-        frame1.add(gui);
-        frame1.setFocusable(true);
-        frame1.addKeyListener(keyListener);
-        frame1.revalidate();
-        frame1.repaint();
         
+    }
+    
+    private class AbaloneGUIThread extends Thread {
+        @Override
+        public void run() {
+            JFrame frame1 = new JFrame();
+            frame1.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+            frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame1.setVisible(true);
+            
+            frame1.add(gui);
+            frame1.setFocusable(true);
+            frame1.addKeyListener(keyListener);
+            frame1.revalidate();
+            frame1.repaint();
+        }
     }
     
     private void updateGUI() {
@@ -601,7 +618,7 @@ public class Abalone {
      * @param dir The direction the group is to be moved
      * @return true if the move is successful
      */
-    private boolean move(AbaloneMove move) {
+    public boolean move(AbaloneMove move) {
         if (move != null) {
             setToNextState(move);
             logMove(move);

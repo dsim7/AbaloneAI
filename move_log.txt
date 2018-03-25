@@ -408,3 +408,52 @@
 2018/03/25 14:42:55: New Game Started
 2018/03/25 14:43:37: New Game Started
 2018/03/25 14:43:43: Player 2 (2,2),(3,2) UL broadside (3.2sec)
+2018/03/25 14:54:27: New Game Started
+2018/03/25 14:54:35: Player 2 (1,1) UL broadside (0.6sec)
+2018/03/25 14:55:57: New Game Started
+2018/03/25 14:56:04: Player 2 (2,2) UL broadside (1.9sec)
+2018/03/25 14:56:39: Player 2 (2,2) UL broadside (0.9sec)
+2018/03/25 14:57:21: New Game Started
+2018/03/25 14:57:29: Player 2 (2,2) UL broadside (1.2sec)
+2018/03/25 15:03:29: New Game Started
+2018/03/25 15:03:42: Player 2 (1,1) UL broadside (0.9sec)
+2018/03/25 15:04:27: New Game Started
+2018/03/25 15:04:35: Player 2 (1,1) UL broadside (0.9sec)
+2018/03/25 15:05:51: New Game Started
+2018/03/25 15:09:42: New Game Started
+2018/03/25 15:09:56: Player 2 (1,1) UL broadside (0.6sec)
+2018/03/25 15:13:17: New Game Started
+2018/03/25 15:13:25: Player 2 (1,1) UL broadside (0.7sec)
+2018/03/25 15:14:27: New Game Started
+2018/03/25 15:23:17: New Game Started
+2018/03/25 15:23:29: Player 2 (1,1) UL broadside (1.1sec)
+2018/03/25 15:27:55: New Game Started
+2018/03/25 15:28:08: Player 2 (1,1) UL broadside (2.8sec)
+2018/03/25 15:47:52: New Game Started
+2018/03/25 15:48:01: Player 2 (1,1) UL broadside (2.6sec)
+2018/03/25 15:48:05: Player 1 (4,6) DR broadside (4.2sec)
+2018/03/25 15:48:14: Player 2 (1,2) L broadside (5.6sec)
+2018/03/25 15:48:45: New Game Started
+2018/03/25 15:48:57: Player 2 (1,1) UL broadside (1.3sec)
+2018/03/25 15:49:16: Player 2 (1,1) UL broadside (2.3sec)
+2018/03/25 15:50:28: New Game Started
+2018/03/25 15:50:38: Player 2 (1,1) UL broadside (1.8sec)
+2018/03/25 15:51:10: New Game Started
+2018/03/25 15:51:31: Player 2 (1,1) UL broadside (2.7sec)
+2018/03/25 15:51:43: Player 1 (4,6) DR broadside (6.5sec)
+2018/03/25 16:08:41: New Game Started
+2018/03/25 16:08:50: Player 2 (1,1) UL broadside (2.7sec)
+2018/03/25 16:08:56: Player 1 (4,6) DR broadside (5.5sec)
+2018/03/25 16:09:03: Player 2 (1,2) L broadside (5.3sec)
+2018/03/25 16:17:25: New Game Started
+2018/03/25 16:17:55: New Game Started
+2018/03/25 16:19:06: New Game Started
+2018/03/25 16:30:05: New Game Started
+2018/03/25 16:30:43: New Game Started
+2018/03/25 16:31:06: Player 2 (1,1) UL broadside (2.4sec)
+2018/03/25 16:34:48: New Game Started
+2018/03/25 16:35:13: Player 2 (1,1) UL broadside (2.5sec)
+2018/03/25 16:35:53: New Game Started
+2018/03/25 16:35:57: New Game Started
+2018/03/25 16:36:20: Player 2 (1,1) UL broadside (2.9sec)
+2018/03/25 16:39:39: New Game Started
