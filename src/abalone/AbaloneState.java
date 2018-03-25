@@ -18,12 +18,12 @@ public class AbaloneState {
 
     }
 
-    public Set<AbaloneCoord> getP1Pieces() {
-        return p1Pieces;
+    public Set<AbaloneCoord> getCurPlayerPieces() {
+        return turn % 2 == 0 ? p1Pieces : p2Pieces;
     }
 
-    public Set<AbaloneCoord> getP2Pieces() {
-        return p2Pieces;
+    public Set<AbaloneCoord> getEnemyPieces() {
+        return turn % 2 == 0 ? p2Pieces : p1Pieces;
     }
 
     public int getStateValue() {
@@ -110,6 +110,10 @@ public class AbaloneState {
         }
         AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
         return nextState;
+    }
+    
+    public void incrementStateTurn() {
+        turn++;
     }
 
     public String toString() {

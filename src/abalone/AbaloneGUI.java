@@ -6,12 +6,18 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -26,12 +32,15 @@ public class AbaloneGUI extends JPanel {
     
     private AbaloneGUISquare[][] coordSpaces = new AbaloneGUISquare[9][9];
     private AbaloneGUIInfoPanel info = new AbaloneGUIInfoPanel();
-
+    private AbaloneGUITimer controls = new AbaloneGUITimer();
+    
     public AbaloneGUI(Abalone ab) {
         this.ab = ab;
         this.setLayout(new BorderLayout());
         this.add(new AbaloneGUIGrid(), BorderLayout.CENTER);
         this.add(info, BorderLayout.SOUTH);
+        this.add(controls, BorderLayout.NORTH);
+        this.setFocusable(false);
     }
 
     /**
@@ -96,6 +105,7 @@ public class AbaloneGUI extends JPanel {
             this.setLayout(new BorderLayout());
             this.setPreferredSize(new Dimension(100,100));
             this.setBackground(Color.BLACK);
+            this.setFocusable(false);
             
             player1label.setFont(Abalone.INFO_FONT);
             player1label.setForeground(Abalone.P1_COLOR);
@@ -152,7 +162,10 @@ public class AbaloneGUI extends JPanel {
             time2label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[1].timeTaken));
             roundTime1label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[0].roundTimeTaken));
             roundTime2label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[1].roundTimeTaken));
-            turnslabel.setText("" + (ab.getState() == null ? 0 : (ab.getState().turn + 1)));
+            
+            AbaloneState state = ab.getState();
+            turnslabel.setText("" + (state == null ? 0 : (state.turn + 1)));
+            turnslabel.setForeground(state.turn == -1 ? Color.WHITE : (state.turn % 2 == 0 ? Abalone.P1_COLOR : Abalone.P2_COLOR));
             repaint();
         }
         
@@ -164,6 +177,7 @@ public class AbaloneGUI extends JPanel {
     private class AbaloneGUIGrid extends JPanel {
         private AbaloneGUIGrid() {
             this.setBackground(Color.BLACK);
+            this.setFocusable(false);
             this.setLayout(new GridLayout(9,1));
             for (int i = 8; i >= 0; i--) {
                 this.add(new AbaloneGUIGridStrip(ab.getBoard()[i]));
@@ -177,6 +191,7 @@ public class AbaloneGUI extends JPanel {
         private AbaloneGUIGridStrip(AbaloneCoord[] strip) {
             this.setBackground(Color.BLACK);
             this.setVisible(true);
+            this.setFocusable(false);
             for (AbaloneCoord sq : strip) {
                 if (sq != null) {
                     AbaloneGUISquare guisq = new AbaloneGUISquare(sq);
@@ -190,17 +205,18 @@ public class AbaloneGUI extends JPanel {
 
     // represents a single square
     private class AbaloneGUISquare extends JPanel {
-        Color color;
-        AbaloneCoord coord;
+        private Color color;
+        private AbaloneCoord coord;
         //AbaloneSquare square;
         //BasicStroke selectedStroke = new BasicStroke(10);
         
         private AbaloneGUISquare(AbaloneCoord coord) {
-            this.setPreferredSize(new Dimension(85,85));
+            this.setPreferredSize(new Dimension(70,70));
             this.setVisible(true);
             this.setOpaque(false);
             this.coord = coord;
             this.addMouseListener(new Listener());
+            this.setFocusable(false);
         }
         
         @Override
@@ -243,6 +259,73 @@ public class AbaloneGUI extends JPanel {
         }
     }
 
+    private class AbaloneGUITimer extends JPanel {
+        private JButton buttonAI = new JButton("Get AI Move");
+        private JButton buttonSwitch = new JButton("Switch");
+        private JButton buttonStart = new JButton("Go");
+        private JButton buttonPause = new JButton("Pause");
+        private JButton buttonStop = new JButton("Stop");
+        private JButton buttonReset = new JButton("Reset");
+        private JButton buttonNext = new JButton("Next Turn");
+        
+        private AbaloneGUITimer() {
+            this.setPreferredSize(new Dimension(1000, 50));
+            this.setLayout(new GridLayout());
+            
+            buttonAI.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ab.getAIMove();
+                }
+                
+            });
+            buttonNext.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    ab.nextPlayerTurn();
+                }
+            });
+            buttonSwitch.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    ab.switchTimers();
+                    
+                }
+            });
+            buttonStart.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    ab.resumeTimers();
+                }
+            });
+            buttonPause.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    ab.pauseTimers();
+                }
+            });
+            buttonStop.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    ab.stopTimers();
+                }
+            });
+            buttonReset.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    ab.resetTimers();
+                }
+            });
+            
+            this.add(buttonAI);
+            //this.add(buttonNext);
+            this.add(buttonSwitch);
+            this.add(buttonStart);
+            this.add(buttonPause);
+            this.add(buttonStop);
+            this.add(buttonReset);
+        }
+    }
 
 
 

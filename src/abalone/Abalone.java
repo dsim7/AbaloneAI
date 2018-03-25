@@ -142,9 +142,9 @@ public class Abalone {
     private KeyListener keyListener = new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent e) {
+            System.out.println("ESC Pressed");
             int key = e.getKeyCode();
             if (key == KeyEvent.VK_ESCAPE) {
-                System.out.println("Selection Cleared");
                 clearSelection();
             }
         }
@@ -183,7 +183,7 @@ public class Abalone {
     public Abalone() {    
         this.initSquares();
         this.initGUIs();
-        
+        this.initState(Abalone.P1_STANDARD, Abalone.P2_STANDARD, -1);
         p1timer.setRepeats(true);
         p2timer.setRepeats(true);
         
@@ -221,9 +221,13 @@ public class Abalone {
         //System.out.println(getCurPlayer());
         if (!curPlayer.isAI && getCanClick()) {
             if (selection1 == null) {
-                selection1 = coord;
+                if (getState().getCurPlayerPieces().contains(coord)) {
+                    selection1 = coord;
+                }
             } else if (selection2 == null) {
-                selection2 = coord;
+                if (getState().getCurPlayerPieces().contains(coord)) {
+                    selection2 = coord;
+                }
             } else if (directionSelection == null) {
                 directionSelection = getDirection(coord);
                 if (!move(composeMove(selection1,
@@ -231,7 +235,6 @@ public class Abalone {
                         directionSelection))) {
                     System.out.println("Invalid move, try again");
                 }
-                clearSelection();
             }
         } else {
             System.out.println("Can't click right now");
@@ -249,21 +252,6 @@ public class Abalone {
         return null;
     }
     
-    private void nextPlayerTurn() {
-        System.out.println("Switching turns");
-        curPlayer = getPlayers()[state.turn % 2];
-                
-        switchTimers();
-        updateGUI();
-        
-        checkMaxTurns();
-
-        if (curPlayer.isAI) {
-            System.out.println("getting AI to move");
-            AbaloneAI ai = new AbaloneAI(state);
-            move(ai.getBestMove());
-        }
-    }
     
     private void checkMaxTurns() {
         if (getState().turn > maxTurns && maxTurns != 0) {
@@ -273,7 +261,7 @@ public class Abalone {
     
     private boolean processInput(String input) {
         String lowerInput = input.toLowerCase();
-        if (lowerInput.equals("stop")) { //stops the game and restarts all timers. game is over
+        /*if (lowerInput.equals("stop")) { //stops the game and restarts all timers. game is over
             if (gameStarted) {
                 stopTimers();
             }
@@ -287,7 +275,7 @@ public class Abalone {
                 System.out.println("Stop the game first");
             }
             
-        } else if (lowerInput.equals("standard")) {
+        } else*/ if (lowerInput.equals("standard")) {
         
             if (!gameOver && !gameStarted) {
                 clearBoard();
@@ -314,7 +302,7 @@ public class Abalone {
                 System.out.println("Stop and reset the game first");
             }
             return true;
-        
+        /*
         } else if (lowerInput.equals("pause")) {
             if (!gameOver && gameStarted && gameRunning) {
                 pauseTimers();
@@ -326,7 +314,7 @@ public class Abalone {
                 resumeTimers();
             }
             return true;
-        
+        */
             // modes
         } else if (lowerInput.equals("bluecomp")) {
             if (!gameStarted) {
@@ -409,8 +397,17 @@ public class Abalone {
         getPlayers()[1].isAI = comp;
     }
 
+
+    public void nextPlayerTurn() {
+        curPlayer = getPlayers()[state.turn % 2];
+        updateGUI();
+        
+        checkMaxTurns();
+
+    }
+    
     // pause timers
-    private void pauseTimers() {
+    public void pauseTimers() {
         System.out.println("Pausing");
         lastRunningTimer = p1timer.isRunning() ? p1timer : p2timer;
         lastRunningTimer.stop();
@@ -421,7 +418,7 @@ public class Abalone {
     
     // timers revert to 0 and stop. should be followed up with a reset of the board.
     // player 1 timer will be the one to resume upon resuming
-    private void stopTimers() {
+    public void stopTimers() {
         System.out.println("Game Over");
         p1timer.restart();
         p2timer.restart();
@@ -438,7 +435,7 @@ public class Abalone {
         // stop ai's TODO
     }
 
-    private void resetTimers() {
+    public void resetTimers() {
         System.out.println("Reseting");
         for (AbalonePlayer player : getPlayers()) {
             player.timeTaken = 0;
@@ -453,7 +450,7 @@ public class Abalone {
     }
 
     // resumes timers
-    private void resumeTimers() {
+    public void resumeTimers() {
         System.out.println("Starting/Resuming");
         if (!gameStarted) {
             if (maxTimePerTurn != 0) {
@@ -469,7 +466,7 @@ public class Abalone {
     }
     
     // switches which timer is running between player1 and player2
-    private void switchTimers() {        
+    public void switchTimers() {        
         if (p1timer.isRunning()) {
             p1timer.stop();
             p2timer.start();
@@ -483,6 +480,25 @@ public class Abalone {
         if (maxTimePerTurn != 0) {
             maxTurnTimer.restart();
         }
+    }
+    
+    public void getAIMove() {
+        if (curPlayer.isAI) {
+            System.out.println("Getting AI to move");
+            AbaloneAI ai = new AbaloneAI(state);
+            move(ai.getBestMove());
+            switchTimers();
+        } else {
+            System.out.println("Player is not an AI");
+        }
+    }
+
+    // clears all currently selected squares and directions
+    public void clearSelection() {
+        System.out.println("Selection Cleared");
+        selection1 = null;
+        selection2 = null;
+        directionSelection = null;
     }
 
     // removes all pieces from the board
@@ -600,9 +616,10 @@ public class Abalone {
     }
     
     private AbaloneMove composeMove(AbaloneCoord coord1, AbaloneCoord coord2, Dir dir) {
-        Set<AbaloneCoord> playerPieces = getState().turn % 2 == 0 ? getState().p1Pieces : getState().p2Pieces;
-        Set<AbaloneCoord> enemyPieces = getState().turn % 2 == 0 ? getState().p2Pieces : getState().p1Pieces;
-        List<AbaloneCoord> group = GroupingHelper.generateCoordinates(coord1, coord2);
+        System.out.println(getState().turn % 2);
+        Set<AbaloneCoord> playerPieces = getState().getCurPlayerPieces();
+        Set<AbaloneCoord> enemyPieces = getState().getEnemyPieces();
+        List<AbaloneCoord> group = GroupingHelper.generateCoordinates(coord1, coord2, playerPieces);
         if (group != null) {
             AbaloneMove move = MoveHelper.generateMove(group, dir, playerPieces, enemyPieces);
             return move;
@@ -616,13 +633,6 @@ public class Abalone {
         state = state.getNextState(move);
     }
 
-    // clears all currently selected squares and directions
-    private void clearSelection() {
-        selection1 = null;
-        selection2 = null;
-        directionSelection = null;
-    }
-    
     private boolean readTestFile(File infile) {
         System.out.println("Reading " + infile.getName());
         try {

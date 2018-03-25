@@ -228,7 +228,7 @@ public final class GroupingHelper {
         return false;
     }
     
-    private static List<AbaloneCoord> generateCoordinates(AbaloneCoord alpha,
+    public static List<AbaloneCoord> generateCoordinates(AbaloneCoord alpha,
                                                       AbaloneCoord beta,
                                                       Set<AbaloneCoord> playerPieces) {
         List<AbaloneCoord> result = new ArrayList<AbaloneCoord>();
