@@ -34,7 +34,6 @@ public class AbaloneAI implements Runnable {
                 return;
             }
             
-            
             minimaxSearch(state, depth++,  transpositionTable);
         }
     }
@@ -42,7 +41,7 @@ public class AbaloneAI implements Runnable {
     /**
      * Sets the AI's current best move from the given state. The best
      * move is computed using minimax iterative deepening search
-     * to a certain depth. Tranposition table is used to avoid recomputation. 
+     * to a certain depth. Transposition table is used to avoid recomputation. 
      * 
      * @param root
      * @param depth
@@ -55,7 +54,27 @@ public class AbaloneAI implements Runnable {
         // we already know it
         System.out.println("Minimax Search depth: " + depth);
         
+        int opponentKnockedOut = 0;
+        boolean maxNode = true;
+        boolean minNode = false;
+        
+        if(depth == 0) {
+            if(opponentKnockedOut < 6) {
+                return false;
+            } 
+            return true;
+        }
+        if(maxNode) {
+            
+            
+            maxNode = false;
+            minNode = true;
+        }
+        
+        
         // add each state's value to the transposition table when it is computed
+        maxNode = true;
+        minNode = false;
         
         return false;
     }
