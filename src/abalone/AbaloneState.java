@@ -10,6 +10,13 @@ public class AbaloneState {
     Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
     Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
     int turn;
+    double stateValue = 0;
+    
+    private List<AbaloneMove> allNextMoves = null;
+    private List<AbaloneState> allNextStates = null;
+    
+    private List<AbaloneMove> allRedMoves = null;
+    private List<AbaloneMove> allBlueMoves = null;
 
     public AbaloneState(Set<AbaloneCoord> p1Pieces, Set<AbaloneCoord> p2Pieces, int turn) {
         this.p1Pieces = p1Pieces;
@@ -26,13 +33,38 @@ public class AbaloneState {
         return turn % 2 == 0 ? p2Pieces : p1Pieces;
     }
 
-    public int getStateValue() {
-        return 0;
+    public double getStateValueRedPerspective() {
+        if (stateValue == 0) {
+            double result = 0;
+            result += valueMovesRedPerspective();
+            result += valueCoordsRedPerspective();
+            stateValue = result;
+        }
+        return stateValue;
     }
 
     public List<AbaloneMove> getAllNextMoves() {
-        Set<List<AbaloneCoord>> groups = GroupingHelper.generateGroups(turn % 2 == 0 ? p1Pieces : p2Pieces); 
-        return MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);   
+        if (allNextMoves == null) {
+            Set<List<AbaloneCoord>> groups = GroupingHelper.generateGroups(turn % 2 == 0 ? p1Pieces : p2Pieces); 
+            allNextMoves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);
+        }
+        return allNextMoves;   
+    }
+    
+    public List<AbaloneMove> getRedMoves() {
+        if (allRedMoves == null) {
+            Set<List<AbaloneCoord>> groups = GroupingHelper.generateGroups(p1Pieces); 
+            allRedMoves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);
+        }
+        return allRedMoves;   
+    }
+    
+    public List<AbaloneMove> getBlueMoves() {
+        if (allBlueMoves == null) {
+            Set<List<AbaloneCoord>> groups = GroupingHelper.generateGroups(p2Pieces); 
+            allBlueMoves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);
+        }
+        return allBlueMoves;   
     }
     
     /**
@@ -40,16 +72,19 @@ public class AbaloneState {
      * every move, then adds all the new states into a List of <AbaloneState>
      */
     public List<AbaloneState> getAllNextStates() {
-        List<AbaloneMove> moves = getAllNextMoves();                                                                    
-        List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
-
-        for (int j = 0; j < moves.size(); j++) {
-            AbaloneState nextState;
-            nextState = this.getNextState(moves.get(j));
-            if (nextState != null) {   // move was a suicide move
-                allNextStates.add(nextState);
+        if (allNextStates == null) {
+            List<AbaloneMove> moves = getAllNextMoves();                                                                    
+            List<AbaloneState> allNextStates = new ArrayList<AbaloneState>();
+    
+            for (int j = 0; j < moves.size(); j++) {
+                AbaloneState nextState;
+                nextState = this.getNextState(moves.get(j));
+                if (nextState != null) {   // move was a suicide move
+                    allNextStates.add(nextState);
+                }
             }
-        } 
+            this.allNextStates = allNextStates;
+        }
         
         return allNextStates;
     }
@@ -137,8 +172,33 @@ public class AbaloneState {
             int col = whitePiece.x + 1;
             toWrite += "" + row + col + "w,";
         }
+        toWrite += (" ---> " + getStateValueRedPerspective());
         toWrite = toWrite.replaceAll(",$", "");
         return toWrite;
     }
 
+    private double valueMovesRedPerspective() {
+        double movesValue = 0;
+        for (AbaloneMove move : getRedMoves()) {
+            movesValue += move.getValue();
+        }
+        for (AbaloneMove move : getBlueMoves()) {
+            movesValue -= move.getValue();
+        }
+        return movesValue / (getRedMoves().size() + getBlueMoves().size());
+    }
+    
+    private double valueCoordsRedPerspective() {
+        double coordsSum = 0;
+        for (AbaloneCoord redCoord : p1Pieces) {
+            System.out.println(AbaloneCoord.coordDistValues.get(redCoord));
+            coordsSum += AbaloneCoord.coordDistValues.get(redCoord);
+        }
+        for (AbaloneCoord blueCoord : p2Pieces) {
+            coordsSum -= AbaloneCoord.coordDistValues.get(blueCoord);
+        }
+        return coordsSum;
+    }
+    
+    
 }

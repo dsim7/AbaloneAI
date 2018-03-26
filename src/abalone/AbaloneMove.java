@@ -7,6 +7,9 @@ public class AbaloneMove {
     private Abalone.Dir direction;
     private boolean isInlineMove;
     
+    private static final double MOVE_WEIGHT = 1;
+    private static final double PUSH_MOVE_VALUE = 30;
+    
     AbaloneMove(List<AbaloneCoord> movingPieces,
                 List<AbaloneCoord> pushingPieces,
                 Abalone.Dir direction,
@@ -52,4 +55,12 @@ public class AbaloneMove {
         return direction;
     }
     
+    public double getValue() {
+        double result = 0;
+        result += Math.pow(movingPieces.size(), 2);   // # pieces ^ 2
+        if (pushingPieces != null) {
+            result += PUSH_MOVE_VALUE;                // + x if push move
+        }
+        return result * MOVE_WEIGHT;
+    }
 }

@@ -620,8 +620,8 @@ public class Abalone {
      */
     public boolean move(AbaloneMove move) {
         if (move != null) {
-            setToNextState(move);
             logMove(move);
+            setToNextState(move);
             nextPlayerTurn();
             clearSelection();
             return true;

@@ -1,7 +1,23 @@
 package abalone;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AbaloneCoord implements Comparable {
     int x,y;
+    
+    private static final double COORD_WEIGHT = 1;
+    private static final double COORD_CONSTANT = 50;
+    
+    public static Map<AbaloneCoord, Double> coordDistValues = new HashMap<AbaloneCoord, Double>();
+    static {
+        for (int i = -1; i < 10; ++i) {
+            for (int j = -1; j < 10; ++j) {
+                AbaloneCoord coord = new AbaloneCoord(i, j);
+                coordDistValues.put(coord, coord.getValue());
+            }
+        }
+    }
     
     public AbaloneCoord(int x, int y) {
         this.x = x;
@@ -29,6 +45,15 @@ public class AbaloneCoord implements Comparable {
             return false;
         }
         return true;
+    }
+    
+    public double getValue() {
+        int x_dist_from_center = Math.abs(x - 4);
+        int y_dist_from_center = Math.abs(y - 4);
+        int dist = Math.abs(4 - Math.max(x_dist_from_center, y_dist_from_center));
+        double value = Math.pow(dist, 2);
+        // double value = Math.pow(2, dist);
+        return COORD_WEIGHT * (value + COORD_CONSTANT);
     }
     
     @Override

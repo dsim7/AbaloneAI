@@ -1,6 +1,7 @@
 package abalone;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AbaloneAI implements Runnable {
@@ -13,20 +14,32 @@ public class AbaloneAI implements Runnable {
     private volatile boolean running = true;
     private volatile boolean paused = false;
     private final Object pauseLock = new Object();
-    
+      
     AbaloneAI(Abalone ab) {
         this.ab = ab;
     }
     
-    
     public AbaloneMove getBestMove() {
-        return ab.getState().getAllNextMoves().get(0);
+        List<AbaloneMove> nextMoves = ab.getState().getAllNextMoves();
+        
+        AbaloneMove bestMove = nextMoves.get(0);
+        double bestMoveStateValue = ab.getState().getNextState(bestMove).getStateValueRedPerspective();
+        
+        for (AbaloneMove move : nextMoves) {
+            double moveStateValue = ab.getState().getNextState(move).getStateValueRedPerspective();
+            if (moveStateValue < bestMoveStateValue) {  // TESTING. blue will always be comp. always find least redperspective value
+                bestMove = move;
+                bestMoveStateValue = moveStateValue;
+            }
+        }
+        System.out.println("BEST MOVE VALUE: " + bestMoveStateValue);
+        return bestMove;
     }
     
     private void iterativeDeepening(AbaloneState state) {
         Map<AbaloneState, Integer> transpositionTable = new HashMap<AbaloneState, Integer>();
         int depth = 1;
-        while (depth < 100000) {
+        while (depth < 10000) {
             // Concurrency stuff... call checkPaused and check running at regular intervals.
             // if not running, should back out completely. abort everything
             checkPaused();
@@ -61,8 +74,8 @@ public class AbaloneAI implements Runnable {
     }
     
 
-    private int evaluateState(AbaloneState state) {
-        return state.getStateValue();
+    private double evaluateState(AbaloneState state) {
+        return state.getStateValueRedPerspective();
     }
     
     

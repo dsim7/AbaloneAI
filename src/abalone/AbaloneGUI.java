@@ -157,14 +157,14 @@ public class AbaloneGUI extends JPanel {
         }
         
         private void updateInfo() {
-            outs1label.setText("" + ab.getPlayers()[0].outs);
-            outs2label.setText("" + ab.getPlayers()[1].outs);
+            AbaloneState state = ab.getState();
+            outs1label.setText("" + (14 - state.p1Pieces.size()));
+            outs2label.setText("" + (14 - state.p2Pieces.size()));
             time1label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[0].timeTaken));
             time2label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[1].timeTaken));
             roundTime1label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[0].roundTimeTaken));
             roundTime2label.setText("" + Abalone.TIME_FORMAT.format(ab.getPlayers()[1].roundTimeTaken));
             
-            AbaloneState state = ab.getState();
             turnslabel.setText("" + (state == null ? 0 : (state.turn + 1)));
             turnslabel.setForeground(state.turn == -1 ? Color.WHITE : (state.turn % 2 == 0 ? Abalone.P1_COLOR : Abalone.P2_COLOR));
             repaint();
