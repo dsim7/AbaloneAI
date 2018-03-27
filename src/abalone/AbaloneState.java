@@ -10,7 +10,7 @@ public class AbaloneState {
     Set<AbaloneCoord> p1Pieces = new HashSet<AbaloneCoord>();
     Set<AbaloneCoord> p2Pieces = new HashSet<AbaloneCoord>();
     int turn;
-    double stateValue = 0;
+    double stateValue = Double.MIN_VALUE;
     
     private List<AbaloneMove> allNextMoves = null;
     private List<AbaloneState> allNextStates = null;
@@ -34,7 +34,7 @@ public class AbaloneState {
     }
 
     public double getStateValueRedPerspective() {
-        if (stateValue == 0) {
+        if (stateValue == Double.MIN_VALUE) {
             double result = 0;
             result += valueMovesRedPerspective();
             result += valueCoordsRedPerspective();

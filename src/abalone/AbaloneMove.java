@@ -9,6 +9,11 @@ public class AbaloneMove {
     
     private static final double MOVE_WEIGHT = 1;
     private static final double PUSH_MOVE_VALUE = 30;
+    private static final double THREATEN_MOVE_VALUE = 80;
+    private static final double SINGLE_GROUP_VALUE = 1;
+    private static final double DOUBLE_GROUP_VALUE = 5;
+    private static final double TRIPLE_GROUP_VALUE = 10;
+    
     
     AbaloneMove(List<AbaloneCoord> movingPieces,
                 List<AbaloneCoord> pushingPieces,
@@ -57,9 +62,21 @@ public class AbaloneMove {
     
     public double getValue() {
         double result = 0;
-        result += Math.pow(movingPieces.size(), 2);   // # pieces ^ 2
+        switch (movingPieces.size()) {
+        case 1 : result = SINGLE_GROUP_VALUE;
+        break;
+        case 2 : result = DOUBLE_GROUP_VALUE;
+        break;
+        case 3 : result = TRIPLE_GROUP_VALUE;
+        break;
+        }
         if (pushingPieces != null) {
             result += PUSH_MOVE_VALUE;                // + x if push move
+            for (AbaloneCoord pushedPiece : pushingPieces) {
+                if (!pushedPiece.isValid()) {
+                    result += THREATEN_MOVE_VALUE;
+                }
+            }
         }
         return result * MOVE_WEIGHT;
     }

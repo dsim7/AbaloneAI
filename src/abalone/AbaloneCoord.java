@@ -7,7 +7,12 @@ public class AbaloneCoord implements Comparable {
     int x,y;
     
     private static final double COORD_WEIGHT = 1;
-    private static final double COORD_CONSTANT = 50;
+    private static final double COORD_CONSTANT = 100;
+    private static final double DIST_FROM_CENTER_0 = 10;
+    private static final double DIST_FROM_CENTER_1 = 10;
+    private static final double DIST_FROM_CENTER_2 = 8;
+    private static final double DIST_FROM_CENTER_3 = 5;
+    private static final double DIST_FROM_CENTER_4 = -10;
     
     public static Map<AbaloneCoord, Double> coordDistValues = new HashMap<AbaloneCoord, Double>();
     static {
@@ -50,9 +55,21 @@ public class AbaloneCoord implements Comparable {
     public double getValue() {
         int x_dist_from_center = Math.abs(x - 4);
         int y_dist_from_center = Math.abs(y - 4);
-        int dist = Math.abs(4 - Math.max(x_dist_from_center, y_dist_from_center));
-        double value = Math.pow(dist, 2);
-        // double value = Math.pow(2, dist);
+        int dist = Math.max(x_dist_from_center, y_dist_from_center);
+        //double value = Math.pow(1.5, dist);
+        double value = 0;
+        switch (dist) {
+        case 0 : value = DIST_FROM_CENTER_0;
+        break;
+        case 1 : value = DIST_FROM_CENTER_1;
+        break;
+        case 2 : value = DIST_FROM_CENTER_2;
+        break;
+        case 3 : value = DIST_FROM_CENTER_3;
+        break;
+        case 4 : value = DIST_FROM_CENTER_4;
+        break;
+        }
         return COORD_WEIGHT * (value + COORD_CONSTANT);
     }
     
