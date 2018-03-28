@@ -1,6 +1,7 @@
 package abalone;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AbaloneAI implements Runnable {
@@ -20,13 +21,14 @@ public class AbaloneAI implements Runnable {
     
     
     public AbaloneMove getBestMove() {
-        return ab.getState().getAllNextMoves().get(0);
+        iterativeDeepening(ab.getState());
+        return bestMove;
     }
     
     private void iterativeDeepening(AbaloneState state) {
         Map<AbaloneState, Integer> transpositionTable = new HashMap<AbaloneState, Integer>();
-        int depth = 1;
-        while (depth < 100000) {
+        int depth = 0;
+        while (depth <  5) {
             // Concurrency stuff... call checkPaused and check running at regular intervals.
             // if not running, should back out completely. abort everything
             checkPaused();
@@ -47,36 +49,58 @@ public class AbaloneAI implements Runnable {
      * @param depth
      * @return true if the search finds a finished solution
      */
-    private boolean minimaxSearch(AbaloneState root,
+    private void minimaxSearch(AbaloneState root,
                                       int depth,
                                       Map<AbaloneState, Integer> transpositionTable) {
         // before computing each state's value, search transposition table to see if
         // we already know it
         System.out.println("Minimax Search depth: " + depth);
         
-        int opponentKnockedOut = 0;
-        boolean maxNode = true;
-        boolean minNode = false;
         
-        if(depth == 0) {
-            if(opponentKnockedOut < 6) {
-                return false;
-            } 
-            return true;
+        if(root.getTurn() % 2 == 0) {
+            maxMove(root, depth);
+        } else {
+            minMove(root, depth);
         }
-        if(maxNode) {
+       
+    }
+    
+    public int maxMove(AbaloneState state, int depth) {
+        
+      if(depth == 0 || state.getStateValue() == Integer.MAX_VALUE) {
+          return state.getStateValue();
+      }
             
-            
-            maxNode = false;
-            minNode = true;
+      List<AbaloneMove> moves = null;
+      
+      moves = state.getAllNextMoves();
+      int minStateValue = 0;
+      for(AbaloneMove move : moves) {
+          AbaloneState resultantState = state.getNextState(move);
+          int resultantStateValue = minMove(resultantState, depth);
+          if(resultantStateValue > minStateValue) {
+              minStateValue = resultantStateValue;
+          }
+      }
+      return minStateValue;
+        
+    }
+    
+    public int minMove(AbaloneState state, int depth) {
+       
+        List<AbaloneMove> moves = null;
+        
+        moves = state.getAllNextMoves();
+        int minStateValue = 0;
+        for(AbaloneMove move : moves) {
+            AbaloneState resultantState = state.getNextState(move);
+            int resultantStateValue = maxMove(resultantState, depth - 1);
+            if(resultantStateValue < minStateValue) {
+                minStateValue = resultantStateValue;
+            }
         }
+        return minStateValue;
         
-        
-        // add each state's value to the transposition table when it is computed
-        maxNode = true;
-        minNode = false;
-        
-        return false;
     }
     
 

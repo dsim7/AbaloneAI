@@ -26,6 +26,10 @@ public class AbaloneState {
         return turn % 2 == 0 ? p2Pieces : p1Pieces;
     }
 
+    public int getTurn() {
+        return turn;
+    }
+    
     public int getStateValue() {
         return 0;
     }
