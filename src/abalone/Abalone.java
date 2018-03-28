@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -35,14 +36,10 @@ import javax.swing.Timer;
  *
  */
 public class Abalone {
-    public static final int PVP = 0;
-    public static final int PVC = 1;
-    public static final int CVC = 2;
     public static final int FRAME_WIDTH = 1000;
     public static final int FRAME_HEIGHT = 1000;
-    public static final Color P1_COLOR = Color.RED;
-    public static final Color P2_COLOR = Color.BLUE;
-    public static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
+    public static final Color P1_COLOR = Color.BLACK;
+    public static final Color P2_COLOR = Color.WHITE;
     public static final DecimalFormat TIME_FORMAT = new DecimalFormat("0.0");
     public static final SimpleDateFormat TIME_STAMP_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     
@@ -106,7 +103,7 @@ public class Abalone {
         new AbaloneCoord(5, 6), new AbaloneCoord(6, 6),
     };
     
-    
+    private boolean guiFlipped = true;
     private int maxTurns = 0;
     private double maxTimePerTurn = 0;
     private Scanner console = new Scanner(System.in);
@@ -160,7 +157,7 @@ public class Abalone {
     private AbaloneGUI gui;
 
     private AbaloneState state;
-    private AbalonePlayer[] players = {new AbalonePlayer(0, P1_COLOR, this), new AbalonePlayer(1, P2_COLOR, this)};
+    private AbalonePlayer[] players = {new AbalonePlayer(0, this), new AbalonePlayer(1, this)};
     private AbalonePlayer curPlayer = getPlayers()[0];
     private AbaloneCoord[][] board = new AbaloneCoord[9][9];
     private AbaloneAI aiThread;
@@ -398,6 +395,8 @@ public class Abalone {
 
 
     public void nextPlayerTurn() {
+        switchTimers();
+        pauseTimers();
         curPlayer = getPlayers()[state.turn % 2];
         updateGUI();
         
@@ -493,13 +492,18 @@ public class Abalone {
     }
     
     public void getAIMove() {
-        if (curPlayer.isAI) {
+        if (getCanClick() && curPlayer.isAI) {
             System.out.println("Getting AI to move");
             aiThread = new AbaloneAI(this);
             (new Thread(aiThread)).start();
         } else {
-            System.out.println("Player is not an AI");
+            System.out.println("Player is not an AI or can't Click right now.");
         }
+    }
+    
+    public void flipGUI() {
+        gui.flip(!guiFlipped);
+        guiFlipped = !guiFlipped;
     }
 
     // clears all currently selected squares and directions
@@ -512,7 +516,9 @@ public class Abalone {
 
     // removes all pieces from the board
     private void clearBoard() {
-        initState(P1_STANDARD, P2_STANDARD, -1);
+        AbaloneCoord[] coordArr1 = {};
+        AbaloneCoord[] coordArr2 = {};
+        initState(coordArr1, coordArr2, -1);
         updateGUI();
     }
 

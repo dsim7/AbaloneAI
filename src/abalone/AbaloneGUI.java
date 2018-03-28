@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -30,18 +31,37 @@ import javax.swing.JPanel;
  */
 public class AbaloneGUI extends JPanel {
     private Abalone ab;
-    
+
+    public static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
+    public static final Font COORD_FONT = new Font("Arial",Font.BOLD, 20 );
+    public static final Color BACKGROUND_COLOR = new Color(0xA0522D);
+    public static final Color BACKGROUND_COLOR2 = new Color(0xDEB887);
     private AbaloneGUISquare[][] coordSpaces = new AbaloneGUISquare[9][9];
-    private AbaloneGUIInfoPanel info = new AbaloneGUIInfoPanel();
-    private AbaloneGUITimer controls = new AbaloneGUITimer();
+    private AbaloneGUIInfoPanel info;
+    private AbaloneGUITimer controls;
+    private AbaloneGUIGrid grid;
     
     public AbaloneGUI(Abalone ab) {
         this.ab = ab;
+        
+        info = new AbaloneGUIInfoPanel();
+        controls = new AbaloneGUITimer();
+        grid = new AbaloneGUIGrid(true);
+        
         this.setLayout(new BorderLayout());
-        this.add(new AbaloneGUIGrid(), BorderLayout.CENTER);
+        this.add(grid, BorderLayout.CENTER);
         this.add(info, BorderLayout.SOUTH);
         this.add(controls, BorderLayout.NORTH);
         this.setFocusable(false);
+    }
+    
+    public void flip(boolean flip) {
+        this.remove(grid);
+        grid = new AbaloneGUIGrid(flip);
+        this.add(grid);
+        this.revalidate();
+        this.updateState();
+        
     }
 
     /**
@@ -68,7 +88,7 @@ public class AbaloneGUI extends JPanel {
         for (AbaloneGUISquare[] guisqarr : coordSpaces) {
             for (AbaloneGUISquare guisq : guisqarr) {
                 if (guisq != null) {
-                    guisq.color = Color.DARK_GRAY;
+                    guisq.color = BACKGROUND_COLOR;
                 }
             }
         }
@@ -78,13 +98,13 @@ public class AbaloneGUI extends JPanel {
         // player1 
         Set<AbaloneCoord> p1Pieces = ab.getState().p1Pieces;
         for (AbaloneCoord p1piece : p1Pieces) {
-            coordSpaces[p1piece.y][p1piece.x].color = Color.RED;
+            coordSpaces[p1piece.y][p1piece.x].color = Abalone.P1_COLOR;
         }
         
         // player2
         Set<AbaloneCoord> p2Pieces = ab.getState().p2Pieces;
         for (AbaloneCoord p2piece : p2Pieces) {
-            coordSpaces[p2piece.y][p2piece.x].color = Color.BLUE;
+            coordSpaces[p2piece.y][p2piece.x].color = Abalone.P2_COLOR;
         }
     }
     
@@ -105,40 +125,40 @@ public class AbaloneGUI extends JPanel {
             this.setVisible(true);
             this.setLayout(new BorderLayout());
             this.setPreferredSize(new Dimension(100,100));
-            this.setBackground(Color.BLACK);
+            this.setBackground(BACKGROUND_COLOR);
             this.setFocusable(false);
             
-            player1label.setFont(Abalone.INFO_FONT);
+            player1label.setFont(INFO_FONT);
             player1label.setForeground(Abalone.P1_COLOR);
-            player2label.setFont(Abalone.INFO_FONT);
+            player2label.setFont(INFO_FONT);
             player2label.setForeground(Abalone.P2_COLOR);
-            time1label.setFont(Abalone.INFO_FONT);
+            time1label.setFont(INFO_FONT);
             time1label.setForeground(Abalone.P1_COLOR);
-            time2label.setFont(Abalone.INFO_FONT);
+            time2label.setFont(INFO_FONT);
             time2label.setForeground(Abalone.P2_COLOR);
-            outs1label.setFont(Abalone.INFO_FONT);
+            outs1label.setFont(INFO_FONT);
             outs1label.setForeground(Abalone.P1_COLOR);
-            outs2label.setFont(Abalone.INFO_FONT);
+            outs2label.setFont(INFO_FONT);
             outs2label.setForeground(Abalone.P2_COLOR);
-            turnslabel.setFont(Abalone.INFO_FONT);
+            turnslabel.setFont(INFO_FONT);
             turnslabel.setForeground(Color.WHITE);
-            roundTime1label.setFont(Abalone.INFO_FONT);
+            roundTime1label.setFont(INFO_FONT);
             roundTime1label.setForeground(Abalone.P1_COLOR);
-            roundTime2label.setFont(Abalone.INFO_FONT);
+            roundTime2label.setFont(INFO_FONT);
             roundTime2label.setForeground(Abalone.P2_COLOR);
             
             JPanel p1 = new JPanel();
             p1.setLayout(new GridLayout());
-            p1.setBackground(Color.BLACK);
+            p1.setBackground(BACKGROUND_COLOR);
             p1.setPreferredSize(new Dimension(400,100));
             
             JPanel p2 = new JPanel();
             p2.setLayout(new GridLayout());
-            p2.setBackground(Color.BLACK);
+            p2.setBackground(BACKGROUND_COLOR);
             p2.setPreferredSize(new Dimension(400,100));
             
             JPanel center = new JPanel();
-            center.setBackground(Color.BLACK);
+            center.setBackground(BACKGROUND_COLOR);
             center.setLayout(new FlowLayout());
             
             this.add(p1, BorderLayout.WEST);
@@ -176,12 +196,21 @@ public class AbaloneGUI extends JPanel {
     
     // panel containing the hexagonal board
     private class AbaloneGUIGrid extends JPanel {
-        private AbaloneGUIGrid() {
-            this.setBackground(Color.BLACK);
-            this.setFocusable(false);
-            this.setLayout(new GridLayout(9,1));
-            for (int i = 8; i >= 0; i--) {
-                this.add(new AbaloneGUIGridStrip(ab.getBoard()[i]));
+        private AbaloneGUIGrid(boolean flipped) {
+            if (flipped) {
+                this.setBackground(BACKGROUND_COLOR);
+                this.setFocusable(false);
+                this.setLayout(new GridLayout(9,1));
+                for (int i = 8; i >= 0; i--) {
+                    this.add(new AbaloneGUIGridStrip(ab.getBoard()[i], flipped));
+                }
+            } else {
+                this.setBackground(BACKGROUND_COLOR);
+                this.setFocusable(false);
+                this.setLayout(new GridLayout(9,1));
+                for (int i = 0; i < 9; i++) {
+                    this.add(new AbaloneGUIGridStrip(ab.getBoard()[i], flipped));
+                }
             }
         }
     }
@@ -189,16 +218,27 @@ public class AbaloneGUI extends JPanel {
 
     // a strip represents one row of squares on the board
     private class AbaloneGUIGridStrip extends JPanel {
-        private AbaloneGUIGridStrip(AbaloneCoord[] strip) {
-            this.setBackground(Color.BLACK);
+        private AbaloneGUIGridStrip(AbaloneCoord[] strip, boolean flipped) {
+            this.setBackground(BACKGROUND_COLOR2);
             this.setVisible(true);
             this.setFocusable(false);
-            for (AbaloneCoord sq : strip) {
-                if (sq != null) {
-                    AbaloneGUISquare guisq = new AbaloneGUISquare(sq);
-                    this.add(guisq);
-                    AbaloneGUI.this.coordSpaces[sq.y][sq.x] = guisq;
+            if (flipped) {
+                for (int i = 0; i < strip.length; i++) {
+                    if (strip[i] != null) {
+                        AbaloneGUISquare guisq = new AbaloneGUISquare(strip[i]);
+                        this.add(guisq);
+                        AbaloneGUI.this.coordSpaces[strip[i].y][strip[i].x] = guisq;
+                    }
+                }   
+            } else {
+                for (int i = strip.length - 1; i >= 0; i--) {
+                    if (strip[i] != null) {
+                        AbaloneGUISquare guisq = new AbaloneGUISquare(strip[i]);
+                        this.add(guisq);
+                        AbaloneGUI.this.coordSpaces[strip[i].y][strip[i].x] = guisq;
+                    }
                 }
+
             }
         }
     }
@@ -225,6 +265,9 @@ public class AbaloneGUI extends JPanel {
             super.paintComponent(g);
             g.setColor(color);
             g.fillOval(0,0,this.getWidth(), this.getHeight());
+            g.setColor(Color.CYAN);
+            g.setFont(COORD_FONT);
+            g.drawString(coord.toString(), 10, 20);
             /*
             List<GamePiece> pieces = square.getPieces();
             if (pieces.size() > 0) {
@@ -268,6 +311,7 @@ public class AbaloneGUI extends JPanel {
         private JButton buttonStop = new JButton("Stop");
         private JButton buttonReset = new JButton("Reset");
         private JButton buttonNext = new JButton("Next Turn");
+        private JButton buttonFlipGUI = new JButton("Flip GUI");
         
         private AbaloneGUITimer() {
             this.setPreferredSize(new Dimension(1000, 50));
@@ -317,6 +361,12 @@ public class AbaloneGUI extends JPanel {
                     ab.resetTimers();
                 }
             });
+            buttonFlipGUI.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    ab.flipGUI();
+                }
+            });
             
             this.add(buttonAI);
             //this.add(buttonNext);
@@ -325,6 +375,7 @@ public class AbaloneGUI extends JPanel {
             this.add(buttonPause);
             this.add(buttonStop);
             this.add(buttonReset);
+            this.add(buttonFlipGUI);
         }
     }
 

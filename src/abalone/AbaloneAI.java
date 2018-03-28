@@ -25,11 +25,21 @@ public class AbaloneAI implements Runnable {
         AbaloneMove bestMove = nextMoves.get(0);
         double bestMoveStateValue = ab.getState().getNextState(bestMove).getStateValueRedPerspective();
         
-        for (AbaloneMove move : nextMoves) {
-            double moveStateValue = ab.getState().getNextState(move).getStateValueRedPerspective();
-            if (moveStateValue < bestMoveStateValue) {  // TESTING. blue will always be comp. always find least redperspective value
-                bestMove = move;
-                bestMoveStateValue = moveStateValue;
+        if (ab.getState().turn % 2 == 0) {
+            for (AbaloneMove move : nextMoves) {
+                double moveStateValue = ab.getState().getNextState(move).getStateValueRedPerspective();
+                if (moveStateValue > bestMoveStateValue) {  // TESTING. blue will always be comp. always find least redperspective value
+                    bestMove = move;
+                    bestMoveStateValue = moveStateValue;
+                }
+            }
+        }else {
+            for (AbaloneMove move : nextMoves) {
+                double moveStateValue = ab.getState().getNextState(move).getStateValueRedPerspective();
+                if (moveStateValue < bestMoveStateValue) {  // TESTING. blue will always be comp. always find least redperspective value
+                    bestMove = move;
+                    bestMoveStateValue = moveStateValue;
+                }
             }
         }
         System.out.println("BEST MOVE VALUE: " + bestMoveStateValue);
@@ -89,7 +99,6 @@ public class AbaloneAI implements Runnable {
         iterativeDeepening(ab.getState());
         if (running) {
             ab.move(getBestMove());
-            ab.switchTimers();
         }
         
     }

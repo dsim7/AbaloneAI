@@ -12,7 +12,7 @@ public class AbaloneCoord implements Comparable {
     private static final double DIST_FROM_CENTER_1 = 10;
     private static final double DIST_FROM_CENTER_2 = 8;
     private static final double DIST_FROM_CENTER_3 = 5;
-    private static final double DIST_FROM_CENTER_4 = -10;
+    private static final double DIST_FROM_CENTER_4 = 0;
     
     public static Map<AbaloneCoord, Double> coordDistValues = new HashMap<AbaloneCoord, Double>();
     static {
@@ -84,9 +84,14 @@ public class AbaloneCoord implements Comparable {
     
     @Override
     public String toString() {
-        return "Coord: " + x + "," + y;
+        String string = "";
+        char row = (char) (y + 65);
+        int col = x + 1;
+        string += "" + row + col;
+        return string;
     }
 
+    @Override
     public int hashCode() {
         int hash = 1;
         hash = 31 * hash + x;
