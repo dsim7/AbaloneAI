@@ -1,8 +1,10 @@
 package abalone;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -17,7 +19,9 @@ public class AbaloneState {
     
     private List<AbaloneMove> allRedMoves = null;
     private List<AbaloneMove> allBlueMoves = null;
-
+    
+    private AbaloneMove parentMove = null;
+    
     public AbaloneState(Set<AbaloneCoord> p1Pieces, Set<AbaloneCoord> p2Pieces, int turn) {
         this.p1Pieces = p1Pieces;
         this.p2Pieces = p2Pieces;
@@ -35,6 +39,7 @@ public class AbaloneState {
 
     public double getStateValueRedPerspective() {
         if (stateValue == Double.MIN_VALUE) {
+            System.out.println("Calculating state value");
             double result = 0;
             result += valueMovesRedPerspective();
             result += valueCoordsRedPerspective();
@@ -98,53 +103,58 @@ public class AbaloneState {
      *            int numPushedPieces)
      */
     public AbaloneState getNextState(AbaloneMove move) {
-        Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
-        Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
-        List<AbaloneCoord> movingPieces = move.getMovingPieces();
-        List<AbaloneCoord> pushedPieces = move.getPushedPieces();
-        Abalone.Dir direction = move.getDirection();
-
-        // add movingPieces and pushedPieces into the same set of changed pieces
-        Set<AbaloneCoord> changedPieces = new HashSet<AbaloneCoord>(movingPieces);
-        if (pushedPieces != null) {
-            for (AbaloneCoord coord : pushedPieces) {
-                changedPieces.add(coord);
+        if (!calculatedStates.containsKey(move)) {
+            Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
+            Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
+            List<AbaloneCoord> movingPieces = move.getMovingPieces();
+            List<AbaloneCoord> pushedPieces = move.getPushedPieces();
+            Abalone.Dir direction = move.getDirection();
+    
+            // add movingPieces and pushedPieces into the same set of changed pieces
+            Set<AbaloneCoord> changedPieces = new HashSet<AbaloneCoord>(movingPieces);
+            if (pushedPieces != null) {
+                for (AbaloneCoord coord : pushedPieces) {
+                    changedPieces.add(coord);
+                }
             }
-        }
-        
-        // copy player pieces, move if it is a moving piece
-        for (AbaloneCoord coord : p1Pieces) {
-            if (!changedPieces.add(coord)) {   // if add fails, it is a moving piece
-                AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
-                if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
-                    newP1Pces.add(newCoord);
-                } /* else {
-                    if (turn % 2 == 0) {  // player1 piece moved player1 piece off bounds
-                        return null;
-                    }
-                } */
-            } else {
-                newP1Pces.add(new AbaloneCoord(coord.x, coord.y));
+            
+            // copy player pieces, move if it is a moving piece
+            for (AbaloneCoord coord : p1Pieces) {
+                if (!changedPieces.add(coord)) {   // if add fails, it is a moving piece
+                    AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
+                    if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
+                        newP1Pces.add(newCoord);
+                    } /* else {
+                        if (turn % 2 == 0) {  // player1 piece moved player1 piece off bounds
+                            return null;
+                        }
+                    } */
+                } else {
+                    newP1Pces.add(new AbaloneCoord(coord.x, coord.y));
+                }
             }
-        }
-        // copy player pieces, move if it is a pushed piece
-        for (AbaloneCoord coord : p2Pieces) {
-            if (!changedPieces.add(coord)) {  // if add fails, it is a pushed piece
-                AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
-                if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
-                    newP2Pces.add(newCoord);
-                } /*else {
-                    if (turn % 2 == 1) { // player2 piece moved player2 piece off bounds
-                        return null;
-                    }
-                } */
-            } else {
-                newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
+            // copy player pieces, move if it is a pushed piece
+            for (AbaloneCoord coord : p2Pieces) {
+                if (!changedPieces.add(coord)) {  // if add fails, it is a pushed piece
+                    AbaloneCoord newCoord = new AbaloneCoord(coord.x + direction.dx, coord.y + direction.dy);
+                    if (newCoord.isValid()) {  // if it is pushed to an out of bounds coord, don't add
+                        newP2Pces.add(newCoord);
+                    } /*else {
+                        if (turn % 2 == 1) { // player2 piece moved player2 piece off bounds
+                            return null;
+                        }
+                    } */
+                } else {
+                    newP2Pces.add(new AbaloneCoord(coord.x, coord.y));
+                }
+            
             }
-        
+            AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
+            calculatedStates.put(move, nextState);
+            return nextState;
+        } else {
+            return calculatedStates.get(move);
         }
-        AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
-        return nextState;
     }
     
     public void incrementStateTurn() {
@@ -191,7 +201,6 @@ public class AbaloneState {
     private double valueCoordsRedPerspective() {
         double coordsSum = 0;
         for (AbaloneCoord redCoord : p1Pieces) {
-            System.out.println(AbaloneCoord.coordDistValues.get(redCoord));
             coordsSum += AbaloneCoord.coordDistValues.get(redCoord);
         }
         for (AbaloneCoord blueCoord : p2Pieces) {

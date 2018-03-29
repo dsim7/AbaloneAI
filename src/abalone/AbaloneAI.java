@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AbaloneAI implements Runnable {
+    
+    private static final int MAX_DEPTH = 2;
     private Abalone ab;
     private AbaloneMove bestMove;
     //private final static AbaloneMove PLACE_HOLDER_BEST_MOVE = 
@@ -14,13 +16,16 @@ public class AbaloneAI implements Runnable {
     private volatile boolean running = true;
     private volatile boolean paused = false;
     private final Object pauseLock = new Object();
+    
+
+    int count = 0;
       
     AbaloneAI(Abalone ab) {
         this.ab = ab;
     }
     
     public AbaloneMove getBestMove() {
-        List<AbaloneMove> nextMoves = ab.getState().getAllNextMoves();
+        /*List<AbaloneMove> nextMoves = ab.getState().getAllNextMoves();
         
         AbaloneMove bestMove = nextMoves.get(0);
         double bestMoveStateValue = ab.getState().getNextState(bestMove).getStateValueRedPerspective();
@@ -43,20 +48,22 @@ public class AbaloneAI implements Runnable {
             }
         }
         System.out.println("BEST MOVE VALUE: " + bestMoveStateValue);
+        */
         return bestMove;
     }
     
     private void iterativeDeepening(AbaloneState state) {
+        System.out.println("Iterative deepening");
         Map<AbaloneState, Integer> transpositionTable = new HashMap<AbaloneState, Integer>();
-        int depth = 1;
-        while (depth < 10000) {
+
+        int depth = 0;
+        while (depth < MAX_DEPTH) {
             // Concurrency stuff... call checkPaused and check running at regular intervals.
             // if not running, should back out completely. abort everything
             checkPaused();
             if (!running) {
                 return;
             }
-            
             
             minimaxSearch(state, depth++,  transpositionTable);
         }
@@ -65,27 +72,71 @@ public class AbaloneAI implements Runnable {
     /**
      * Sets the AI's current best move from the given state. The best
      * move is computed using minimax iterative deepening search
-     * to a certain depth. Tranposition table is used to avoid recomputation. 
+     * to a certain depth. Transposition table is used to avoid recomputation. 
      * 
      * @param root
      * @param depth
      * @return true if the search finds a finished solution
      */
-    private boolean minimaxSearch(AbaloneState root,
-                                      int depth,
-                                      Map<AbaloneState, Integer> transpositionTable) {
+    private void minimaxSearch(AbaloneState root,
+                               int depth,
+                               Map<AbaloneState, Integer> transpositionTable) {
         // before computing each state's value, search transposition table to see if
         // we already know it
-        System.out.println("Minimax Search depth: " + depth);
+        //System.out.println("Minimax Search depth: " + depth);
         
-        // add each state's value to the transposition table when it is computed
         
-        return false;
+        if(root.turn % 2 == 0) {
+            maxMove(root, depth);
+        } else {
+            minMove(root, depth);
+        }
+       
     }
     
+    private double maxMove(AbaloneState state, int depth) {
+        //System.out.println("Minimax : max " + count++);
+        if (depth > MAX_DEPTH || state.getStateValueRedPerspective() == Double.MAX_VALUE) {
+            return state.getStateValueRedPerspective();
+        }
 
-    private double evaluateState(AbaloneState state) {
-        return state.getStateValueRedPerspective();
+        List<AbaloneMove> moves = null;
+
+        moves = state.getAllNextMoves();
+        double maxStateValue = Double.MIN_VALUE;
+        for (AbaloneMove move : moves) {
+            //System.out.println(state.turn);
+            AbaloneState resultantState = state.getNextState(move);
+            double resultantStateValue = minMove(resultantState, depth + 1);
+            if (resultantStateValue > maxStateValue) {
+                bestMove = move;
+                maxStateValue = resultantStateValue;
+            }
+        }
+        //System.out.println("Max return " + maxStateValue);
+        return maxStateValue;
+        
+    }
+    
+    public double minMove(AbaloneState state, int depth) {
+        
+        //System.out.println("Minimax : min");
+        List<AbaloneMove> moves = null;
+        
+        moves = state.getAllNextMoves();
+        double minStateValue = Double.MAX_VALUE;
+        for(AbaloneMove move : moves) {
+            //System.out.println(state.turn);
+            AbaloneState resultantState = state.getNextState(move);
+            double resultantStateValue = maxMove(resultantState, depth + 1);
+            if (resultantStateValue < minStateValue) {
+                bestMove = move;
+                minStateValue = resultantStateValue;
+            }
+        }
+        //System.out.println("Min return " + minStateValue);
+        return minStateValue;
+        
     }
     
     

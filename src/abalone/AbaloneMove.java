@@ -80,4 +80,14 @@ public class AbaloneMove {
         }
         return result * MOVE_WEIGHT;
     }
+    
+    @Override
+    public int hashCode() {
+        int hashCode = 1;
+        for (AbaloneCoord movingPiece : movingPieces) {
+            hashCode = 31 * hashCode + movingPiece.hashCode();
+        }
+        
+        return 0;
+    }
 }
