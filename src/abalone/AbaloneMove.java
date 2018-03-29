@@ -1,7 +1,7 @@
 package abalone;
 import java.util.List;
 
-public class AbaloneMove {
+public class AbaloneMove implements Comparable {
     private List<AbaloneCoord> movingPieces;
     private List<AbaloneCoord> pushingPieces;
     private Abalone.Dir direction;
@@ -25,6 +25,7 @@ public class AbaloneMove {
         this.isInlineMove = isInlineMove;
     }
     
+    @Override
     public String toString() {
         String toString = "";
         for (AbaloneCoord piece : movingPieces) {
@@ -79,5 +80,13 @@ public class AbaloneMove {
             }
         }
         return result * MOVE_WEIGHT;
+    }
+
+    @Override
+    public int compareTo(Object obj) {
+        if (!(obj instanceof AbaloneMove)) {
+            return -1;
+        }
+        return ((Double) this.getValue()).compareTo(((AbaloneMove) obj).getValue());
     }
 }
