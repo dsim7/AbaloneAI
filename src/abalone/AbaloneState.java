@@ -14,13 +14,10 @@ public class AbaloneState {
     int turn;
     double stateValue = Double.MIN_VALUE;
     
-    private List<AbaloneMove> allNextMoves = null;
     private List<AbaloneState> allNextStates = null;
     
     private List<AbaloneMove> allRedMoves = null;
     private List<AbaloneMove> allBlueMoves = null;
-    
-    private AbaloneMove parentMove = null;
     
     public AbaloneState(Set<AbaloneCoord> p1Pieces, Set<AbaloneCoord> p2Pieces, int turn) {
         this.p1Pieces = p1Pieces;
@@ -38,22 +35,20 @@ public class AbaloneState {
     }
 
     public double getStateValueRedPerspective() {
+        //long time = System.nanoTime();
         if (stateValue == Double.MIN_VALUE) {
-            System.out.println("Calculating state value");
             double result = 0;
             result += valueMovesRedPerspective();
             result += valueCoordsRedPerspective();
             stateValue = result;
         }
+        //System.out.println("Time to get value : " + (System.nanoTime() - time));
         return stateValue;
     }
 
     public List<AbaloneMove> getAllNextMoves() {
-        if (allNextMoves == null) {
-            Set<List<AbaloneCoord>> groups = GroupingHelper.generateGroups(turn % 2 == 0 ? p1Pieces : p2Pieces); 
-            allNextMoves = MoveHelper.generateAllMoves(groups, p1Pieces, p2Pieces);
-        }
-        return allNextMoves;   
+        
+        return turn % 2 == 0 ? getRedMoves() : getBlueMoves();   
     }
     
     public List<AbaloneMove> getRedMoves() {
@@ -103,7 +98,7 @@ public class AbaloneState {
      *            int numPushedPieces)
      */
     public AbaloneState getNextState(AbaloneMove move) {
-        if (!calculatedStates.containsKey(move)) {
+        //if (!calculatedStates.containsKey(move)) {
             Set<AbaloneCoord> newP1Pces = new HashSet<AbaloneCoord>();
             Set<AbaloneCoord> newP2Pces = new HashSet<AbaloneCoord>();
             List<AbaloneCoord> movingPieces = move.getMovingPieces();
@@ -150,15 +145,11 @@ public class AbaloneState {
             
             }
             AbaloneState nextState = new AbaloneState(newP1Pces, newP2Pces, turn + 1);
-            calculatedStates.put(move, nextState);
+            //calculatedStates.put(move, nextState);
             return nextState;
-        } else {
-            return calculatedStates.get(move);
-        }
-    }
-    
-    public void incrementStateTurn() {
-        turn++;
+        //} else {
+        //    return calculatedStates.get(move);
+        //}
     }
 
     public String toString() {

@@ -12,7 +12,7 @@ public class AbaloneCoord implements Comparable {
     private static final double DIST_FROM_CENTER_1 = 10;
     private static final double DIST_FROM_CENTER_2 = 8;
     private static final double DIST_FROM_CENTER_3 = 5;
-    private static final double DIST_FROM_CENTER_4 = 0;
+    private static final double DIST_FROM_CENTER_4 = 3;
     
     public static Map<AbaloneCoord, Double> coordDistValues = new HashMap<AbaloneCoord, Double>();
     static {

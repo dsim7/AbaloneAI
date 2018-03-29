@@ -11,8 +11,8 @@ public class AbaloneMove {
     private static final double PUSH_MOVE_VALUE = 30;
     private static final double THREATEN_MOVE_VALUE = 80;
     private static final double SINGLE_GROUP_VALUE = 1;
-    private static final double DOUBLE_GROUP_VALUE = 5;
-    private static final double TRIPLE_GROUP_VALUE = 10;
+    private static final double DOUBLE_GROUP_VALUE = 10;
+    private static final double TRIPLE_GROUP_VALUE = 20;
     
     
     AbaloneMove(List<AbaloneCoord> movingPieces,
@@ -28,7 +28,7 @@ public class AbaloneMove {
     public String toString() {
         String toString = "";
         for (AbaloneCoord piece : movingPieces) {
-            toString += "(" + piece.x + "," + piece.y + "),";
+            toString += piece.toString() + ", ";
         }
         toString = toString.replaceAll(",$", "");
         toString += " " + direction.toString()
@@ -79,15 +79,5 @@ public class AbaloneMove {
             }
         }
         return result * MOVE_WEIGHT;
-    }
-    
-    @Override
-    public int hashCode() {
-        int hashCode = 1;
-        for (AbaloneCoord movingPiece : movingPieces) {
-            hashCode = 31 * hashCode + movingPiece.hashCode();
-        }
-        
-        return 0;
     }
 }

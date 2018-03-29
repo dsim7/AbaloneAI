@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class AbaloneAI implements Runnable {
     
-    private static final int MAX_DEPTH = 2;
+    private static final int MAX_DEPTH = 3;
     private Abalone ab;
     private AbaloneMove bestMove;
     //private final static AbaloneMove PLACE_HOLDER_BEST_MOVE = 
@@ -60,10 +60,10 @@ public class AbaloneAI implements Runnable {
         while (depth < MAX_DEPTH) {
             // Concurrency stuff... call checkPaused and check running at regular intervals.
             // if not running, should back out completely. abort everything
-            checkPaused();
-            if (!running) {
-                return;
-            }
+            //checkPaused();
+            //if (!running) {
+            //    return;
+            //}
             
             minimaxSearch(state, depth++,  transpositionTable);
         }
@@ -85,31 +85,33 @@ public class AbaloneAI implements Runnable {
         // we already know it
         //System.out.println("Minimax Search depth: " + depth);
         
-        
+        long time = System.nanoTime();
         if(root.turn % 2 == 0) {
-            maxMove(root, depth);
+            maxMove(root, 0, depth);
         } else {
-            minMove(root, depth);
+            minMove(root, 0, depth);
         }
+        System.out.println("Minimax depth " + depth + " " + (System.nanoTime() - time));
        
     }
     
-    private double maxMove(AbaloneState state, int depth) {
+    private double maxMove(AbaloneState state, int curDepth, int depth) {
         //System.out.println("Minimax : max " + count++);
-        if (depth > MAX_DEPTH || state.getStateValueRedPerspective() == Double.MAX_VALUE) {
+        if (curDepth >= depth || state.getStateValueRedPerspective() == Double.MAX_VALUE) {
             return state.getStateValueRedPerspective();
         }
 
-        List<AbaloneMove> moves = null;
-
-        moves = state.getAllNextMoves();
+        List<AbaloneMove> moves = state.getAllNextMoves();
+        //System.out.println(curDepth + " " + moves.size());
         double maxStateValue = Double.MIN_VALUE;
         for (AbaloneMove move : moves) {
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
-            double resultantStateValue = minMove(resultantState, depth + 1);
+            double resultantStateValue = minMove(resultantState, curDepth + 1, depth);
             if (resultantStateValue > maxStateValue) {
-                bestMove = move;
+                if (curDepth == 0) {
+                    bestMove = move;
+                }
                 maxStateValue = resultantStateValue;
             }
         }
@@ -118,19 +120,22 @@ public class AbaloneAI implements Runnable {
         
     }
     
-    public double minMove(AbaloneState state, int depth) {
-        
+    private double minMove(AbaloneState state, int curDepth, int depth) {
+        if (curDepth >= depth || state.getStateValueRedPerspective() == Double.MIN_VALUE) {
+            return state.getStateValueRedPerspective();
+        }
         //System.out.println("Minimax : min");
-        List<AbaloneMove> moves = null;
-        
-        moves = state.getAllNextMoves();
+        List<AbaloneMove> moves = state.getAllNextMoves();
+        //System.out.println(curDepth + " " + moves.size());
         double minStateValue = Double.MAX_VALUE;
         for(AbaloneMove move : moves) {
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
-            double resultantStateValue = maxMove(resultantState, depth + 1);
+            double resultantStateValue = maxMove(resultantState, curDepth + 1, depth);
             if (resultantStateValue < minStateValue) {
-                bestMove = move;
+                if (curDepth == 0) {
+                    bestMove = move;
+                }
                 minStateValue = resultantStateValue;
             }
         }
