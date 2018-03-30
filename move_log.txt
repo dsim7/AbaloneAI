@@ -2444,3 +2444,45 @@
 2018/03/29 15:39:35: New Game Started
 2018/03/29 15:40:07: Player 1 C3, C5, C4,  UL broadside (1.1sec)
 2018/03/29 15:40:16: Player 2 G5, H5, I5,  DR inline (7.3sec)
+2018/03/29 21:09:17: New Game Started
+2018/03/29 21:09:25: Player 1 C3, C5, C4,  UL broadside (1.2sec)
+2018/03/29 21:09:42: Player 2 G5,  L broadside (15.4sec)
+2018/03/29 21:09:56: New Game Started
+2018/03/29 21:10:02: Player 1 C3, C5, C4,  UL broadside (1.1sec)
+2018/03/29 21:10:03: Player 2 G6,  DL broadside (0.6sec)
+2018/03/29 21:10:07: Player 1 B2, B4, B3,  UL broadside (1.1sec)
+2018/03/29 21:10:08: Player 2 H6,  DR broadside (0.5sec)
+2018/03/29 21:10:12: Player 1 A1, A3, A2,  UR broadside (1.6sec)
+2018/03/29 21:10:13: Player 2 H8,  DR broadside (0.5sec)
+2018/03/29 21:10:16: Player 1 B3, C4, D5,  UR inline (1.4sec)
+2018/03/29 21:10:17: Player 2 I8,  DR broadside (0.5sec)
+2018/03/29 21:10:20: Player 1 B4, B6, B5,  UR broadside (1.3sec)
+2018/03/29 21:10:21: Player 2 H8,  UL broadside (0.4sec)
+2018/03/29 21:10:24: Player 1 B1, C2, D3,  UR inline (1.5sec)
+2018/03/29 21:10:25: Player 2 I8,  DR broadside (0.7sec)
+2018/03/29 21:10:28: Player 1 B2, C3, D4,  UR inline (1.3sec)
+2018/03/29 21:10:29: Player 2 H8,  UL broadside (0.5sec)
+2018/03/29 21:19:49: New Game Started
+2018/03/29 21:19:55: Player 1 C3, C5, C4,  UL broadside (1.3sec)
+2018/03/29 21:19:57: Player 2 G7,  DL broadside (0.6sec)
+2018/03/29 21:20:00: Player 1 B2, B4, B3,  UL broadside (1.5sec)
+2018/03/29 21:20:01: Player 2 A1, A2, A3,  UR broadside (0.5sec)
+2018/03/29 21:20:06: Player 1 B4, B6, B5,  UR broadside (1.8sec)
+2018/03/29 21:20:08: Player 2 B1, C2, D3,  UR inline (0.4sec)
+2018/03/29 21:20:48: New Game Started
+2018/03/29 21:20:54: Player 1 C3, C5, C4,  UL broadside (1.3sec)
+2018/03/29 21:20:55: Player 2 G7,  DL broadside (0.5sec)
+2018/03/29 21:20:58: Player 1 B2, B4, B3,  UL broadside (1.3sec)
+2018/03/29 21:20:59: Player 2 F6,  L broadside (0.4sec)
+2018/03/29 21:21:02: Player 1 A2, A4, A3,  UL broadside (1.2sec)
+2018/03/29 21:21:03: Player 2 G6,  DR broadside (0.4sec)
+2018/03/29 21:32:25: New Game Started
+2018/03/29 21:32:31: Player 1 C3, C5, C4,  UL broadside (2.1sec)
+2018/03/29 21:32:32: Player 2 G7,  DL broadside (0.5sec)
+2018/03/29 21:33:01: New Game Started
+2018/03/29 21:33:15: New Game Started
+2018/03/29 21:33:22: Player 1 C3, C5, C4,  UL broadside (1.4sec)
+2018/03/29 21:33:24: Player 2 G7,  DL broadside (0.7sec)
+2018/03/29 21:33:38: New Game Started
+2018/03/29 21:33:47: Player 1 C3, C5, C4,  UL broadside (1.5sec)
+2018/03/29 21:33:49: Player 2 G5, H6, I7,  DL inline (0.8sec)

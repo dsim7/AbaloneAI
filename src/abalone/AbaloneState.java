@@ -37,10 +37,16 @@ public class AbaloneState {
     public double getStateValueRedPerspective() {
         //long time = System.nanoTime();
         if (stateValue == Double.MIN_VALUE) {
-            double result = 0;
-            result += valueMovesRedPerspective();
-            result += valueCoordsRedPerspective();
-            stateValue = result;
+            if (p1Pieces.size() <= 8) {
+                stateValue = Double.MIN_VALUE;
+            } else if (p2Pieces.size() <= 8) {
+                stateValue = Double.MAX_VALUE;
+            } else {
+                double result = 0;
+                result += valueMovesRedPerspective();
+                result += valueCoordsRedPerspective();
+                stateValue = result;
+            }
         }
         //System.out.println("Time to get value : " + (System.nanoTime() - time));
         return stateValue;
