@@ -223,6 +223,7 @@ public class AbaloneAI implements Runnable {
         } else {
             minMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
         }
+        bestMove = bestMoveMidSearch;
         System.out.println("Minimax depth " + depth + " " + (System.nanoTime() - time));
        
     }
@@ -248,7 +249,7 @@ public class AbaloneAI implements Runnable {
             if (result > resultantStateValue) {
                 resultantStateValue = result;
                 if (curDepth == 0) {
-                    bestMove = move;
+                    bestMoveMidSearch = move;
                 }
             }
             
@@ -289,7 +290,7 @@ public class AbaloneAI implements Runnable {
             if (result < resultantStateValue) {
                 resultantStateValue = result;
                 if (curDepth == 0) {
-                  bestMove = move;
+                  bestMoveMidSearch = move;
                   //bestMove = moves.get(i);
                 }
             }
