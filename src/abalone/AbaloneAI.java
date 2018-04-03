@@ -68,10 +68,11 @@ public class AbaloneAI implements Runnable {
             //    return;
             //}
             
-            minimaxSearch(state, depth++,  transpositionTable);
-            //swp_minimaxSearch(state, depth++,  transpositionTable);
+            //minimaxSearch(state, depth++,  transpositionTable);
+            swp_minimaxSearch(state, depth++,  transpositionTable);
         }
     }
+    
     
     /**
      * Sets the AI's current best move from the given state. The best
@@ -82,6 +83,7 @@ public class AbaloneAI implements Runnable {
      * @param depth
      * @return true if the search finds a finished solution
      */
+    /*
     private void minimaxSearch(AbaloneState root,
                                int depth,
                                Map<AbaloneState, Integer> transpositionTable) {
@@ -169,8 +171,10 @@ public class AbaloneAI implements Runnable {
         return resultantStateValue;
         
     }
+    */
     
-    //alpha beta pruning code - swp
+    
+    //alpha beta pruning code start - swp
     /**
      * Sets the AI's current best move from the given state. The best
      * move is computed using minimax iterative deepening search
@@ -247,16 +251,19 @@ public class AbaloneAI implements Runnable {
         Collections.sort(moves);
         //System.out.println(curDepth + " " + moves.size());
         double resultantStateValue = Double.MAX_VALUE;
+        
         for (AbaloneMove move : moves) {
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
+            //AbaloneState resultantState = state.getNextState(moves.get(i));
             
             double result = swp_maxMove(resultantState, curDepth + 1, depth, alpha, beta);
             
             if (result < resultantStateValue) {
                 resultantStateValue = result;
                 if (curDepth == 0) {
-                    bestMove = move;
+                  bestMove = move;
+                  //bestMove = moves.get(i);
                 }
             }
             
