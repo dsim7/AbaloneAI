@@ -68,8 +68,7 @@ public class AbaloneAI implements Runnable {
             //    return;
             //}
             
-            //minimaxSearch(state, depth++,  transpositionTable);
-            swp_minimaxSearch(state, depth++,  transpositionTable);
+            minimaxSearch(state, depth++,  transpositionTable);
         }
     }
     
@@ -184,7 +183,7 @@ public class AbaloneAI implements Runnable {
      * @param depth
      * @return true if the search finds a finished solution
      */
-    private void swp_minimaxSearch(AbaloneState root,
+    private void minimaxSearch(AbaloneState root,
                                int depth,
                                Map<AbaloneState, Integer> transpositionTable) {
         // before computing each state's value, search transposition table to see if
@@ -196,15 +195,15 @@ public class AbaloneAI implements Runnable {
         
         long time = System.nanoTime();
         if(root.turn % 2 == 0) {
-            swp_maxMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
+            maxMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
         } else {
-            swp_minMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
+            minMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
         }
         System.out.println("Minimax depth " + depth + " " + (System.nanoTime() - time));
        
     }
     
-    private double swp_maxMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
+    private double maxMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
         //System.out.println("Minimax : max " + count++);
         if (curDepth >= depth || state.getStateValueRedPerspective() == Double.MAX_VALUE) {
             //maxScoreSoFar = Math.max(maxScoreSoFar, state.getStateValueRedPerspective());
@@ -220,7 +219,7 @@ public class AbaloneAI implements Runnable {
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
             
-            double result = swp_minMove(resultantState, curDepth + 1, depth, alpha, beta);
+            double result = minMove(resultantState, curDepth + 1, depth, alpha, beta);
             
             if (result > resultantStateValue) {
                 resultantStateValue = result;
@@ -241,7 +240,7 @@ public class AbaloneAI implements Runnable {
         
     }
     
-    private double swp_minMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
+    private double minMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
         if (curDepth >= depth || state.getStateValueRedPerspective() == -Double.MAX_VALUE) {
             return state.getStateValueRedPerspective();
         }
@@ -257,7 +256,7 @@ public class AbaloneAI implements Runnable {
             AbaloneState resultantState = state.getNextState(move);
             //AbaloneState resultantState = state.getNextState(moves.get(i));
             
-            double result = swp_maxMove(resultantState, curDepth + 1, depth, alpha, beta);
+            double result = maxMove(resultantState, curDepth + 1, depth, alpha, beta);
             
             if (result < resultantStateValue) {
                 resultantStateValue = result;

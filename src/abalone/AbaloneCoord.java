@@ -7,12 +7,12 @@ public class AbaloneCoord implements Comparable {
     int x,y;
     
     private static final double COORD_WEIGHT = 1;
-    private static final double COORD_CONSTANT = 100;
-    private static final double DIST_FROM_CENTER_0 = 10;
-    private static final double DIST_FROM_CENTER_1 = 10;
-    private static final double DIST_FROM_CENTER_2 = 8;
-    private static final double DIST_FROM_CENTER_3 = 5;
-    private static final double DIST_FROM_CENTER_4 = 3;
+    private static final double COORD_CONSTANT = 200;
+    private static final double DIST_FROM_CENTER_0 = 8;
+    private static final double DIST_FROM_CENTER_1 = 8;
+    private static final double DIST_FROM_CENTER_2 = 5;
+    private static final double DIST_FROM_CENTER_3 = 3;
+    private static final double DIST_FROM_CENTER_4 = 1;
     
     public static Map<AbaloneCoord, Double> coordDistValues = new HashMap<AbaloneCoord, Double>();
     static {
