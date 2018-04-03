@@ -38,9 +38,9 @@ public class AbaloneState {
         //long time = System.nanoTime();
         if (stateValue == Double.MIN_VALUE) {
             if (p1Pieces.size() <= 8) {
-                stateValue = Double.MIN_VALUE;
+                stateValue = (double) Long.MIN_VALUE;
             } else if (p2Pieces.size() <= 8) {
-                stateValue = Double.MAX_VALUE;
+                stateValue = (double) Long.MAX_VALUE;
             } else {
                 double result = 0;
                 result += valueMovesRedPerspective();
@@ -53,6 +53,21 @@ public class AbaloneState {
     }
 
     public List<AbaloneMove> getAllNextMoves() {
+        /*
+        if (turn % 2 == 0) {
+            List<AbaloneMove> moves = new ArrayList<AbaloneMove>();
+            for (int i = 0; i < 3; i++) {
+                moves.add(getRedMoves().get(i));
+            }
+            return moves;
+        } else {
+            List<AbaloneMove> moves = new ArrayList<AbaloneMove>();
+            for (int i = 0; i < 3; i++) {
+                moves.add(getBlueMoves().get(i));
+            }
+            return moves;
+        }
+        */
         
         return turn % 2 == 0 ? getRedMoves() : getBlueMoves();   
     }

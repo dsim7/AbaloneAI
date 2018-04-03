@@ -129,8 +129,11 @@ public class Abalone {
     private Timer maxTurnTimer = new Timer(1000, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            nextPlayerTurn();
             System.out.println("Turn is up");
+            pauseTimers();
+            if (aiThread != null) {
+                aiThread.stop();
+            }
             updateGUIInfo();
         }
     });
@@ -467,6 +470,9 @@ public class Abalone {
             nextPlayerTurn();
         }
         lastRunningTimer.start();
+        if (maxTimePerTurn != 0) {
+            maxTurnTimer.start();
+        }
         gameRunning = true;
         
         if (aiThread != null) {
@@ -627,6 +633,7 @@ public class Abalone {
     public boolean move(AbaloneMove move) {
         if (move != null) {
             logMove(move);
+            gui.updateLastMove(move);
             setToNextState(move);
             nextPlayerTurn();
             clearSelection();
@@ -771,14 +778,17 @@ public class Abalone {
     // each direction has a delta x and delta y which represent the difference in x
     // and y which result from moving in that direction
     public enum Dir {
-        L(-1,0,"L"), UL(0,1,"UL"), DL(-1,-1,"DL"), UR(1,1,"UR"), DR(0,-1,"DR"), R(1,0,"R");
+        L(-1,0,"L", "9"), UL(0,1,"UL", "11"), DL(-1,-1,"DL", "7"), UR(1,1,"UR", "1"), DR(0,-1,"DR", "5"), R(1,0,"R", "3");
 
         int dx, dy;
         String name;
-        Dir(int dx, int dy, String name) {
+        String notation;
+        
+        Dir(int dx, int dy, String name, String notation) {
             this.dx = dx;
             this.dy = dy;
             this.name = name;
+            this.notation = notation;
         }
     }
 }

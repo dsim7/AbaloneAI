@@ -7,9 +7,9 @@ public class AbaloneMove implements Comparable {
     private Abalone.Dir direction;
     private boolean isInlineMove;
     
-    private static final double MOVE_WEIGHT = 1;
+    private static final double MOVE_WEIGHT = 2;
     private static final double PUSH_MOVE_VALUE = 30;
-    private static final double THREATEN_MOVE_VALUE = 80;
+    private static final double THREATEN_MOVE_VALUE = 50;
     private static final double SINGLE_GROUP_VALUE = 1;
     private static final double DOUBLE_GROUP_VALUE = 10;
     private static final double TRIPLE_GROUP_VALUE = 20;
@@ -27,7 +27,18 @@ public class AbaloneMove implements Comparable {
     
     @Override
     public String toString() {
-        String toString = "";
+        String moveTypeNotation = isInlineMove ? "i" : "s";
+        String tail = MoveHelper.findTailPiece(movingPieces, direction).toString();
+        String front = MoveHelper.findFrontPiece(movingPieces, direction).toString();
+        String directionNotation = direction.notation;
+        
+        if (isInlineMove) {
+            return moveTypeNotation + " - " + tail + " - " + directionNotation;
+        } else {
+            return moveTypeNotation + " - " + tail + " - " + front + " - " + directionNotation;
+        }
+        
+        /*     
         for (AbaloneCoord piece : movingPieces) {
             toString += piece.toString() + ", ";
         }
@@ -40,9 +51,9 @@ public class AbaloneMove implements Comparable {
             for (AbaloneCoord piece : pushingPieces) {
                 toString += "(" + piece.x + "," + piece.y + "),";
             }
-        }*/
+        }/
         toString = toString.replaceAll(",$", "");
-        return toString;
+        return toString;*/
     }
     
     public List<AbaloneCoord> getMovingPieces() {

@@ -211,12 +211,21 @@ public final class MoveHelper {
         return legalMoves;
     }
     
-    private static AbaloneCoord findFrontPiece(List<AbaloneCoord> group, Abalone.Dir direction) {
+    public static AbaloneCoord findFrontPiece(List<AbaloneCoord> group, Abalone.Dir direction) {
         Collections.sort(group);
         if (direction == Dir.UL || direction == Dir.UR || direction == Dir.R) {
             return group.get(group.size() - 1);
         } else {
             return group.get(0);
+        }
+    }
+    
+    public static AbaloneCoord findTailPiece(List<AbaloneCoord> group, Abalone.Dir direction) {
+        Collections.sort(group);
+        if (direction == Dir.UL || direction == Dir.UR || direction == Dir.R) {
+            return group.get(0);
+        } else {
+            return group.get(group.size() - 1);
         }
     }
     

@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 public class AbaloneAI implements Runnable {
-    
+    private static final double MAX = (double) Long.MAX_VALUE;
+    private static final double MIN = (double) Long.MIN_VALUE;
     private static final int MAX_DEPTH = 3;
     private Abalone ab;
     private AbaloneMove bestMove;
+    private AbaloneMove bestMoveMidSearch;
     //private final static AbaloneMove PLACE_HOLDER_BEST_MOVE = 
     //       new AbaloneMove(new ArrayList<AbaloneCoord>(), null, Abalone.Dir.UL, false);
     
@@ -20,9 +22,7 @@ public class AbaloneAI implements Runnable {
     
 
     int count = 0;
-    double maxScoreSoFar;
-    double minScoreSoFar;
-      
+    
     AbaloneAI(Abalone ab) {
         this.ab = ab;
     }
@@ -60,15 +60,14 @@ public class AbaloneAI implements Runnable {
         Map<AbaloneState, Integer> transpositionTable = new HashMap<AbaloneState, Integer>();
 
         int depth = 0;
-        while (depth < MAX_DEPTH) {
-            // Concurrency stuff... call checkPaused and check running at regular intervals.
-            // if not running, should back out completely. abort everything
-            //checkPaused();
-            //if (!running) {
-            //    return;
-            //}
+        while (depth <= MAX_DEPTH) {
+             //Concurrency stuff... call checkPaused and check running at regular intervals.
+             //if not running, should back out completely. abort everything
             
             minimaxSearch(state, depth++,  transpositionTable);
+            if (running) {
+                bestMove = bestMoveMidSearch;
+            }
         }
     }
     
@@ -88,99 +87,118 @@ public class AbaloneAI implements Runnable {
         // we already know it
         //System.out.println("Minimax Search depth: " + depth);
 
-        maxScoreSoFar = Double.MIN_VALUE;
-        minScoreSoFar = Double.MAX_VALUE;
-        
         long time = System.nanoTime();
         if(root.turn % 2 == 0) {
-            maxMove(root, 0, depth);
+            maxMove(root, MIN, MAX, 0, depth);
         } else {
-            minMove(root, 0, depth);
+            minMove(root, MIN, MAX, 0, depth);
         }
         System.out.println("Minimax depth " + depth + " " + (System.nanoTime() - time));
        
     }
     
-    private double maxMove(AbaloneState state, int curDepth, int depth) {
-        //System.out.println("Minimax : max " + count++);
-        if (curDepth >= depth || state.getStateValueRedPerspective() == Double.MAX_VALUE) {
-            maxScoreSoFar = Math.max(maxScoreSoFar, state.getStateValueRedPerspective());
+    private double maxMove(AbaloneState state, double a, double b, int curDepth, int depth) {
+        //System.out.println("//// MAX " + curDepth + " \\\\");
+        if (curDepth >= depth || state.getStateValueRedPerspective() == MAX) {
+            //System.out.println("TERMINAL STATE VALUE: " + state.getStateValueRedPerspective());
+            //System.out.println("\\\\ MAX " + curDepth + " ////");
             return state.getStateValueRedPerspective();
         }
 
         List<AbaloneMove> moves = state.getAllNextMoves();
-        
         Collections.sort(moves);
-        //System.out.println(curDepth + " " + moves.size());
-        double resultantStateValue = Double.MIN_VALUE;
+        
+        double highestChildValue = MIN;
         for (AbaloneMove move : moves) {
-            //System.out.println(state.turn);
-            AbaloneState resultantState = state.getNextState(move);
+            //System.out.println("Check Move: " + move);
             
-            double result = minMove(resultantState, curDepth + 1, depth);
-            if (result > resultantStateValue) {
-                resultantStateValue = result;
+            AbaloneState resultantState = state.getNextState(move);
+            double resultantStateValue = minMove(resultantState, a, b, curDepth + 1, depth);
+            
+            //checkPaused();
+            if (!running) {
+                break;
+            }
+            
+            //System.out.println("Compare " + result + " " + highestChildValue);
+            if (resultantStateValue > highestChildValue) {
+                highestChildValue = resultantStateValue;
+                //System.out.println("Highest child is now: " + highestChildValue);
                 if (curDepth == 0) {
-                    bestMove = move;
+                    bestMoveMidSearch = move;
                 }
             }
-            
-            // pruning
-            if (resultantStateValue > minScoreSoFar) {
-                return resultantStateValue;
+
+            //System.out.println("Beta Compare: " + highestChildValue + " " + b.beta);
+            if (highestChildValue > b) {
+                //System.out.println("Pruning max");
+                return highestChildValue;
             }
-            maxScoreSoFar = Math.max(maxScoreSoFar, resultantStateValue);
+            a = Math.max(highestChildValue, a);
+            //System.out.println("Alpha set to: " + a.alpha);
         }
-        //System.out.println("Max return " + maxStateValue);
-        return resultantStateValue;
+        //System.out.println("VALUE OF THIS NODE IS: " + highestChildValue);
+        //System.out.println("\\\\ MAX " + curDepth + " ////");
+        
+        return highestChildValue;
         
     }
     
-    private double minMove(AbaloneState state, int curDepth, int depth) {
-        if (curDepth >= depth || state.getStateValueRedPerspective() == Double.MIN_VALUE) {
+    private double minMove(AbaloneState state, double a, double b, int curDepth, int depth) {
+        //System.out.println("//// MIN " + curDepth + " \\\\");
+        if (curDepth >= depth || state.getStateValueRedPerspective() == MIN) {
+            //System.out.println("TERMINAL STATE VALUE: " + state.getStateValueRedPerspective());
+            //System.out.println("\\\\ MIN " + curDepth + " ////");
             return state.getStateValueRedPerspective();
         }
-        //System.out.println("Minimax : min");
+        
         List<AbaloneMove> moves = state.getAllNextMoves();
         
         Collections.sort(moves);
-        //System.out.println(curDepth + " " + moves.size());
-        double resultantStateValue = Double.MAX_VALUE;
+        
+        double lowestChildValue = MAX;
         for (AbaloneMove move : moves) {
+            //System.out.println("Check Move: " + move);
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
             
-            double result = maxMove(resultantState, curDepth + 1, depth);
-            if (result < resultantStateValue) {
-                resultantStateValue = result;
-                if (curDepth == 0) {
-                    bestMove = move;
-                }
+            double resultantStateValue = maxMove(resultantState, a, b , curDepth + 1, depth);
+            //System.out.println("Compare " + result + " " + lowestChildValue);
+
+            //checkPaused();
+            if (!running) {
+                break;
             }
             
-            // pruning
-            if (resultantStateValue < maxScoreSoFar) {
-                return resultantStateValue;
+            if (resultantStateValue < lowestChildValue) {
+                //System.out.println("Lowest child is now: " + lowestChildValue);
+                lowestChildValue = resultantStateValue;
+                if (curDepth == 0) {
+                    bestMoveMidSearch = move;
+                }
             }
-            maxScoreSoFar = Math.min(minScoreSoFar, resultantStateValue);
+
+            //System.out.println("Alpha Compare: " + lowestChildValue + " " + a.alpha);
+            // pruning
+            if (lowestChildValue < a) {
+                //System.out.println("Pruning min");
+                return lowestChildValue;
+            }
+            b = Math.min(lowestChildValue, b);
+            //System.out.println("Beta set to: " + b.beta);
         }
         //System.out.println("Max return " + maxStateValue);
-        return resultantStateValue;
+        //System.out.println("VALUE OF THIS NODE IS: " + lowestChildValue);
+        //System.out.println("\\\\ MIN " + curDepth + " ////");
+        return lowestChildValue;
         
     }
-    
-    
-    
-    
-    
     
     // ===========Concurrency stuff============
     @Override
     public void run() {
         iterativeDeepening(ab.getState());
-        if (running) {
-            ab.move(getBestMove());
-        }
+        ab.move(getBestMove());
         
     }
     

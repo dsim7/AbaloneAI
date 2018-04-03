@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 /**
  * The GUI to display the Abalone game
@@ -33,6 +34,7 @@ public class AbaloneGUI extends JPanel {
     private Abalone ab;
 
     public static final Font INFO_FONT = new Font("Arial",Font.BOLD, 20 );
+    public static final Font INFO_FONT_BIG = new Font("Arial",Font.BOLD, 40 );
     public static final Font COORD_FONT = new Font("Arial",Font.BOLD, 20 );
     public static final Color BACKGROUND_COLOR = new Color(0xA0522D);
     public static final Color BACKGROUND_COLOR2 = new Color(0xDEB887);
@@ -83,6 +85,10 @@ public class AbaloneGUI extends JPanel {
         info.updateInfo();
     }
     
+    public void updateLastMove(AbaloneMove move) {
+        info.updateLastMove(move);
+    }
+    
     private void updateColors() {
         // gray all out
         for (AbaloneGUISquare[] guisqarr : coordSpaces) {
@@ -111,8 +117,8 @@ public class AbaloneGUI extends JPanel {
     
     // panel containing statistics of the game
     private class AbaloneGUIInfoPanel extends JPanel {
-        JLabel player1label = new JLabel("Player 1");
-        JLabel player2label = new JLabel("Player 2");
+        JLabel player1label = new JLabel("Black");
+        JLabel player2label = new JLabel("White");
         JLabel time1label = new JLabel("0");
         JLabel time2label = new JLabel("0");
         JLabel outs1label = new JLabel("0");
@@ -120,6 +126,7 @@ public class AbaloneGUI extends JPanel {
         JLabel turnslabel = new JLabel("0");
         JLabel roundTime1label = new JLabel("0");
         JLabel roundTime2label = new JLabel("0");
+        JLabel lastMoveLabel = new JLabel("--------MOVE--------");
         
         private AbaloneGUIInfoPanel() {
             this.setVisible(true);
@@ -136,30 +143,35 @@ public class AbaloneGUI extends JPanel {
             time1label.setForeground(Abalone.P1_COLOR);
             time2label.setFont(INFO_FONT);
             time2label.setForeground(Abalone.P2_COLOR);
-            outs1label.setFont(INFO_FONT);
+            outs1label.setFont(INFO_FONT_BIG);
             outs1label.setForeground(Abalone.P1_COLOR);
-            outs2label.setFont(INFO_FONT);
+            outs2label.setFont(INFO_FONT_BIG);
             outs2label.setForeground(Abalone.P2_COLOR);
             turnslabel.setFont(INFO_FONT);
             turnslabel.setForeground(Color.WHITE);
+            turnslabel.setHorizontalAlignment(SwingConstants.CENTER);
             roundTime1label.setFont(INFO_FONT);
             roundTime1label.setForeground(Abalone.P1_COLOR);
             roundTime2label.setFont(INFO_FONT);
             roundTime2label.setForeground(Abalone.P2_COLOR);
+            lastMoveLabel.setFont(INFO_FONT_BIG);
+            lastMoveLabel.setForeground(Color.WHITE);
+            lastMoveLabel.setHorizontalAlignment(SwingConstants.CENTER);
             
             JPanel p1 = new JPanel();
             p1.setLayout(new GridLayout());
             p1.setBackground(BACKGROUND_COLOR);
-            p1.setPreferredSize(new Dimension(400,100));
+            p1.setPreferredSize(new Dimension(300,100));
             
             JPanel p2 = new JPanel();
             p2.setLayout(new GridLayout());
             p2.setBackground(BACKGROUND_COLOR);
-            p2.setPreferredSize(new Dimension(400,100));
+            p2.setPreferredSize(new Dimension(300,100));
             
             JPanel center = new JPanel();
             center.setBackground(BACKGROUND_COLOR);
-            center.setLayout(new FlowLayout());
+            center.setLayout(new GridLayout(0,1));
+            center.setAlignmentY(CENTER_ALIGNMENT);
             
             this.add(p1, BorderLayout.WEST);
             this.add(p2, BorderLayout.EAST);
@@ -174,6 +186,12 @@ public class AbaloneGUI extends JPanel {
             p2.add(roundTime2label);
             p2.add(outs2label);
             center.add(turnslabel);
+            center.add(lastMoveLabel);
+        }
+        
+        private void updateLastMove(AbaloneMove move) {
+            lastMoveLabel.setForeground(ab.getState().turn % 2 == 0 ? Abalone.P1_COLOR : Abalone.P2_COLOR);
+            lastMoveLabel.setText(move.toString());
         }
         
         private void updateInfo() {
