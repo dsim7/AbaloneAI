@@ -8,7 +8,7 @@ import java.util.Map;
 public class AbaloneAI implements Runnable {
 
     
-    private static final int MAX_DEPTH = 3;
+    private static final int MAX_DEPTH = 4;
     private Abalone ab;
     private AbaloneMove bestMove;
     private AbaloneMove bestMoveMidSearch;
@@ -195,7 +195,10 @@ public class AbaloneAI implements Runnable {
         } else {
             minMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
         }
-        bestMove = bestMoveMidSearch;
+        if (running) {
+            bestMove = bestMoveMidSearch;
+        }
+        System.out.println("Best move at depth " + depth + ": " + bestMove);
         System.out.println("Minimax depth " + depth + " " + (System.nanoTime() - time));
        
     }
