@@ -8,7 +8,7 @@ import java.util.Map;
 public class AbaloneAI implements Runnable {
 
     
-    private static final int MAX_DEPTH = 4;
+    private static final int MAX_DEPTH = 3;
     private Abalone ab;
     private AbaloneMove bestMove;
     private AbaloneMove bestMoveMidSearch;
@@ -90,12 +90,6 @@ public class AbaloneAI implements Runnable {
         // we already know it
         //System.out.println("Minimax Search depth: " + depth);
 
-<<<<<<< HEAD
-=======
-        maxScoreSoFar = -Double.MAX_VALUE;
-        minScoreSoFar = Double.MAX_VALUE;
-        
->>>>>>> 41d103a0e0939a65274b6b3775eb9c91ce9a4435
         long time = System.nanoTime();
         if(root.turn % 2 == 0) {
             maxMove(root, MIN, MAX, 0, depth);
@@ -116,13 +110,8 @@ public class AbaloneAI implements Runnable {
 
         List<AbaloneMove> moves = state.getAllNextMoves();
         Collections.sort(moves);
-<<<<<<< HEAD
-        
-        double highestChildValue = MIN;
-=======
         //System.out.println(curDepth + " " + moves.size());
         double resultantStateValue = -Double.MAX_VALUE;
->>>>>>> 41d103a0e0939a65274b6b3775eb9c91ce9a4435
         for (AbaloneMove move : moves) {
             //System.out.println("Check Move: " + move);
             
@@ -271,6 +260,10 @@ public class AbaloneAI implements Runnable {
             }
             
             alpha = Math.max(alpha, resultantStateValue);
+            
+            if (!running) {
+                break;
+            }
         }
         //System.out.println("Max return " + maxStateValue);
         return resultantStateValue;
@@ -309,6 +302,10 @@ public class AbaloneAI implements Runnable {
             }
             
             beta = Math.min(beta, resultantStateValue);
+            
+            if (!running) {
+                break;
+            }
         }
         //System.out.println("Max return " + maxStateValue);
         return resultantStateValue;
