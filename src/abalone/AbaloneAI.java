@@ -88,7 +88,7 @@ public class AbaloneAI implements Runnable {
         // we already know it
         //System.out.println("Minimax Search depth: " + depth);
 
-        maxScoreSoFar = Double.MIN_VALUE;
+        maxScoreSoFar = -Double.MAX_VALUE;
         minScoreSoFar = Double.MAX_VALUE;
         
         long time = System.nanoTime();
@@ -112,7 +112,7 @@ public class AbaloneAI implements Runnable {
         
         Collections.sort(moves);
         //System.out.println(curDepth + " " + moves.size());
-        double resultantStateValue = Double.MIN_VALUE;
+        double resultantStateValue = -Double.MAX_VALUE;
         for (AbaloneMove move : moves) {
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
@@ -168,6 +168,102 @@ public class AbaloneAI implements Runnable {
         return resultantStateValue;
         
     }
+    
+    //alpha beta pruning code - swp
+    /**
+     * Sets the AI's current best move from the given state. The best
+     * move is computed using minimax iterative deepening search
+     * to a certain depth. Transposition table is used to avoid recomputation. 
+     * 
+     * @param root
+     * @param depth
+     * @return true if the search finds a finished solution
+     */
+    private void swp_minimaxSearch(AbaloneState root,
+                               int depth,
+                               Map<AbaloneState, Integer> transpositionTable) {
+        // before computing each state's value, search transposition table to see if
+        // we already know it
+        //System.out.println("Minimax Search depth: " + depth);
+
+        maxScoreSoFar = -Double.MAX_VALUE;
+        minScoreSoFar = Double.MAX_VALUE;
+        
+        long time = System.nanoTime();
+        if(root.turn % 2 == 0) {
+            swp_maxMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
+        } else {
+            swp_minMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
+        }
+        System.out.println("Minimax depth " + depth + " " + (System.nanoTime() - time));
+       
+    }
+    
+    private double swp_maxMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
+        //System.out.println("Minimax : max " + count++);
+        if (curDepth >= depth || state.getStateValueRedPerspective() == Double.MAX_VALUE) {
+            //maxScoreSoFar = Math.max(maxScoreSoFar, state.getStateValueRedPerspective());
+            return state.getStateValueRedPerspective();
+        }
+
+        List<AbaloneMove> moves = state.getAllNextMoves();
+        
+        Collections.sort(moves);
+        //System.out.println(curDepth + " " + moves.size());
+        double resultantStateValue = -Double.MAX_VALUE;
+        for (AbaloneMove move : moves) {
+            //System.out.println(state.turn);
+            AbaloneState resultantState = state.getNextState(move);
+            
+            resultantStateValue = Math.max(resultantStateValue, swp_minMove(resultantState, curDepth + 1, depth, alpha, beta));
+            
+            //pruning
+            if (resultantStateValue > beta) {
+                if (curDepth == 0) {
+                    bestMove = move;
+                }
+                return resultantStateValue;
+            }
+            
+            alpha = Math.max(alpha, resultantStateValue);
+        }
+        //System.out.println("Max return " + maxStateValue);
+        return resultantStateValue;
+        
+    }
+    
+    private double swp_minMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
+        if (curDepth >= depth || state.getStateValueRedPerspective() == -Double.MAX_VALUE) {
+            return state.getStateValueRedPerspective();
+        }
+        //System.out.println("Minimax : min");
+        List<AbaloneMove> moves = state.getAllNextMoves();
+        
+        Collections.sort(moves);
+        //System.out.println(curDepth + " " + moves.size());
+        double resultantStateValue = Double.MAX_VALUE;
+        for (AbaloneMove move : moves) {
+            //System.out.println(state.turn);
+            AbaloneState resultantState = state.getNextState(move);
+            
+            resultantStateValue = Math.min(resultantStateValue, swp_maxMove(resultantState, curDepth + 1, depth, alpha, beta));
+            
+            //pruning
+            if (resultantStateValue < alpha) {
+                if (curDepth == 0) {
+                    bestMove = move;
+                }
+                return resultantStateValue;
+            }
+            
+            beta = Math.min(beta, resultantStateValue);
+        }
+        //System.out.println("Max return " + maxStateValue);
+        return resultantStateValue;
+        
+    }
+    //swp code end
+    
     
     
     
