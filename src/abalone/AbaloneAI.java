@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class AbaloneAI implements Runnable {
     
-    private static final int MAX_DEPTH = 3;
+    private static final int MAX_DEPTH = 4;
     private Abalone ab;
     private AbaloneMove bestMove;
     //private final static AbaloneMove PLACE_HOLDER_BEST_MOVE = 
@@ -69,6 +69,7 @@ public class AbaloneAI implements Runnable {
             //}
             
             minimaxSearch(state, depth++,  transpositionTable);
+            //swp_minimaxSearch(state, depth++,  transpositionTable);
         }
     }
     
@@ -215,13 +216,17 @@ public class AbaloneAI implements Runnable {
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
             
-            resultantStateValue = Math.max(resultantStateValue, swp_minMove(resultantState, curDepth + 1, depth, alpha, beta));
+            double result = swp_minMove(resultantState, curDepth + 1, depth, alpha, beta);
             
-            //pruning
-            if (resultantStateValue > beta) {
+            if (result > resultantStateValue) {
+                resultantStateValue = result;
                 if (curDepth == 0) {
                     bestMove = move;
                 }
+            }
+            
+            //pruning
+            if (resultantStateValue > beta) {
                 return resultantStateValue;
             }
             
@@ -246,13 +251,17 @@ public class AbaloneAI implements Runnable {
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
             
-            resultantStateValue = Math.min(resultantStateValue, swp_maxMove(resultantState, curDepth + 1, depth, alpha, beta));
+            double result = swp_maxMove(resultantState, curDepth + 1, depth, alpha, beta);
             
-            //pruning
-            if (resultantStateValue < alpha) {
+            if (result < resultantStateValue) {
+                resultantStateValue = result;
                 if (curDepth == 0) {
                     bestMove = move;
                 }
+            }
+            
+            //pruning
+            if (resultantStateValue < alpha) {
                 return resultantStateValue;
             }
             
