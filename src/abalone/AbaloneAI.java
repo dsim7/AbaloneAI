@@ -20,7 +20,6 @@ public class AbaloneAI implements Runnable {
     private volatile boolean paused = false;
     private final Object pauseLock = new Object();
     
-
     int count = 0;
     double maxScoreSoFar;
     double minScoreSoFar;
@@ -29,33 +28,6 @@ public class AbaloneAI implements Runnable {
         this.ab = ab;
     }
     
-    public AbaloneMove getBestMove() {
-        /*List<AbaloneMove> nextMoves = ab.getState().getAllNextMoves();
-        
-        AbaloneMove bestMove = nextMoves.get(0);
-        double bestMoveStateValue = ab.getState().getNextState(bestMove).getStateValueRedPerspective();
-        
-        if (ab.getState().turn % 2 == 0) {
-            for (AbaloneMove move : nextMoves) {
-                double moveStateValue = ab.getState().getNextState(move).getStateValueRedPerspective();
-                if (moveStateValue > bestMoveStateValue) {  // TESTING. blue will always be comp. always find least redperspective value
-                    bestMove = move;
-                    bestMoveStateValue = moveStateValue;
-                }
-            }
-        }else {
-            for (AbaloneMove move : nextMoves) {
-                double moveStateValue = ab.getState().getNextState(move).getStateValueRedPerspective();
-                if (moveStateValue < bestMoveStateValue) {  // TESTING. blue will always be comp. always find least redperspective value
-                    bestMove = move;
-                    bestMoveStateValue = moveStateValue;
-                }
-            }
-        }
-        System.out.println("BEST MOVE VALUE: " + bestMoveStateValue);
-        */
-        return bestMove;
-    }
     
     private void iterativeDeepening(AbaloneState state) {
         System.out.println("Iterative deepening");
@@ -317,7 +289,7 @@ public class AbaloneAI implements Runnable {
     @Override
     public void run() {
         iterativeDeepening(ab.getState());
-        ab.move(getBestMove());
+        ab.move(bestMove);
         
     }
     

@@ -38,9 +38,9 @@ public class AbaloneState {
         //long time = System.nanoTime();
         if (stateValue == Double.MIN_VALUE) {
             if (p1Pieces.size() <= 8) {
-                stateValue = (double) Long.MIN_VALUE;
+                stateValue = -Double.MAX_VALUE;
             } else if (p2Pieces.size() <= 8) {
-                stateValue = (double) Long.MAX_VALUE;
+                stateValue = Double.MAX_VALUE;
             } else {
                 double result = 0;
                 result += valueMovesRedPerspective();
