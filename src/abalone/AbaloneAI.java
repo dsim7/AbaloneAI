@@ -8,7 +8,7 @@ import java.util.Map;
 public class AbaloneAI implements Runnable {
 
     
-    private static final int MAX_DEPTH = 4;
+    private static final int MAX_DEPTH = 3;
     private Abalone ab;
     private AbaloneMove bestMove;
     private AbaloneMove bestMoveMidSearch;
@@ -186,8 +186,8 @@ public class AbaloneAI implements Runnable {
         // we already know it
         //System.out.println("Minimax Search depth: " + depth);
 
-        maxScoreSoFar = -Double.MAX_VALUE;
-        minScoreSoFar = Double.MAX_VALUE;
+        maxScoreSoFar = -1000000;
+        minScoreSoFar = 1000000;
         
         long time = System.nanoTime();
         if(root.turn % 2 == 0) {
@@ -205,16 +205,17 @@ public class AbaloneAI implements Runnable {
     
     private double maxMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
         //System.out.println("Minimax : max " + count++);
-        if (curDepth >= depth || state.getStateValueRedPerspective() == Double.MAX_VALUE) {
+        if (curDepth >= depth
+                || state.getStateValueRedPerspective() == -1000000) {
             //maxScoreSoFar = Math.max(maxScoreSoFar, state.getStateValueRedPerspective());
-            return state.getStateValueRedPerspective();
+            return 1000000;
         }
 
         List<AbaloneMove> moves = state.getAllNextMoves();
         
         Collections.sort(moves);
         //System.out.println(curDepth + " " + moves.size());
-        double resultantStateValue = -Double.MAX_VALUE;
+        double resultantStateValue = -1000000;
         for (AbaloneMove move : moves) {
             //System.out.println(state.turn);
             AbaloneState resultantState = state.getNextState(move);
@@ -245,15 +246,16 @@ public class AbaloneAI implements Runnable {
     }
     
     private double minMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
-        if (curDepth >= depth || state.getStateValueRedPerspective() == -Double.MAX_VALUE) {
-            return state.getStateValueRedPerspective();
+        if (curDepth >= depth
+                || state.getStateValueRedPerspective() == 1000000) {
+            return -1000000;
         }
         //System.out.println("Minimax : min");
         List<AbaloneMove> moves = state.getAllNextMoves();
         
         Collections.sort(moves);
         //System.out.println(curDepth + " " + moves.size());
-        double resultantStateValue = Double.MAX_VALUE;
+        double resultantStateValue = 1000000;
         
         for (AbaloneMove move : moves) {
             //System.out.println(state.turn);

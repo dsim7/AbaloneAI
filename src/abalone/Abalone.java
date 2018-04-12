@@ -64,44 +64,43 @@ public class Abalone {
     };
     
     public static final AbaloneCoord[] P1_BELGIAN = {
-        new AbaloneCoord(0, 0), new AbaloneCoord(1, 0),
-        new AbaloneCoord(2, 0), new AbaloneCoord(3, 0),
-        new AbaloneCoord(4, 0), new AbaloneCoord(0, 1),
-        new AbaloneCoord(1, 1), new AbaloneCoord(2, 1),
-        new AbaloneCoord(3, 1), new AbaloneCoord(4, 1),
-        new AbaloneCoord(5, 1), new AbaloneCoord(2, 2),
-        new AbaloneCoord(3, 2), new AbaloneCoord(4, 2)
-    };
+            new AbaloneCoord(0, 0), new AbaloneCoord(1, 0),
+            new AbaloneCoord(0, 1), new AbaloneCoord(1, 1),
+            new AbaloneCoord(2, 1), new AbaloneCoord(1, 2),
+            new AbaloneCoord(2, 2), new AbaloneCoord(6, 6),
+            new AbaloneCoord(7, 6), new AbaloneCoord(6, 7),
+            new AbaloneCoord(7, 7), new AbaloneCoord(8, 7),
+            new AbaloneCoord(7, 8), new AbaloneCoord(8, 8)
+        };
 
-    public static final AbaloneCoord[] P2_BELGIAN = {
-        new AbaloneCoord(4, 8), new AbaloneCoord(5, 8),
-        new AbaloneCoord(6, 8), new AbaloneCoord(7, 8),
-        new AbaloneCoord(8, 8), new AbaloneCoord(3, 7),
-        new AbaloneCoord(4, 7), new AbaloneCoord(5, 7),
-        new AbaloneCoord(6, 7), new AbaloneCoord(7, 7),
-        new AbaloneCoord(8, 7), new AbaloneCoord(4, 6),
-        new AbaloneCoord(5, 6), new AbaloneCoord(6, 6),
-    }; 
-    
-    public static final AbaloneCoord[] P1_GERMAN = {
-        new AbaloneCoord(0, 0), new AbaloneCoord(1, 0),
-        new AbaloneCoord(2, 0), new AbaloneCoord(3, 0),
-        new AbaloneCoord(4, 0), new AbaloneCoord(0, 1),
-        new AbaloneCoord(1, 1), new AbaloneCoord(2, 1),
-        new AbaloneCoord(3, 1), new AbaloneCoord(4, 1),
-        new AbaloneCoord(5, 1), new AbaloneCoord(2, 2),
-        new AbaloneCoord(3, 2), new AbaloneCoord(4, 2)
-    };
-
-    public static final AbaloneCoord[] P2_GERMAN = {
-        new AbaloneCoord(4, 8), new AbaloneCoord(5, 8),
-        new AbaloneCoord(6, 8), new AbaloneCoord(7, 8),
-        new AbaloneCoord(8, 8), new AbaloneCoord(3, 7),
-        new AbaloneCoord(4, 7), new AbaloneCoord(5, 7),
-        new AbaloneCoord(6, 7), new AbaloneCoord(7, 7),
-        new AbaloneCoord(8, 7), new AbaloneCoord(4, 6),
-        new AbaloneCoord(5, 6), new AbaloneCoord(6, 6),
-    };
+        public static final AbaloneCoord[] P2_BELGIAN = {
+            new AbaloneCoord(4, 8), new AbaloneCoord(5, 8),
+            new AbaloneCoord(3, 7), new AbaloneCoord(4, 7),
+            new AbaloneCoord(5, 7), new AbaloneCoord(3, 6),
+            new AbaloneCoord(4, 6), new AbaloneCoord(4, 2),
+            new AbaloneCoord(5, 2), new AbaloneCoord(3, 1),
+            new AbaloneCoord(4, 1), new AbaloneCoord(5, 1),
+            new AbaloneCoord(3, 0), new AbaloneCoord(4, 0),
+        }; 
+        
+        public static final AbaloneCoord[] P1_GERMAN = {
+            new AbaloneCoord(7, 7), new AbaloneCoord(8, 7),
+            new AbaloneCoord(6, 6), new AbaloneCoord(7, 6),
+            new AbaloneCoord(8, 6), new AbaloneCoord(6, 5),
+            new AbaloneCoord(7, 5), new AbaloneCoord(1, 3),
+            new AbaloneCoord(2, 3), new AbaloneCoord(0, 2),
+            new AbaloneCoord(1, 2), new AbaloneCoord(2, 2),
+            new AbaloneCoord(0, 1), new AbaloneCoord(1, 1)
+        };
+        public static final AbaloneCoord[] P2_GERMAN = {
+            new AbaloneCoord(3, 7), new AbaloneCoord(4, 7),
+            new AbaloneCoord(2, 6), new AbaloneCoord(3, 6),
+            new AbaloneCoord(4, 6), new AbaloneCoord(2, 5),
+            new AbaloneCoord(3, 5), new AbaloneCoord(5, 3),
+            new AbaloneCoord(6, 3), new AbaloneCoord(4, 2),
+            new AbaloneCoord(5, 2), new AbaloneCoord(6, 2),
+            new AbaloneCoord(4, 1), new AbaloneCoord(5, 1),
+        };
     
     private boolean guiFlipped = true;
     private int maxTurns = 0;
