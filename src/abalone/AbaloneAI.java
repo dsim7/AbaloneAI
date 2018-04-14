@@ -38,7 +38,9 @@ public class AbaloneAI implements Runnable {
              //Concurrency stuff... call checkPaused and check running at regular intervals.
              //if not running, should back out completely. abort everything
             
-            minimaxSearch(state, depth++,  transpositionTable);
+            if (minimaxSearch(state, depth++,  transpositionTable) == 1000000) {
+                break;
+            }
         }
     }
     
@@ -179,37 +181,41 @@ public class AbaloneAI implements Runnable {
      * @param depth
      * @return true if the search finds a finished solution
      */
-    private void minimaxSearch(AbaloneState root,
+    private double minimaxSearch(AbaloneState root,
                                int depth,
                                Map<AbaloneState, Integer> transpositionTable) {
         // before computing each state's value, search transposition table to see if
         // we already know it
         //System.out.println("Minimax Search depth: " + depth);
-
+        double result;
+        
         maxScoreSoFar = -1000000;
         minScoreSoFar = 1000000;
         
         long time = System.nanoTime();
         if(root.turn % 2 == 0) {
-            maxMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
+            result = maxMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
         } else {
-            minMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
+            result = minMove(root, 0, depth, maxScoreSoFar, minScoreSoFar);
         }
         if (running) {
             bestMove = bestMoveMidSearch;
         }
         System.out.println("Best move at depth " + depth + ": " + bestMove);
         System.out.println("Minimax depth " + depth + " " + (System.nanoTime() - time));
-       
+        return result;
     }
     
     private double maxMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
         //System.out.println("Minimax : max " + count++);
-        if (curDepth >= depth
-                || state.getStateValueRedPerspective() == -1000000) {
+        if (curDepth >= depth) {
             //maxScoreSoFar = Math.max(maxScoreSoFar, state.getStateValueRedPerspective());
-            return 1000000;
+            return state.getStateValueRedPerspective();
         }
+        /*if (state.getStateValueRedPerspective() == -1000000) {
+            System.out.println("found goal max");
+            return 1000000;
+        }*/
 
         List<AbaloneMove> moves = state.getAllNextMoves();
         
@@ -221,6 +227,11 @@ public class AbaloneAI implements Runnable {
             AbaloneState resultantState = state.getNextState(move);
             
             double result = minMove(resultantState, curDepth + 1, depth, alpha, beta);
+            
+            if (result == 1000000) {
+                bestMoveMidSearch = move;
+                return 1000000;
+            }
             
             if (result > resultantStateValue) {
                 resultantStateValue = result;
@@ -246,9 +257,13 @@ public class AbaloneAI implements Runnable {
     }
     
     private double minMove(AbaloneState state, int curDepth, int depth, double alpha, double beta) {
-        if (curDepth >= depth
-                || state.getStateValueRedPerspective() == 1000000) {
-            return -1000000;
+        if (curDepth >= depth) {
+            //maxScoreSoFar = Math.max(maxScoreSoFar, state.getStateValueRedPerspective());
+            return state.getStateValueRedPerspective();
+        }
+        if (state.getStateValueRedPerspective() == 1000000) {
+            System.out.println("found goal min");
+            return 1000000;
         }
         //System.out.println("Minimax : min");
         List<AbaloneMove> moves = state.getAllNextMoves();
@@ -263,6 +278,8 @@ public class AbaloneAI implements Runnable {
             //AbaloneState resultantState = state.getNextState(moves.get(i));
             
             double result = maxMove(resultantState, curDepth + 1, depth, alpha, beta);
+            
+            
             
             if (result < resultantStateValue) {
                 resultantStateValue = result;

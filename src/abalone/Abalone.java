@@ -83,6 +83,27 @@ public class Abalone {
             new AbaloneCoord(3, 0), new AbaloneCoord(4, 0),
         }; 
         
+        public static final AbaloneCoord[] P1_TEST = {
+            new AbaloneCoord(1, 1), new AbaloneCoord(1, 2),
+            new AbaloneCoord(1, 4), new AbaloneCoord(1, 3),
+            new AbaloneCoord(2, 1), new AbaloneCoord(2, 2),
+            new AbaloneCoord(2, 5), new AbaloneCoord(2, 4),
+            new AbaloneCoord(3, 1), new AbaloneCoord(3, 2),
+            new AbaloneCoord(3, 6), new AbaloneCoord(3, 5),
+            new AbaloneCoord(4, 1), new AbaloneCoord(4, 2)
+        };
+
+        public static final AbaloneCoord[] P2_TEST = {
+            new AbaloneCoord(0, 0), new AbaloneCoord(0, 1),
+            new AbaloneCoord(0, 2), new AbaloneCoord(0, 3),
+            new AbaloneCoord(0, 4), new AbaloneCoord(1, 0),
+            new AbaloneCoord(3, 0), new AbaloneCoord(2, 0),
+            new AbaloneCoord(1, 5), new AbaloneCoord(2, 6),
+            new AbaloneCoord(3, 7), new AbaloneCoord(3, 0),
+            new AbaloneCoord(4, 0), new AbaloneCoord(4, 8),
+        }; 
+        
+        
         public static final AbaloneCoord[] P1_GERMAN = {
             new AbaloneCoord(7, 7), new AbaloneCoord(8, 7),
             new AbaloneCoord(6, 6), new AbaloneCoord(7, 6),
@@ -181,7 +202,7 @@ public class Abalone {
     public Abalone() {    
         this.initSquares();
         this.initGUIs();
-        this.initState(Abalone.P1_STANDARD, Abalone.P2_STANDARD, -1);
+        this.initState(Abalone.P1_BELGIAN, Abalone.P2_BELGIAN, -1);
         p1timer.setRepeats(true);
         p2timer.setRepeats(true);
         
